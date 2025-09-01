@@ -23,8 +23,10 @@ import 'package:fuelmaster/providers/app_settings_provider.dart';
 import 'package:fuelmaster/utils/constants.dart';
 import 'package:fuelmaster/providers/history_provider.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
+  await dotenv.load(fileName: ".env");
   final initialData = await AppInitializer.initialize();
   final SharedPreferences prefs = initialData['sharedPreferences'] as SharedPreferences;
   final Locale initialLocale = initialData['initialLocale'] as Locale;
