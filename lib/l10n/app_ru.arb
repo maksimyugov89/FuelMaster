@@ -1,0 +1,567 @@
+{
+  "app_title": "FuelMaster",
+  "welcome_message": "Добро пожаловать в Fuel Master!",
+  "go_to_history": "Перейти к истории",
+  "history_title": "История расчетов",
+  "select_car": "Выбрать автомобиль",
+  "all_cars": "Все автомобили",
+  "fuel_usage_chart": "График расхода топлива",
+  "no_chart_data": "Нет данных для графика",
+  "history_calculations": "История расчетов",
+  "history_empty": "История пуста",
+  "no_history_for_car": "Нет записей для выбранного автомобиля",
+  "export_record": "Экспортировать запись",
+  "export_email": "Экспортировать через Email",
+  "export_telegram": "Экспортировать через Telegram",
+  "export_whatsapp": "Экспортировать через WhatsApp",
+  "clear_history": "Очистить историю",
+  "clear_history_confirm": "Вы уверены, что хотите очистить историю расчетов?",
+  "cancel": "Отмена",
+  "clear": "Очистить",
+  "history_cleared": "История очищена",
+  "history_empty_export": "История пуста",
+  "fuel_history_message": "История расчетов топлива",
+  "email_subject": "История топлива",
+  "error": "Ошибка",
+  "error_email": "Не удалось открыть почтовый клиент",
+  "error_telegram": "Не удалось открыть Telegram",
+  "error_whatsapp": "Не удалось открыть WhatsApp",
+  "other": "Другое",
+  "share_history": "Поделиться историей",
+  "select_share_method": "Выберите способ отправки истории",
+  "invalid_input": "Неверный формат данных",
+  "out_of_range": "Значения вне допустимого диапазона",
+  "final_mileage_greater": "Конечный пробег должен быть больше начального",
+  "highway_not_exceed_total": "Пробег по трассе не должен превышать общий",
+  "date": "Дата",
+  "brand": "Марка",
+  "model": "Модель",
+  "initial_mileage": "Начальный пробег",
+  "final_mileage": "Конечный пробег",
+  "total_mileage": "Общий пробег",
+  "city_mileage": "Пробег по городу",
+  "city_norm": "Городская норма",
+  "highway_mileage": "Пробег по трассе",
+  "highway_norm": "Трассовая норма",
+  "refuel": "Заправка",
+  "fuel_used": "Расход",
+  "final_fuel": "Остаток",
+  "liters": "л",
+  "kilometers": "км",
+  "success": "Расчет выполнен",
+  "current_calculations": "Текущие расчеты",
+  "no_calculations": "Нет доступных расчетов",
+  "@no_calculations": {
+    "description": "Сообщение, отображаемое, когда нет расчетов для отображения"
+  },
+  "record_deleted": "Запись успешно удалена",
+  "@record_deleted": {
+    "description": "Сообщение, отображаемое при успешном удалении записи расчета"
+  },
+  "ok": "ОК",
+  "@ok": {
+    "description": "Текст для кнопки ОК в диалогах"
+  },
+  "back": "Назад",
+  "logo_not_found": "Логотип не найден",
+  "initial_mileage_short": "Нач. км",
+  "final_mileage_short": "Кон. км",
+  "initial_fuel_short": "Нач. топл.",
+  "refuel_short": "Заправка",
+  "highway_distance_short": "Трасса км",
+  "theme": "Тема",
+  "light": "Светлая",
+  "dark": "Темная",
+  "auto": "Авто",
+  "@auto": {
+    "description": "Метка для автоматического выбора темы"
+  },
+  "theme_changed": "Тема изменена на %s",
+  "language": "Язык",
+  "russian": "Русский",
+  "english": "Английский",
+  "language_changed": "Язык изменен на %s",
+  "step1": "Введите данные автомобиля (марка, модель, нормы расхода).",
+  "step2": "Рассчитайте расход топлива, указав пробег и заправки.",
+  "step3": "Просмотрите историю и экспортируйте данные.",
+  "step1_title": "Добавьте свой автомобиль",
+  "step1_description": "Добавьте данные о своем автомобиле, включая марку, модель и нормы расхода топлива.",
+  "step2_title": "Рассчитывайте расход топлива",
+  "step2_description": "Используйте калькулятор для отслеживания расхода топлива на основе пробега и заправок.",
+  "step3_title": "Отслеживайте свою историю",
+  "step3_description": "Просматривайте историю расхода топлива, экспортируйте данные и получайте статистику.",
+  "start_app": "Начать использование",
+  "enter_car_details": "Введите данные автомобиля",
+  "save_and_continue": "Сохранить и продолжить",
+  "next": "Далее",
+  "previous_cars": "Ранее введенные автомобили",
+  "no_cars": "Нет добавленных автомобилей",
+  "delete_car": "Удалить автомобиль",
+  "delete_car_confirm": "Вы уверены, что хотите удалить этот автомобиль?",
+  "fill_all_fields": "Заполните все поля!",
+  "delete": "Удалить",
+  "settings": "Настройки",
+  "home": "Главная",
+  "history": "История",
+  "liters_per_100km": "л/100км",
+  "calculate": "Рассчитать",
+  "save_and_back": "Сохранить",
+  "continue_calculations": "Продолжить",
+  "your_cars": "Ваши автомобили",
+  "car_saved": "Автомобиль успешно сохранён",
+  "@car_saved": {
+    "description": "Сообщение, отображаемое при успешном сохранении автомобиля"
+  },
+  "create_new_car": "Создать новый автомобиль",
+  "@create_new_car": {
+    "description": "Текст кнопки для создания нового автомобиля"
+  },
+  "configure_cars": "Настройка твоих авто",
+  "@configure_cars": {
+    "description": "Текст кнопки для перехода к настройке автомобилей"
+  },
+  "select_period": "Выбрать период",
+  "@select_period": {
+    "description": "Текст кнопки для выбора диапазона дат"
+  },
+  "reset_period": "Сброс периода",
+  "@reset_period": {
+    "description": "Текст кнопки для сброса выбранного диапазона дат"
+  },
+  "share_all_history": "Поделиться всей историей",
+  "@share_all_history": {
+    "description": "Текст кнопки для экспорта всей истории расчетов"
+  },
+  "select_car": "Выбрать автомобиль",
+  "go_to_calculator": "Перейти к калькулятору",
+  "calculation_complete": "Расчёт завершён",
+  "calculation_options": "Для продолжения вы можете сохранить текущий расчёт и вернуться в главное меню или продолжить расчёты в этом окне.",
+  "duplicate_model": "Эта модель уже используется!",
+  "@duplicate_model": {
+    "description": "Сообщение, отображаемое при обнаружении дубликата модели"
+  },
+  "invalid_norm": "Неверный формат нормы расхода!",
+  "@invalid_norm": {
+    "description": "Сообщение, отображаемое при неверном вводе нормы расхода"
+  },
+  "positive_norm": "Норма расхода должна быть положительной!",
+  "@positive_norm": {
+    "description": "Сообщение, отображаемое при отрицательной норме расхода"
+  },
+  "loading": "Загрузка...",
+  "@loading": {
+    "description": "Текст, отображаемый на заставке во время загрузки приложения"
+  },
+  "ad_not_available": "Реклама недоступна",
+  "city_mileage": "Пробег по городу",
+  "highway_mileage": "Пробег по трассе",
+  "period": "Период",
+  "@city_mileage": {
+    "description": "Метка для пробега по городу в истории расчётов"
+  },
+  "@highway_mileage": {
+    "description": "Метка для пробега по трассе в истории расчётов"
+  },
+  "@period": {
+    "description": "Метка для периода дат на странице истории"
+  },
+  "ad_load_failed": "Не удалось загрузить рекламу, попробуйте позже",
+  "ad_show_failed": "Не удалось показать рекламу, попробуйте снова",
+  "continue_calculation": "Продолжить расчёт",
+  "choose_calculation_option": "Хотите начать новый расчёт или продолжить текущий?",
+  "@choose_calculation_option": {
+    "description": "Подсказка для выбора между новым или продолжаемым расчётом"
+  },
+  "start_new_calculation": "Начать новый расчёт",
+  "@start_new_calculation": {
+    "description": "Текст кнопки для начала нового расчёта"
+  },
+  "continue_current_calculation": "Продолжить текущий расчёт",
+  "@continue_current_calculation": {
+    "description": "Текст кнопки для продолжения текущего расчёта"
+  },
+  "new_calculation_started": "Начался новый расчёт",
+  "@new_calculation_started": {
+    "description": "Сообщение, отображаемое при начале нового расчёта"
+  },
+  "continued_calculation": "Продолжен текущий расчёт",
+  "@continued_calculation": {
+    "description": "Сообщение, отображаемое при продолжении текущего расчёта"
+  },
+  "no_previous_calculation": "Нет предыдущих расчётов",
+  "@no_previous_calculation": {
+    "description": "Сообщение, отображаемое, когда нет предыдущих расчётов для продолжения"
+  },
+  "negative_final_fuel": "Остаток топлива из предыдущего расчёта отрицательный, начните новый расчёт",
+  "@negative_final_fuel": {
+    "description": "Сообщение, отображаемое, когда остаток топлива из предыдущего расчёта отрицательный"
+  },
+  "confirm_save_before_exit": "У вас есть несохранённые расчёты. Сохранить перед выходом?",
+  "@confirm_save_before_exit": {
+    "description": "Подсказка, отображаемая при выходе из FuelCalculatorPage с несохранёнными расчётами"
+  },
+  "generation": "Поколение",
+  "@generation": {
+    "description": "Метка для поколения автомобиля"
+  },
+  "modification": "Модификация",
+  "@modification": {
+    "description": "Метка для модификации автомобиля"
+  },
+  "year_from": "Год начала выпуска",
+  "@year_from": {
+    "description": "Метка для года начала производства автомобиля"
+  },
+  "year_to": "Год окончания выпуска",
+  "@year_to": {
+    "description": "Метка для года окончания производства автомобиля"
+  },
+  "engine_volume": "Объём двигателя",
+  "@engine_volume": {
+    "description": "Метка для объёма двигателя автомобиля"
+  },
+  "power_hp": "Мощность (л.с.)",
+  "@power_hp": {
+    "description": "Метка для мощности автомобиля в лошадиных силах"
+  },
+  "fuel_type": "Тип топлива",
+  "@fuel_type": {
+    "description": "Метка для типа топлива автомобиля"
+  },
+  "petrol": "Бензин",
+  "@petrol": {
+    "description": "Метка для бензинового типа топлива"
+  },
+  "diesel": "Дизель",
+  "@diesel": {
+    "description": "Метка для дизельного типа топлива"
+  },
+  "lpg": "Сжиженный газ",
+  "@lpg": {
+    "description": "Метка для типа топлива СНГ"
+  },
+  "cng": "Компрессированный газ",
+  "@cng": {
+    "description": "Метка для типа топлива КПГ"
+  },
+  "transmission_type": "Тип КПП",
+  "@transmission_type": {
+    "description": "Метка для типа коробки передач автомобиля"
+  },
+  "transmission_speeds": "Количество передач",
+  "@transmission_speeds": {
+    "description": "Метка для количества передач в коробке передач"
+  },
+  "combined_norm": "Смешанный расход топлива",
+  "@combined_norm": {
+    "description": "Метка для смешанного расхода топлива"
+  },
+  "base_city_norm": "Базовая норма по городу",
+  "@base_city_norm": {
+    "description": "Метка для базовой нормы расхода топлива по городу"
+  },
+  "base_highway_norm": "Базовая норма по трассе",
+  "@base_highway_norm": {
+    "description": "Метка для базовой нормы расхода топлива по трассе"
+  },
+  "base_combined_norm": "Базовая смешанная норма",
+  "@base_combined_norm": {
+    "description": "Метка для базовой смешанной нормы расхода топлива"
+  },
+  "city": "Город",
+  "@city": {
+    "description": "Метка для ввода города в расчёте топлива"
+  },
+  "weather_multiplier": "Погодный коэффициент",
+  "@weather_multiplier": {
+    "description": "Метка для погодного коэффициента в расчёте топлива"
+  },
+  "invalid_engine_volume": "Объём двигателя должен быть от 0.5 до 10 литров",
+  "@invalid_engine_volume": {
+    "description": "Сообщение, отображаемое при неверном диапазоне объёма двигателя"
+  },
+  "premium_subscription": "Премиум-подписка",
+  "@premium_subscription": {
+    "description": "Метка для опции премиум-подписки"
+  },
+  "buy": "Купить",
+  "@buy": {
+    "description": "Текст кнопки для покупки премиум-подписки"
+  },
+  "premium_active": "Премиум активирован",
+  "@premium_active": {
+    "description": "Сообщение, отображаемое при активной премиум-подписке"
+  },
+  "store_unavailable": "Магазин недоступен",
+  "@store_unavailable": {
+    "description": "Сообщение, отображаемое при недоступности магазина покупок"
+  },
+  "product_not_found": "Премиум-продукт не найден",
+  "@product_not_found": {
+    "description": "Сообщение, отображаемое при отсутствии премиум-продукта"
+  },
+  "premium_purchase_in_progress": "Покупка в процессе",
+  "@premium_purchase_in_progress": {
+    "description": "Сообщение, отображаемое во время покупки премиум-подписки"
+  },
+  "premium_activated": "Премиум активирован",
+  "@premium_activated": {
+    "description": "Сообщение, отображаемое при успешной активации премиум-подписки"
+  },
+  "purchase_error": "Ошибка покупки",
+  "@purchase_error": {
+    "description": "Сообщение, отображаемое при сбое покупки премиум-подписки"
+  },
+  "weather_unavailable": "Погодные данные недоступны, используются значения по умолчанию",
+  "@weather_unavailable": {
+    "description": "Сообщение, отображаемое при недоступности погодных данных"
+  },
+  "enter_city": "Введите город",
+  "@enter_city": {
+    "description": "Сообщение, отображаемое при пустом поле ввода города"
+  },
+  "register": "Регистрация",
+  "@register": {
+    "description": "Метка для страницы регистрации и кнопки"
+  },
+  "email_or_phone": "Email или телефон",
+  "@email_or_phone": {
+    "description": "Метка для поля ввода email или телефона"
+  },
+  "password": "Пароль",
+  "@password": {
+    "description": "Метка для поля ввода пароля"
+  },
+  "detect_location": "Определить текущее местоположение",
+  "@detect_location": {
+    "description": "Текст кнопки для определения текущего местоположения"
+  },
+  "location_service_disabled": "Службы геолокации отключены",
+  "@location_service_disabled": {
+    "description": "Сообщение, отображаемое при отключённых службах геолокации"
+  },
+  "location_permission_denied": "Разрешение на геолокацию отклонено",
+  "@location_permission_denied": {
+    "description": "Сообщение, отображаемое при отклонении разрешения на геолокацию"
+  },
+  "location_permission_denied_forever": "Разрешение на геолокацию отклонено навсегда",
+  "@location_permission_denied_forever": {
+    "description": "Сообщение, отображаемое при постоянном отклонении разрешения на геолокацию"
+  },
+  "invalid_email_or_phone": "Неверный формат email или номера телефона",
+  "@invalid_email_or_phone": {
+    "description": "Сообщение, отображаемое при неверном формате email или номера телефона"
+  },
+  "api_key_missing": "Ключ Google API отсутствует",
+  "@api_key_missing": {
+    "description": "Сообщение, отображаемое, когда ключ Google API не настроен"
+  },
+  "edit_car": "Редактировать автомобиль",
+  "@edit_car": {
+    "description": "Метка для редактирования автомобиля"
+  },
+  "vehicleType": "Тип транспортного средства",
+  "selectVehicleType": "Выберите тип транспортного средства",
+  "passengerCar": "Легковой",
+  "bus": "Автобус",
+  "truck": "Грузовик",
+  "tractor": "Тягач",
+  "dumpTruck": "Самосвал",
+  "van": "Фургон",
+  "vanWithoutCargo": "Фургон без учета груза (добавка 10% к норме)",
+  "trailerMass": "Масса прицепа (т)",
+  "payloadCapacity": "Грузоподъемность (т)",
+  "tripFuelRate": "Норма расхода топлива на ездку (л)",
+  "heaterRate": "Норма расхода топлива на отопитель (л/ч)",
+  "heaterTime": "Время работы отопителя (ч)",
+  "mileage": "Пробег (км)",
+  "cargoMass": "Масса груза (т)",
+  "cargoMileage": "Пробег с грузом (км)",
+  "trips": "Количество ездок",
+  "correctionFactor": "Поправочный коэффициент (%)",
+  "autoCorrectionFactor": "Использовать автоматический расчет коэффициента",
+  "winterConditions": "Зимние условия (+10%)",
+  "mountainConditions": "Горная местность (+15%)",
+  "airConditioner": "Кондиционер (+7%)",
+  "calculatedFuelConsumption": "Рассчитанный расход топлива",
+  "electric": "Электро",
+  "gas_diesel": "Газодизель",
+  "adjustments": "Корректировки",
+  "history_exported": "История экспортирована",
+  "export": "Экспорт",
+  "geocoding_error": "Не удалось определить местоположение. Попробуйте ввести город вручную.",
+  "@geocoding_error": {
+    "description": "Сообщение, отображаемое при сбое геокодирования"
+  },
+  "api_key_invalid": "Недействительный API-ключ. Проверьте настройки.",
+  "@api_key_invalid": {
+    "description": "Сообщение, отображаемое при неверном API-ключе"
+  },
+  "location_service_disabled": "Службы геолокации отключены",
+  "@location_service_disabled": {
+    "description": "Сообщение, отображаемое при отключённых службах геолокации"
+  },
+  "location_permission_denied": "Разрешение на геолокацию отклонено",
+  "@location_permission_denied": {
+    "description": "Сообщение, отображаемое при отклонении разрешения на геолокацию"
+  },
+  "location_permission_denied_forever": "Разрешение на геолокацию отклонено навсегда",
+  "@location_permission_denied_forever": {
+    "description": "Сообщение, отображаемое при постоянном отклонении разрешения на геолокацию"
+  },
+  "winter": "Зима",
+  "@winter": {
+    "description": "Метка для переключателя зимних условий в расчёте топлива"
+  },
+  "ac": "Кондиционер",
+  "@ac": {
+    "description": "Метка для переключателя кондиционера в расчёте топлива"
+  },
+  "mountain": "Горная местность",
+  "@mountain": {
+    "description": "Метка для переключателя горной местности в расчёте топлива"
+  },
+  "vehicle_type": "Тип транспортного средства",
+  "passenger_car": "Легковой автомобиль",
+  "bus": "Автобус",
+  "truck": "Грузовой бор. автомобиль",
+  "tractor": "Тягач",
+  "dump_truck": "Самосвал",
+  "van": "Фургон",
+  "special_equipment": "Спецтехника",
+  "select_preset_car": "Выберите предустановленный автомобиль",
+  "custom_input": "Ручной ввод",
+  "license_plate": "ГРЗ",
+  "fill_license_plate": "Заполните ГРЗ",
+  "duplicate_license_plate": "ГРЗ уже используется",
+  "search_car": "Поиск автомобиля",
+  "car_deleted": "Автомобиль удалён",
+  "select_brand": "Выберите марку",
+  "select_model": "Выберите модель",
+  "select_generation": "Выберите поколение",
+  "@select_brand": {
+    "description": "Метка для выбора марки автомобиля из выпадающего списка"
+  },
+  "@select_model": {
+    "description": "Метка для выбора модели автомобиля из выпадающего списка"
+  },
+  "@select_generation": {
+    "description": "Метка для выбора поколения автомобиля из выпадающего списка"
+  },
+  "no_data_found": "Данные не найдены",
+  "no_cars_available": "Нет доступных автомобилей",
+  "fuel_advice_button": "AI совет по экономии",
+  "@fuel_advice_button": {
+    "description": "Текст кнопки для запроса AI-советов по экономии топлива"
+  },
+  "fuel_advice_title": "Советы по экономии топлива",
+  "@fuel_advice_title": {
+    "description": "Заголовок диалога с AI-советами по экономии топлива"
+  },
+  "premium_feature": "Эта функция доступна только для премиум-пользователей",
+  "@premium_feature": {
+    "description": "Сообщение, отображаемое при попытке доступа к премиум-функции не премиум-пользователем"
+  },
+  "share": "Поделиться",
+  "@share": {
+    "description": "Текст кнопки для шаринга контента, например, AI-советов по экономии топлива"
+  },
+  "insufficient_balance": "Недостаточно баланса для AI-советов. Пополните счёт.",
+  "@insufficient_balance": {
+    "description": "Сообщение, отображаемое при ошибке 402 DeepSeek API из-за недостаточного баланса"
+  },
+  "error_sharing": "Ошибка при попытке поделиться советом",
+  "no_advice_to_share": "Нет советов для отправки",
+  "search": "Поиск",
+  "correction_factor": "Поправочный коэффициент (%)",
+  "@correction_factor": {
+    "description": "Метка для поля ввода поправочного коэффициента в расчете топлива для автобусов"
+  },
+  "heater_operating_time": "Время работы отопителя (ч)",
+  "@heater_operating_time": {
+    "description": "Метка для поля ввода времени работы отопителя в расчете топлива для автобусов"
+  },
+  "invalid_correction_factor": "Поправочный коэффициент должен быть в диапазоне -50..50%",
+  "@invalid_correction_factor": {
+    "description": "Сообщение, отображаемое, когда поправочный коэффициент вне допустимого диапазона"
+  },
+  "invalid_heater_time": "Время работы отопителя должно быть неотрицательным",
+  "@invalid_heater_time": {
+    "description": "Сообщение, отображаемое, когда время работы отопителя отрицательное"
+  },
+  "heater_fuel_consumption": "Расход топлива на отопитель",
+  "@heater_fuel_consumption": {
+    "description": "Label for heater fuel consumption"
+  },
+  "passenger_capacity": "Пассажировместимость",
+  "@passenger_capacity": {
+    "description": "Label for passenger capacity"
+  },
+  "sync_success": "Данные успешно синхронизированы", 
+  "sync_error": "Не удалось синхронизировать данные. Попробуйте снова.",
+  "register": "Регистрация",
+  "login": "Вход",
+  "email": "Электронная почта",
+  "password": "Пароль",
+  "city": "Город",
+  "enter_city": "Введите ваш город",
+  "detect_location": "Определить местоположение",
+  "fill_all_fields": "Заполните все поля",
+  "invalid_email": "Недействительный адрес электронной почты",
+  "weak_password": "Пароль должен содержать не менее 6 символов",
+  "registration_success": "Регистрация прошла успешно",
+  "email_already_in_use": "Электронная почта уже используется",
+  "login_success": "Вход выполнен успешно",
+  "invalid_credentials": "Недействительный email или пароль",
+  "register_instead": "Нет аккаунта? Зарегистрируйтесь",
+  "login_instead": "Уже есть аккаунт? Войдите",
+  "error": "Произошла ошибка",
+  "geocoding_error": "Не удалось определить местоположение",
+  "location_service_disabled": "Службы геолокации отключены",
+  "location_permission_denied": "Разрешение на геолокацию отклонено",
+  "location_permission_denied_forever": "Разрешение на геолокацию отклонено навсегда",
+  "api_key_invalid": "Недействительный ключ API",
+  "sign_out": "Выйти из аккаунта",
+  "sign_out_success": "Выход выполнен успешно",
+  "loading_car_database": "Загрузка базы данных автотранспорта...",
+  "duplicate_record": "Расчет уже сохранен.",
+  "yes": "Да",
+  "no": "Нет",
+  "unsaved_changes": "Несохраненные изменения",
+  "save": "Сохранить",
+  "history_label_date": "Дата",
+  "history_label_brand": "Марка",
+  "history_label_license_plate": "Гос. номер",
+  "history_label_initial_mileage": "Начальный пробег",
+  "history_label_final_mileage": "Конечный пробег",
+  "history_label_total_mileage": "Общий пробег",
+  "history_label_city_mileage": "Пробег по городу",
+  "history_label_highway_mileage": "Пробег по трассе",
+  "history_label_city_norm": "Городская норма",
+  "history_label_highway_norm": "Трассовая норма",
+  "history_label_initial_fuel": "Начальное топливо",
+  "history_label_refuel": "Заправка",
+  "history_label_fuel_used": "Расход",
+  "history_label_final_fuel": "Остаток",
+  "condition_winter": "Зима",
+  "condition_ac": "Кондиционер",
+  "condition_mountain": "Горная местность",
+  "liters": "л",
+  "confirm_delete_record_title": "Подтвердите удаление",
+  "confirm_delete_record_content": "Вы уверены, что хотите удалить эту запись?",
+  "no_modification": "Нет модификации",
+  "correction_factor_tooltip": "Этот коэффициент корректирует норму расхода топлива.\n\nАвтоматический режим:\nПри включении этой опции, коэффициент рассчитывается сам на основе актуальных погодных данных (температура, ветер, осадки). Это позволяет точно учесть влияние погоды на расход.\n\nРучной режим:\nКоэффициент вводится вручную в процентах (%) и может быть положительным (увеличивает расход) или отрицательным (уменьшает). Используйте его для учета уникальных условий, не связанных с погодой. Например: плохое состояние дороги, частые пробки, агрессивный стиль вождения или техническое состояние автомобиля.",
+  "heater_operating_time_tooltip": "Введите общее время работы автономного отопителя салона в часах. Расход топлива отопителем рассчитывается отдельно и суммируется с основным расходом на движение. Норма расхода для отопителя задается в настройках автомобиля.",
+  "auto_factor_error": "Не удалось получить погодные данные. Включен ручной ввод.",
+  "onboarding_title": "Ваш личный топливный ассистент",
+  "onboarding_step1_title": "Умный учет автомобилей",
+  "onboarding_step1_desc": "Добавляйте свои автомобили вручную или выбирайте из обширной базы данных с автозаполнением норм расхода. Все ваши машины — в одном удобном списке.",
+  "onboarding_step2_title": "Точные расчеты",
+  "onboarding_step2_desc": "Используйте калькулятор для точного расчета расхода топлива, учитывая зимние условия, работу кондиционера и поездки в горной местности. Для автобусов доступен учет работы отопителя.",
+  "onboarding_step3_title": "Анализ и экспорт",
+  "onboarding_step3_desc": "Следите за статистикой на наглядных графиках, просматривайте детальную историю расчетов и делитесь данными в удобном формате.",
+  "onboarding_button": "Начать работу",
+  "car_form_step1_title": "Шаг 1: Идентификация",
+  "car_form_step2_title": "Шаг 2: Выбор модели (автозаполнение)",
+  "car_form_step3_title": "Шаг 3: Нормы расхода и детали"
+}

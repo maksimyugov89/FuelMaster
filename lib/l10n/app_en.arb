@@ -1,0 +1,567 @@
+{
+  "app_title": "FuelMaster",
+  "welcome_message": "Welcome to Fuel Master!",
+  "go_to_history": "Go to History",
+  "history_title": "Calculation History",
+  "select_car": "Select Car",
+  "all_cars": "All Cars",
+  "fuel_usage_chart": "Fuel Usage Chart",
+  "no_chart_data": "No Chart Data",
+  "history_calculations": "History Calculations",
+  "history_empty": "History is Empty",
+  "no_history_for_car": "No Records for Selected Car",
+  "export_record": "Export Record",
+  "export_email": "Export via Email",
+  "export_telegram": "Export via Telegram",
+  "export_whatsapp": "Export via WhatsApp",
+  "clear_history": "Clear History",
+  "clear_history_confirm": "Are you sure you want to clear the calculation history?",
+  "cancel": "Cancel",
+  "clear": "Clear",
+  "history_cleared": "History Cleared",
+  "history_empty_export": "History is Empty",
+  "fuel_history_message": "Fuel Calculation History",
+  "email_subject": "Fuel History",
+  "error": "Error",
+  "error_email": "Unable to open email client",
+  "error_telegram": "Unable to open Telegram",
+  "error_whatsapp": "Unable to open WhatsApp",
+  "other": "Other",
+  "share_history": "Share History",
+  "select_share_method": "Select a method to share the history",
+  "invalid_input": "Invalid input format",
+  "out_of_range": "Values out of range",
+  "final_mileage_greater": "Final mileage must be greater than initial",
+  "highway_not_exceed_total": "Highway mileage cannot exceed total mileage",
+  "date": "Date",
+  "brand": "Brand",
+  "model": "Model",
+  "initial_mileage": "Initial Mileage",
+  "final_mileage": "Final Mileage",
+  "total_mileage": "Total Mileage",
+  "city_mileage": "City Mileage",
+  "city_norm": "City Norm",
+  "highway_mileage": "Highway Mileage",
+  "highway_norm": "Highway Norm",
+  "refuel": "Refuel",
+  "fuel_used": "Fuel Used",
+  "final_fuel": "Final Fuel",
+  "liters": "liters",
+  "kilometers": "km",
+  "success": "Calculation completed",
+  "current_calculations": "Current Calculations",
+  "no_calculations": "No calculations available",
+  "@no_calculations": {
+    "description": "Message displayed when there are no calculations to show"
+  },
+  "record_deleted": "Record deleted successfully",
+  "@record_deleted": {
+    "description": "Message shown when a calculation record is successfully deleted"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "Text for the OK button in dialogs"
+  },
+  "back": "Back",
+  "logo_not_found": "Logo not found",
+  "initial_mileage_short": "Init. km",
+  "final_mileage_short": "Final km",
+  "initial_fuel_short": "Init. Fuel",
+  "refuel_short": "Refuel",
+  "highway_distance_short": "Highway km",
+  "theme": "Theme",
+  "light": "Light",
+  "dark": "Dark",
+  "auto": "Auto",
+  "@auto": {
+    "description": "Label for automatic theme selection"
+  },
+  "theme_changed": "Theme changed to %s",
+  "language": "Language",
+  "russian": "Russian",
+  "english": "English",
+  "language_changed": "Language changed to %s",
+  "step1": "Enter car details (brand, model, fuel norms).",
+  "step2": "Calculate fuel consumption by entering mileage and refueling data.",
+  "step3": "View history and export data.",
+  "step1_title": "Add Your Car",
+  "step1_description": "Add your car's details, including make, model, and fuel consumption rates.",
+  "step2_title": "Calculate Fuel Consumption",
+  "step2_description": "Use the calculator to track your fuel usage based on mileage and refueling.",
+  "step3_title": "Track Your History",
+  "step3_description": "View your fuel consumption history, export data, and get insights.",
+  "start_app": "Start Using",
+  "enter_car_details": "Enter Car Details",
+  "save_and_continue": "Save and Continue",
+  "next": "Next",
+  "previous_cars": "Previously Added Cars",
+  "no_cars": "No cars added",
+  "delete_car": "Delete Car",
+  "delete_car_confirm": "Are you sure you want to delete this car?",
+  "fill_all_fields": "Please fill all fields!",
+  "delete": "Delete",
+  "settings": "Settings",
+  "home": "Home",
+  "history": "History",
+  "liters_per_100km": "L/100km",
+  "calculate": "Calculate",
+  "save_and_back": "Save",
+  "continue_calculations": "Continue",
+  "your_cars": "Your Cars",
+  "car_saved": "Car saved successfully",
+  "@car_saved": {
+    "description": "Message shown when a car is successfully saved"
+  },
+  "create_new_car": "Create New Car",
+  "@create_new_car": {
+    "description": "Button text for creating a new car"
+  },
+  "configure_cars": "Configure Your Cars",
+  "@configure_cars": {
+    "description": "Button text for navigating to car configuration"
+  },
+  "select_period": "Select Period",
+  "@select_period": {
+    "description": "Button text for selecting a date range"
+  },
+  "reset_period": "Reset Period",
+  "@reset_period": {
+    "description": "Button text for resetting the selected date range"
+  },
+  "share_all_history": "Share All History",
+  "@share_all_history": {
+    "description": "Button text for sharing the entire calculation history"
+  },
+  "select_car": "Select a car",
+  "go_to_calculator": "Go to Calculator",
+  "calculation_complete": "Calculation Complete",
+  "calculation_options": "To continue, you can save the current calculation and return to the main menu or continue calculations in this window.",
+  "duplicate_model": "This model is already in use!",
+  "@duplicate_model": {
+    "description": "Message shown when a duplicate model is detected"
+  },
+  "invalid_norm": "Invalid fuel norm format!",
+  "@invalid_norm": {
+    "description": "Message shown when the fuel norm input is invalid"
+  },
+  "positive_norm": "Fuel norm must be positive!",
+  "@positive_norm": {
+    "description": "Message shown when the fuel norm is not positive"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Text displayed on the splash screen while the app is loading"
+  },
+  "ad_not_available": "Advertisement not available",
+  "city_mileage": "City Mileage",
+  "highway_mileage": "Highway Mileage",
+  "period": "Period",
+  "@city_mileage": {
+    "description": "Label for city mileage in fuel calculation history"
+  },
+  "@highway_mileage": {
+    "description": "Label for highway mileage in fuel calculation history"
+  },
+  "@period": {
+    "description": "Label for date range period in history page"
+  },
+  "ad_load_failed": "Failed to load ad, please try again later",
+  "ad_show_failed": "Failed to show ad, please try again",
+  "continue_calculation": "Continue Calculation",
+  "choose_calculation_option": "Do you want to start a new calculation or continue the current one?",
+  "@choose_calculation_option": {
+    "description": "Prompt for choosing between new or continued calculation"
+  },
+  "start_new_calculation": "Start New Calculation",
+  "@start_new_calculation": {
+    "description": "Button text for starting a new calculation"
+  },
+  "continue_current_calculation": "Continue Current Calculation",
+  "@continue_current_calculation": {
+    "description": "Button text for continuing the current calculation"
+  },
+  "new_calculation_started": "New calculation started",
+  "@new_calculation_started": {
+    "description": "Message shown when a new calculation is started"
+  },
+  "continued_calculation": "Continued current calculation",
+  "@continued_calculation": {
+    "description": "Message shown when continuing the current calculation"
+  },
+  "no_previous_calculation": "No previous calculations available",
+  "@no_previous_calculation": {
+    "description": "Message shown when there are no previous calculations to continue"
+  },
+  "negative_final_fuel": "Previous final fuel is negative, please start a new calculation",
+  "@negative_final_fuel": {
+    "description": "Message shown when the final fuel from the previous calculation is negative"
+  },
+  "confirm_save_before_exit": "You have unsaved calculations. Save before exiting?",
+  "@confirm_save_before_exit": {
+    "description": "Prompt shown when exiting FuelCalculatorPage with unsaved calculations"
+  },
+  "generation": "Generation",
+  "@generation": {
+    "description": "Label for car generation"
+  },
+  "modification": "Modification",
+  "@modification": {
+    "description": "Label for car modification"
+  },
+  "year_from": "Year From",
+  "@year_from": {
+    "description": "Label for car's start production year"
+  },
+  "year_to": "Year To",
+  "@year_to": {
+    "description": "Label for car's end production year"
+  },
+  "engine_volume": "Engine Volume",
+  "@engine_volume": {
+    "description": "Label for car's engine volume"
+  },
+  "power_hp": "Power (HP)",
+  "@power_hp": {
+    "description": "Label for car's horsepower"
+  },
+  "fuel_type": "Fuel Type",
+  "@fuel_type": {
+    "description": "Label for car's fuel type"
+  },
+  "petrol": "Petrol",
+  "@petrol": {
+    "description": "Label for petrol fuel type"
+  },
+  "diesel": "Diesel",
+  "@diesel": {
+    "description": "Label for diesel fuel type"
+  },
+  "lpg": "LPG",
+  "@lpg": {
+    "description": "Label for LPG fuel type"
+  },
+  "cng": "CNG",
+  "@cng": {
+    "description": "Label for CNG fuel type"
+  },
+  "transmission_type": "Transmission Type",
+  "@transmission_type": {
+    "description": "Label for car's transmission type"
+  },
+  "transmission_speeds": "Transmission Speeds",
+  "@transmission_speeds": {
+    "description": "Label for number of transmission speeds"
+  },
+  "combined_norm": "Combined Fuel Consumption",
+  "@combined_norm": {
+    "description": "Label for combined fuel consumption"
+  },
+  "base_city_norm": "Base City Norm",
+  "@base_city_norm": {
+    "description": "Label for base city fuel consumption norm"
+  },
+  "base_highway_norm": "Base Highway Norm",
+  "@base_highway_norm": {
+    "description": "Label for base highway fuel consumption norm"
+  },
+  "base_combined_norm": "Base Combined Norm",
+  "@base_combined_norm": {
+    "description": "Label for base combined fuel consumption norm"
+  },
+  "city": "City",
+  "@city": {
+    "description": "Label for city input in fuel calculation"
+  },
+  "weather_multiplier": "Weather Multiplier",
+  "@weather_multiplier": {
+    "description": "Label for weather multiplier in fuel calculation"
+  },
+  "invalid_engine_volume": "Engine volume must be between 0.5 and 10 liters",
+  "@invalid_engine_volume": {
+    "description": "Message shown when engine volume is out of valid range"
+  },
+  "premium_subscription": "Premium Subscription",
+  "@premium_subscription": {
+    "description": "Label for premium subscription option"
+  },
+  "buy": "Buy",
+  "@buy": {
+    "description": "Button text for purchasing premium subscription"
+  },
+  "premium_active": "Premium Active",
+  "@premium_active": {
+    "description": "Message shown when premium subscription is active"
+  },
+  "store_unavailable": "Store is unavailable",
+  "@store_unavailable": {
+    "description": "Message shown when in-app purchase store is unavailable"
+  },
+  "product_not_found": "Premium product not found",
+  "@product_not_found": {
+    "description": "Message shown when premium product is not found"
+  },
+  "premium_purchase_in_progress": "Purchase in progress",
+  "@premium_purchase_in_progress": {
+    "description": "Message shown when premium purchase is in progress"
+  },
+  "premium_activated": "Premium activated",
+  "@premium_activated": {
+    "description": "Message shown when premium subscription is successfully activated"
+  },
+  "purchase_error": "Purchase error",
+  "@purchase_error": {
+    "description": "Message shown when premium purchase fails"
+  },
+  "weather_unavailable": "Weather data unavailable, using default values",
+  "@weather_unavailable": {
+    "description": "Message shown when weather data cannot be retrieved"
+  },
+  "enter_city": "Enter city",
+  "@enter_city": {
+    "description": "Message shown when city input is empty"
+  },
+  "register": "Register",
+  "@register": {
+    "description": "Label for registration page and button"
+  },
+  "email_or_phone": "Email or Phone",
+  "@email_or_phone": {
+    "description": "Label for email or phone input field"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Label for password input field"
+  },
+  "detect_location": "Detect Current Location",
+  "@detect_location": {
+    "description": "Button text for detecting current location"
+  },
+  "location_service_disabled": "Location services are disabled",
+  "@location_service_disabled": {
+    "description": "Message shown when location services are disabled"
+  },
+  "location_permission_denied": "Location permission denied",
+  "@location_permission_denied": {
+    "description": "Message shown when location permission is denied"
+  },
+  "location_permission_denied_forever": "Location permission denied forever",
+  "@location_permission_denied_forever": {
+    "description": "Message shown when location permission is permanently denied"
+  },
+  "invalid_email_or_phone": "Invalid email or phone number format",
+  "@invalid_email_or_phone": {
+    "description": "Message shown when email or phone number format is invalid"
+  },
+  "api_key_missing": "Google API key is missing",
+  "@api_key_missing": {
+    "description": "Message shown when Google API key is not configured"
+  },
+  "edit_car": "Edit Car",
+  "@edit_car": {
+    "description": "Label for editing a car"
+  },
+  "vehicleType": "Vehicle Type",
+  "selectVehicleType": "Select vehicle type",
+  "passengerCar": "Passenger Car",
+  "bus": "Bus",
+  "truck": "Truck",
+  "tractor": "Tractor",
+  "dumpTruck": "Dump Truck",
+  "van": "Van",
+  "vanWithoutCargo": "Van without cargo (add 10% to norm)",
+  "trailerMass": "Trailer Mass (tonnes)",
+  "payloadCapacity": "Payload Capacity (tonnes)",
+  "tripFuelRate": "Fuel Rate per Trip (liters)",
+  "heaterRate": "Heater Fuel Rate (liters/hour)",
+  "heaterTime": "Heater Operation Time (hours)",
+  "mileage": "Mileage (km)",
+  "cargoMass": "Cargo Mass (tonnes)",
+  "cargoMileage": "Cargo Mileage (km)",
+  "trips": "Number of Trips",
+  "correctionFactor": "Correction Factor (%)",
+  "autoCorrectionFactor": "Use Automatic Correction Factor",
+  "winterConditions": "Winter Conditions (+10%)",
+  "mountainConditions": "Mountain Conditions (+15%)",
+  "airConditioner": "Air Conditioner (+7%)",
+  "calculatedFuelConsumption": "Calculated Fuel Consumption",
+  "electric": "Electric",
+  "gas_diesel": "Gas-Diesel",
+  "adjustments": "Adjustments",
+  "history_exported": "History Exported",
+  "export": "Export",
+  "geocoding_error": "Failed to determine location. Try entering the city manually.",
+  "@geocoding_error": {
+    "description": "Message shown when geocoding fails"
+  },
+  "api_key_invalid": "Invalid API key. Please check your settings.",
+  "@api_key_invalid": {
+    "description": "Message shown when the API key is invalid"
+  },
+  "location_service_disabled": "Location services are disabled",
+  "@location_service_disabled": {
+    "description": "Message shown when location services are disabled"
+  },
+  "location_permission_denied": "Location permission denied",
+  "@location_permission_denied": {
+    "description": "Message shown when location permission is denied"
+  },
+  "location_permission_denied_forever": "Location permission denied forever",
+  "@location_permission_denied_forever": {
+    "description": "Message shown when location permission is permanently denied"
+  },
+  "winter": "Winter",
+  "@winter": {
+    "description": "Label for winter condition toggle in fuel calculation"
+  },
+  "ac": "Air Conditioner",
+  "@ac": {
+    "description": "Label for air conditioner toggle in fuel calculation"
+  },
+  "mountain": "Mountain Terrain",
+  "@mountain": {
+    "description": "Label for mountain terrain toggle in fuel calculation"
+  },
+  "vehicle_type": "Vehicle Type",
+  "passenger_car": "Passenger Car",
+  "bus": "Bus",
+  "truck": "Truck",
+  "tractor": "Tractor",
+  "dump_truck": "Dump Truck",
+  "van": "Van",
+  "special_equipment": "Special Equipment",
+  "select_preset_car": "Select Predefined Car",
+  "custom_input": "Custom Input",
+  "license_plate": "License Plate",
+  "fill_license_plate": "Please fill in the license plate",
+  "duplicate_license_plate": "License plate already in use",
+  "search_car": "Search car",
+  "car_deleted": "Car deleted",
+  "select_brand": "Select Brand",
+  "select_model": "Select Model",
+  "select_generation": "Select Generation",
+  "@select_brand": {
+    "description": "Label for selecting a car brand from a dropdown"
+  },
+  "@select_model": {
+    "description": "Label for selecting a car model from a dropdown"
+  },
+  "@select_generation": {
+    "description": "Label for selecting a car generation from a dropdown"
+  },
+  "no_data_found": "No data found",
+  "no_cars_available": "No cars available",
+  "fuel_advice_button": "AI Fuel Efficiency Advice",
+  "@fuel_advice_button": {
+    "description": "Button text for requesting AI fuel efficiency advice"
+  },
+  "fuel_advice_title": "Fuel Efficiency Tips",
+  "@fuel_advice_title": {
+    "description": "Title for the dialog showing AI fuel efficiency advice"
+  },
+  "premium_feature": "This feature is available only for premium users",
+  "@premium_feature": {
+    "description": "Message shown when a premium feature is accessed by a non-premium user"
+  },
+  "share": "Share",
+  "@share": {
+    "description": "Button text for sharing content, such as AI fuel efficiency advice"
+  },
+  "insufficient_balance": "Insufficient balance for AI advice. Please top up your account.",
+  "@insufficient_balance": {
+    "description": "Message shown when DeepSeek API returns a 402 error due to insufficient balance"
+  },
+  "error_sharing": "Error while trying to share advice",
+  "no_advice_to_share": "No advice available to share",
+  "search": "Search",
+  "correction_factor": "Correction Factor (%)",
+  "@correction_factor": {
+    "description": "Label for correction factor input in fuel calculation for buses"
+  },
+  "heater_operating_time": "Heater Operating Time (h)",
+  "@heater_operating_time": {
+    "description": "Label for heater operating time input in fuel calculation for buses"
+  },
+  "invalid_correction_factor": "Correction factor must be between -50 and 50%",
+  "@invalid_correction_factor": {
+    "description": "Message shown when correction factor is out of valid range"
+  },
+  "invalid_heater_time": "Heater operating time must be non-negative",
+  "@invalid_heater_time": {
+    "description": "Message shown when heater operating time is negative"
+  },
+  "heater_fuel_consumption": "Heater Fuel Consumption",
+  "@heater_fuel_consumption": {
+    "description": "Label for heater fuel consumption"
+  },
+  "passenger_capacity": "Passenger Capacity",
+  "@passenger_capacity": {
+    "description": "Label for passenger capacity"
+  },
+  "sync_success": "Data synced successfully", 
+  "sync_error": "Failed to sync data. Please try again.",
+  "register": "Register",
+  "login": "Log In",
+  "email": "Email",
+  "password": "Password",
+  "city": "City",
+  "enter_city": "Enter your city",
+  "detect_location": "Detect Location",
+  "fill_all_fields": "Please fill in all fields",
+  "invalid_email": "Invalid email address",
+  "weak_password": "Password must be at least 6 characters",
+  "registration_success": "Registration successful",
+  "email_already_in_use": "Email already in use",
+  "login_success": "Login successful",
+  "invalid_credentials": "Invalid email or password",
+  "register_instead": "Don't have an account? Register",
+  "login_instead": "Already have an account? Log In",
+  "error": "An error occurred",
+  "geocoding_error": "Unable to fetch location",
+  "location_service_disabled": "Location services are disabled",
+  "location_permission_denied": "Location permission denied",
+  "location_permission_denied_forever": "Location permission permanently denied",
+  "api_key_invalid": "Invalid API key",
+  "sign_out": "Sign Out",
+  "sign_out_success": "Signed out successfully",
+  "loading_car_database": "Loading car database...",
+  "duplicate_record": "Calculation has already been saved.",
+  "yes": "yes",
+  "no": "no",
+  "unsaved_changes": "Unsaved Changes",
+  "save": "Save",
+  "history_label_date": "Date",
+  "history_label_brand": "Brand",
+  "history_label_license_plate": "License Plate",
+  "history_label_initial_mileage": "Initial Mileage",
+  "history_label_final_mileage": "Final Mileage",
+  "history_label_total_mileage": "Total Mileage",
+  "history_label_city_mileage": "City Mileage",
+  "history_label_highway_mileage": "Highway Mileage",
+  "history_label_city_norm": "City Norm",
+  "history_label_highway_norm": "Highway Norm",
+  "history_label_initial_fuel": "Initial Fuel",
+  "history_label_refuel": "Refuel",
+  "history_label_fuel_used": "Fuel Used",
+  "history_label_final_fuel": "Final Fuel",
+  "condition_winter": "Winter",
+  "condition_ac": "A/C",
+  "condition_mountain": "Mountain",
+  "liters": "L",
+  "confirm_delete_record_title": "Confirm Deletion",
+  "confirm_delete_record_content": "Are you sure you want to delete this record?",
+  "no_modification": "No modification",
+  "correction_factor_tooltip": "This factor adjusts the fuel consumption rate.\n\nAutomatic Mode:\nWhen this option is enabled, the factor is calculated automatically based on current weather data (temperature, wind, precipitation). This allows for an accurate accounting of weather's impact on fuel consumption.\n\nManual Mode:\nThe factor is entered manually as a percentage (%) and can be positive (increases consumption) or negative (decreases it). Use it to account for unique conditions not related to weather. For example: poor road conditions, frequent traffic jams, aggressive driving style, or the vehicle's technical condition.",
+  "heater_operating_time_tooltip": "Enter the total operating time of the autonomous cabin heater in hours. The fuel consumed by the heater is calculated separately and added to the main fuel consumption from driving. The consumption rate for the heater is set in the vehicle's settings.",
+  "auto_factor_error": "Failed to get weather data. Manual input is enabled.",
+  "onboarding_title": "Your Personal Fuel Assistant",
+  "onboarding_step1_title": "Smart Car Management",
+  "onboarding_step1_desc": "Add your vehicles manually or choose from an extensive database with auto-filled consumption rates. All your cars in one convenient list.",
+  "onboarding_step2_title": "Accurate Calculations",
+  "onboarding_step2_desc": "Use the calculator for precise fuel consumption tracking, considering winter conditions, AC usage, and mountain trips. Heater operation is available for buses.",
+  "onboarding_step3_title": "Analysis & Export",
+  "onboarding_step3_desc": "Monitor your statistics with clear charts, view detailed calculation history, and share your data in a convenient format.",
+  "onboarding_button": "Get Started",
+  "car_form_step1_title": "Step 1: Identification",
+  "car_form_step2_title": "Step 2: Model Selection (Autocomplete)",
+  "car_form_step3_title": "Step 3: Consumption Rates & Details"
+}

@@ -1,0 +1,105 @@
+name: fuelmaster
+description: Приложение на Flutter для управления расходом топлива и данными автомобилей.
+version: 1.0.1+7
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+  shared_preferences: ^2.5.3
+  path_provider: ^2.1.5
+  url_launcher: ^6.3.2
+  share_plus: ^11.0.0
+  cross_file: ^0.3.4+2
+  fl_chart: ^1.0.0
+  logger: ^2.6.1
+  lottie: ^3.3.1
+  permission_handler: ^12.0.1
+  firebase_analytics: ^12.0.0
+  firebase_core: ^4.0.0
+  in_app_purchase: ^3.2.3
+  flutter_native_splash: ^2.4.6
+  firebase_app_check: ^0.4.0
+  sqflite: ^2.4.2
+  path: ^1.9.1
+  http: ^1.5.0
+  flutter_dotenv: ^6.0.0
+  uuid: ^4.5.1
+  geolocator: ^14.0.2
+  dropdown_search: ^6.0.2
+  dio: ^5.9.0
+  csv: ^6.0.0
+  collection: ^1.17.0
+  flutter_isolate: ^2.0.4
+  transparent_image: ^2.0.1
+  provider: ^6.1.5+1
+  firebase_auth: ^6.0.1
+  cloud_firestore: ^6.0.0
+  yandex_mobileads: ^7.13.0
+  meta: ^1.16.0
+  leak_tracker: ^11.0.1
+  leak_tracker_flutter_testing: ^3.0.10
+  leak_tracker_testing: ^3.0.2
+  test_api: ^0.7.6
+  vector_math: ^2.2.0
+  characters: ^1.4.0
+  material_color_utilities: ^0.11.1
+  vm_service: ^15.0.2
+  google_nav_bar: ^5.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.6.1
+  mockito: ^5.5.0
+  flutter_launcher_icons: ^0.14.4
+  sqflite_common_ffi: ^2.3.6
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/launch_image.png
+    - assets/2.0x/launch_image.png
+    - assets/3.0x/launch_image.png
+    - assets/4.0x/launch_image.png
+    - assets/launch_image_2.png
+    - assets/2.0x/launch_image_2.png
+    - assets/3.0x/launch_image_2.png
+    - assets/4.0x/launch_image_2.png
+    - assets/fuelmaster_logo.png
+    - assets/2.0x/fuelmaster_logo.png
+    - assets/3.0x/fuelmaster_logo.png
+    - assets/4.0x/fuelmaster_logo.png
+    - assets/loading_animation.json
+    - assets/icon/icon.png
+    - .env
+    - assets/cars.csv
+    - assets/car_brands/
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+  generate: true
+
+flutter_intl:
+  enabled: true
+  main_locale: en
+  arb_dir: lib/l10n
+  output_dir: lib/l10n
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/icon.png"
