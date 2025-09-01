@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "619524253699",
+    "project_id": "fuelmaster-984fb",
+    "storage_bucket": "fuelmaster-984fb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:619524253699:android:2a62bb1d5d95a788b0c636",
+        "android_client_info": {
+          "package_name": "com.example.fuelmaster"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4o36Kvel_taihH9jIPXK8XlOxZuac3tU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

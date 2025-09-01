@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Тема приложения -->
+    <style name="Theme.FuelMaster" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Настройка цветов -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+        <!-- Дополнительные настройки -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+
+    <!-- Тема для запуска -->
+    <style name="LaunchTheme" parent="Theme.FuelMaster">
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+
+    <!-- Нормальная тема для Flutter -->
+    <style name="NormalTheme" parent="Theme.FuelMaster">
+        <item name="android:windowBackground">?android:colorBackground</item>
+    </style>
+</resources>
