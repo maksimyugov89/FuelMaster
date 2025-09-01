@@ -14,9 +14,7 @@
         android:hardwareAccelerated="false"
         tools:replace="android:hardwareAccelerated">
 
-        <meta-data
-            android:name="yandex_mobile_ads_app_id"
-            android:value="y0__xDT56mVBhjnjC0gl4a8jxQw6pWHmwiGEtSKAeuTk9Lc_GVwrPI_rJ-QWA" />
+        
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
