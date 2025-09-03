@@ -42,8 +42,9 @@ class HistoryDisplayService {
 
     final List<String> formatted = [
       '${l10n.history_label_date}: ${record['date'] ?? ''}',
-      '${l10n.history_label_brand}: ${car?.brand ?? record['brand'] ?? ''}',
-      '${l10n.history_label_license_plate}: ${car?.licensePlate ?? record['license_plate'] ?? l10n.no}',
+      '${l10n.brand}: ${car?.brand ?? ''}',
+      '${l10n.model}: ${car?.model ?? ''}',
+      '${l10n.license_plate}: ${car?.licensePlate ?? l10n.no}',
       '${l10n.history_label_initial_mileage}: ${record['initial_mileage']?.toString() ?? '0'} ${l10n.kilometers}',
       '${l10n.history_label_final_mileage}: ${record['final_mileage']?.toString() ?? '0'} ${l10n.kilometers}',
       '${l10n.history_label_total_mileage}: ${record['total_mileage']?.toStringAsFixed(1) ?? '0.0'} ${l10n.kilometers}',

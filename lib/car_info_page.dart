@@ -12,6 +12,10 @@ import 'package:fuelmaster/utils/preset_data_loader.dart';
 import 'package:fuelmaster/widgets/gradient_button.dart';
 import 'package:fuelmaster/widgets/gradient_text.dart';
 import 'package:fuelmaster/theme.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:fuelmaster/widgets/license_plate_widget.dart';
+import 'package:fuelmaster/utils/constants.dart';
+import 'package:fuelmaster/widgets/gradient_background.dart';
 
 class CarInfoPage extends StatefulWidget {
   final List<CarData> cars;
@@ -39,8 +43,10 @@ class _CarInfoPageState extends State<CarInfoPage> {
   final TextEditingController baseCityNormController = TextEditingController();
   final TextEditingController baseHighwayNormController = TextEditingController();
   final TextEditingController baseCombinedNormController = TextEditingController();
-  final TextEditingController heaterFuelConsumptionController = TextEditingController();
-  final TextEditingController passengerCapacityController = TextEditingController();
+  final TextEditingController heaterFuelConsumptionController =
+      TextEditingController();
+  final TextEditingController passengerCapacityController =
+      TextEditingController();
   String? fuelType;
   String? vehicleType;
   bool isCustom = true;
@@ -57,46 +63,41 @@ class _CarInfoPageState extends State<CarInfoPage> {
   final FocusNode heaterFuelConsumptionFocus = FocusNode();
   final FocusNode passengerCapacityFocus = FocusNode();
   final Debouncer debouncer = Debouncer(duration: const Duration(milliseconds: 300));
+  final licensePlateMask = MaskTextInputFormatter(
+      mask: 'A ### AA ###', // A - Буква, # - Цифра
+      filter: {
+        "#": RegExp(r'[0-9]'),
+        "A": RegExp(r'[АВЕКМНОРСТУХABEKMHOPCTYX]', caseSensitive: false)
+      },
+      type: MaskAutoCompletionType.lazy);
   bool _isLoading = false;
-
-  // Карта для иконок марок
-  static const Map<String, String> brandIcons = {
-    'Acura': 'assets/car_brands/acura.png', 'Alfa Romeo': 'assets/car_brands/alfa_romeo.png', 'Aston Martin': 'assets/car_brands/aston_martin.png', 'Audi': 'assets/car_brands/audi.png', 'Bentley': 'assets/car_brands/bentley.png', 'BMW': 'assets/car_brands/bmw.png', 'Богдан': 'assets/car_brands/bogdan.png', 'Bugatti': 'assets/car_brands/bugatti.png', 'Buick': 'assets/car_brands/buick.png', 'Cadillac': 'assets/car_brands/cadillac.png', 'Chery': 'assets/car_brands/chery.png', 'Chevrolet': 'assets/car_brands/chevrolet.png', 'Chrysler': 'assets/car_brands/chrysler.png', 'Citroen': 'assets/car_brands/citroen.png', 'Daewoo': 'assets/car_brands/daewoo.png', 'Dodge': 'assets/car_brands/dodge.png', 'Ferrari': 'assets/car_brands/ferrari.png', 'Fiat': 'assets/car_brands/fiat.png', 'Ford': 'assets/car_brands/ford.png', 'Foton': 'assets/car_brands/Foton.png', 'ГАЗ': 'assets/car_brands/gaz.png', 'Genesis': 'assets/car_brands/genesis.png', 'GMC': 'assets/car_brands/gmc.png', 'Golden Dragon': 'assets/car_brands/Golden_Dragon.png', 'Great Wall': 'assets/car_brands/great_wall.png', 'Higer': 'assets/car_brands/Higer.png', 'Honda': 'assets/car_brands/honda.png', 'Hyundai': 'assets/car_brands/hyundai.png', 'Infiniti': 'assets/car_brands/infiniti.png', 'Iveco': 'assets/car_brands/Iveco.png', 'ИЖ': 'assets/car_brands/izh.png', 'Jaguar': 'assets/car_brands/jaguar.png', 'Jeep': 'assets/car_brands/jeep.png', 'KIA': 'assets/car_brands/kia.png', 'Lada': 'assets/car_brands/lada.png', 'Lamborghini': 'assets/car_brands/lamborghini.png', 'Land Rover': 'assets/car_brands/land_rover.png', 'Lexus': 'assets/car_brands/lexus.png', 'ЛиАЗ': 'assets/car_brands/Liaz.png', 'Lifan': 'assets/car_brands/lifan.png', 'Lincoln': 'assets/car_brands/lincoln.png', 'MAN': 'assets/car_brands/MAN.png', 'Maserati': 'assets/car_brands/maserati.png', 'Mazda': 'assets/car_brands/mazda.png', 'Mercedes-Benz': 'assets/car_brands/mercedes.png', 'MINI': 'assets/car_brands/mini.png', 'Mitsubishi': 'assets/car_brands/mitsubishi.png', 'НефАЗ': 'assets/car_brands/Nefaz.png', 'Nissan': 'assets/car_brands/nissan.png', 'Opel': 'assets/car_brands/opel.png', 'ПАЗ': 'assets/car_brands/PAZ.png', 'Peugeot': 'assets/car_brands/peugeot.png', 'Porsche': 'assets/car_brands/porsche.png', 'Ram': 'assets/car_brands/ram.png', 'Renault': 'assets/car_brands/renault.png', 'Rolls-Royce': 'assets/car_brands/rolls_royce.png', 'Rover': 'assets/car_brands/rover.png', 'Saab': 'assets/car_brands/saab.png', 'Scania': 'assets/car_brands/Scania.png', 'Scion': 'assets/car_brands/scion.png', 'Seat': 'assets/car_brands/seat.png', 'СеАЗ': 'assets/car_brands/seaz.png', 'Shenlong': 'assets/car_brands/Shenlong.png', 'Skoda': 'assets/car_brands/skoda.png', 'smart': 'assets/car_brands/smart.png', 'Ssang Yong': 'assets/car_brands/ssang_yong.png', 'Subaru': 'assets/car_brands/subaru.png', 'Suzuki': 'assets/car_brands/suzuki.png', 'TAGAZ': 'assets/car_brands/tagaz.png', 'Tesla': 'assets/car_brands/tesla.png', 'Toyota': 'assets/car_brands/toyota.png', 'УАЗ': 'assets/car_brands/uaz.png', 'УРАЛ': 'assets/car_brands/URAL.png', 'ВАЗ': 'assets/car_brands/vaz.png', 'Волга': 'assets/car_brands/volga.png', 'Volgabus': 'assets/car_brands/Volgabus.png', 'Volkswagen': 'assets/car_brands/volkswagen.png', 'Volvo': 'assets/car_brands/volvo.png', 'Vortex': 'assets/car_brands/vortex.png', 'Yutong': 'assets/car_brands/Yutong.png', 'ЗАЗ': 'assets/car_brands/zaz.png', 'АТС': 'assets/car_brands/АТС.png', 'ЛУИДОР': 'assets/car_brands/ЛУИДОР.png', 'МАЗ': 'assets/car_brands/МАЗ.png', 'МАРЗ': 'assets/car_brands/МАРЗ.png',
-  };
 
   static const List<String> vehicleTypes = [
     'Passenger Car', 'Bus', 'Truck', 'Tractor', 'Dump Truck', 'Van', 'Special Equipment'
   ];
 
   @override
-    void initState() {
-      super.initState();
+  void initState() {
+    super.initState();
 
-      // Сначала инициализируем все синхронные переменные и объекты
-      _setInitialVehicleType();
-      _initPresetDataLoader();
-      
-      // Затем запускаем единый асинхронный метод для загрузки данных
-      _loadInitialDataForPage();
+    _setInitialVehicleType();
+    _initPresetDataLoader();
+    _loadInitialDataForPage();
+    _addListenersToControllers();
 
-      // Слушатели контроллеров остаются без изменений
-      _addListenersToControllers();
-    }
+    // --- ИСПРАВЛЕНИЕ: Слушатель для авто-конвертации теперь находится ВНУТРИ initState ---
+    licensePlateController.addListener(_convertLicensePlateLayout);
+  }
 
-    // Новый вспомогательный метод для асинхронной загрузки
-    Future<void> _loadInitialDataForPage() async {
-    // Показываем индикатор загрузки в самом начале
+  Future<void> _loadInitialDataForPage() async {
     setState(() => _isLoading = true);
-
-    try { // Обернем в try-finally для надежности
+    try {
       if (widget.carToEdit != null) {
-        // Если редактируем, просто загружаем данные
         _loadCarDataForEditing(widget.carToEdit!);
+        await _loadDependentPresetDataForEditing(widget.carToEdit!);
       } else {
-        // Если создаем новую, нужно загрузить список брендов
         final brands = await _presetDataLoader.loadPresetBrands();
         if (mounted) {
-          // Только после загрузки обновляем состояние
           setState(() {
             presetBrands = brands;
           });
@@ -105,7 +106,6 @@ class _CarInfoPageState extends State<CarInfoPage> {
     } catch (e) {
       logger.e("Error loading initial data: $e");
     } finally {
-      // В самом конце, ВНЕ ЗАВИСИМОСТИ от результата, убираем индикатор загрузки
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -117,12 +117,12 @@ class _CarInfoPageState extends State<CarInfoPage> {
   }
 
   void _initPresetDataLoader() {
-  _presetDataLoader = PresetDataLoader(
-    context: context,
-    vehicleType: vehicleType,
-    onLoadingChanged: (loading) {},
-  );
-}
+    _presetDataLoader = PresetDataLoader(
+      context: context,
+      vehicleType: vehicleType,
+      onLoadingChanged: (loading) {},
+    );
+  }
 
   void _loadCarDataForEditing(CarData car) {
     licensePlateController.text = car.licensePlate ?? '';
@@ -151,14 +151,38 @@ class _CarInfoPageState extends State<CarInfoPage> {
     passengerCapacityController.addListener(() => debouncer.run(() => setState(() {})));
   }
 
+  // --- ИСПРАВЛЕНИЕ: Этот метод теперь является частью класса и будет найден ---
+  void _convertLicensePlateLayout() {
+    const Map<String, String> layoutConverter = {
+      'A': 'А', 'B': 'В', 'E': 'Е', 'K': 'К', 'M': 'М', 'H': 'Н',
+      'O': 'О', 'P': 'Р', 'C': 'С', 'T': 'Т', 'Y': 'У', 'X': 'Х',
+    };
+
+    final originalText = licensePlateController.text;
+    String convertedText = '';
+
+    for (int i = 0; i < originalText.length; i++) {
+      final char = originalText[i].toUpperCase();
+      convertedText += layoutConverter[char] ?? char;
+    }
+
+    if (originalText != convertedText) {
+      final selection = licensePlateController.selection;
+      licensePlateController.value = licensePlateController.value.copyWith(
+        text: convertedText,
+        selection: selection,
+      );
+    }
+  }
+
   void _onVehicleTypeChanged(String? value) {
     if (value == null || value == vehicleType) return;
-    
+
     setState(() {
       vehicleType = value;
       isCustom = true;
       _clearCarDetails();
-      _initPresetDataLoader(); 
+      _initPresetDataLoader();
     });
 
     _presetDataLoader.loadPresetBrands().then((brands) {
@@ -167,17 +191,34 @@ class _CarInfoPageState extends State<CarInfoPage> {
     });
   }
 
+  Future<void> _loadDependentPresetDataForEditing(CarData car) async {
+    final l10n = AppLocalizations.of(context)!;
+    final models = await _presetDataLoader.loadPresetModels(car.brand);
+    final modifications = await _presetDataLoader.loadPresetModifications(car.brand, car.model, null);
+
+    if (modifications.isEmpty) {
+      modifications.add(l10n.no_modification);
+    }
+
+    if (mounted) {
+      setState(() {
+        presetModels = models;
+        presetModifications = modifications;
+      });
+    }
+  }
+
   void _clearCarDetails() {
-      brandController.clear();
-      modelController.clear();
-      modificationController.clear();
-      baseCityNormController.clear();
-      baseHighwayNormController.clear();
-      baseCombinedNormController.clear();
-      heaterFuelConsumptionController.clear();
-      passengerCapacityController.clear();
-      presetModels = [];
-      presetModifications = [];
+    brandController.clear();
+    modelController.clear();
+    modificationController.clear();
+    baseCityNormController.clear();
+    baseHighwayNormController.clear();
+    baseCombinedNormController.clear();
+    heaterFuelConsumptionController.clear();
+    passengerCapacityController.clear();
+    presetModels = [];
+    presetModifications = [];
   }
 
   void _showSearchableDropdown({
@@ -203,7 +244,8 @@ class _CarInfoPageState extends State<CarInfoPage> {
                 child: Column(
                   children: [
                     TextField(
-                      onChanged: (value) => setStateDialog(() => searchQuery = value),
+                      onChanged: (value) =>
+                          setStateDialog(() => searchQuery = value),
                       decoration: InputDecoration(
                         labelText: AppLocalizations.of(context)!.search,
                         prefixIcon: const Icon(Icons.search),
@@ -246,11 +288,23 @@ class _CarInfoPageState extends State<CarInfoPage> {
       items: presetBrands,
       onItemSelected: _onBrandSelected,
       itemBuilder: (brand) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final iconWidget = AppConstants.brandIcons.containsKey(brand)
+            ? Image.asset(AppConstants.brandIcons[brand]!, width: 28, height: 28,
+                errorBuilder: (_, __, ___) => Icon(Icons.directions_car, size: 28, color: Theme.of(context).colorScheme.primary))
+            : Icon(Icons.directions_car, size: 28, color: Theme.of(context).colorScheme.primary);
+
         return ListTile(
-          leading: brandIcons.containsKey(brand)
-              ? Image.asset(brandIcons[brand]!, width: 32, height: 32,
-                  errorBuilder: (_, __, ___) => Icon(Icons.directions_car, color: Theme.of(context).colorScheme.primary))
-              : Icon(Icons.directions_car, color: Theme.of(context).colorScheme.primary),
+          leading: Container(
+            width: 40,
+            height: 40,
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withOpacity(0.9) : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: iconWidget,
+          ),
           title: Text(brand, overflow: TextOverflow.ellipsis),
         );
       },
@@ -269,7 +323,7 @@ class _CarInfoPageState extends State<CarInfoPage> {
     if (!mounted) return;
     setState(() => presetModels = loadedModels);
   }
-  
+
   void _showModelDropdown() async {
     if (brandController.text.isEmpty) return;
     _showSearchableDropdown(
@@ -295,7 +349,7 @@ class _CarInfoPageState extends State<CarInfoPage> {
     if (loadedModifications.isEmpty) {
       loadedModifications.add(l10n.no_modification);
     }
-    
+
     setState(() => presetModifications = loadedModifications);
 
     if (loadedModifications.length == 1) {
@@ -304,10 +358,10 @@ class _CarInfoPageState extends State<CarInfoPage> {
       _showModificationDropdown();
     }
   }
-  
+
   void _showModificationDropdown() async {
     if (modelController.text.isEmpty) return;
-      _showSearchableDropdown(
+    _showSearchableDropdown(
       title: AppLocalizations.of(context)!.modification,
       items: presetModifications,
       onItemSelected: _onModificationSelected,
@@ -321,9 +375,9 @@ class _CarInfoPageState extends State<CarInfoPage> {
 
   Future<void> _autofillAllData() async {
     if (brandController.text.isEmpty || modelController.text.isEmpty) return;
-    
+
     setState(() => _isLoading = true);
-    
+
     final l10n = AppLocalizations.of(context)!;
     final modificationText = modificationController.text;
 
@@ -331,13 +385,15 @@ class _CarInfoPageState extends State<CarInfoPage> {
       brand: brandController.text,
       model: modelController.text,
       generation: null,
-      modification: modificationText.isNotEmpty && modificationText != l10n.no_modification 
-          ? modificationText 
+      modification: modificationText.isNotEmpty &&
+              modificationText != l10n.no_modification
+          ? modificationText
           : null,
     );
 
     if (carData != null && mounted) {
-      logger.d('CarInfoPage: _autofillAllData received carData: ${carData.toJson()}');
+      logger.d(
+          'CarInfoPage: _autofillAllData received carData: ${carData.toJson()}');
       _updateControllersWithCarData(carData);
     }
 
@@ -350,7 +406,8 @@ class _CarInfoPageState extends State<CarInfoPage> {
     final modification = carData.modification?.toLowerCase() ?? '';
     final l10n = AppLocalizations.of(context)!;
 
-    if ((localPassengerCapacity == null || localPassengerCapacity == 0) && modification.contains('мест')) {
+    if ((localPassengerCapacity == null || localPassengerCapacity == 0) &&
+        modification.contains('мест')) {
       final RegExp capacityRegExp = RegExp(r'(\d+)\s*мест');
       final match = capacityRegExp.firstMatch(modification);
       if (match != null) {
@@ -360,37 +417,43 @@ class _CarInfoPageState extends State<CarInfoPage> {
         }
       }
     }
-    
-    // --- ИЗМЕНЕНО: Начало блока ---
-    // Безусловно устанавливаем норму 0.6 для автобусов, согласно приказу Минтранса.
-    // Предыдущая логика парсинга из модификации заменена.
+
     if (vehicleType == 'Bus') {
       localHeaterConsumption = 0.6;
     }
-    // --- ИЗМЕНЕНО: Конец блока ---
-    
+
     setState(() {
-        baseCityNormController.text = carData.baseCityNorm.toString();
-        baseHighwayNormController.text = carData.baseHighwayNorm.toString();
-        
-        if (carData.baseCombinedNorm == null && carData.baseCityNorm > 0 && carData.baseHighwayNorm > 0) {
-          baseCombinedNormController.text = ((carData.baseCityNorm + carData.baseHighwayNorm) / 2).toStringAsFixed(2);
-        } else {
-          baseCombinedNormController.text = carData.baseCombinedNorm?.toString() ?? '';
-        }
-        
-        heaterFuelConsumptionController.text = localHeaterConsumption?.toString() ?? '';
-        passengerCapacityController.text = localPassengerCapacity?.toString() ?? '';
+      baseCityNormController.text = carData.baseCityNorm.toString();
+      baseHighwayNormController.text = carData.baseHighwayNorm.toString();
 
-        if (carData.modification == null && modificationController.text == l10n.no_modification) {
-            // ничего не делаем, оставляем текст "Нет модификации"
-        } else {
-            modificationController.text = carData.modification ?? l10n.no_modification;
-        }
+      if (carData.baseCombinedNorm == null &&
+          carData.baseCityNorm > 0 &&
+          carData.baseHighwayNorm > 0) {
+        baseCombinedNormController.text =
+            ((carData.baseCityNorm + carData.baseHighwayNorm) / 2)
+                .toStringAsFixed(2);
+      } else {
+        baseCombinedNormController.text =
+            carData.baseCombinedNorm?.toString() ?? '';
+      }
 
-        fuelType = carData.fuelType;
-        isCustom = false;
-        logger.d('CarInfoPage: _updateControllersWithCarData setting heater: ${heaterFuelConsumptionController.text}, capacity: ${passengerCapacityController.text}');
+      heaterFuelConsumptionController.text =
+          localHeaterConsumption?.toString() ?? '';
+      passengerCapacityController.text =
+          localPassengerCapacity?.toString() ?? '';
+
+      if (carData.modification == null &&
+          modificationController.text == l10n.no_modification) {
+        // ничего не делаем
+      } else {
+        modificationController.text =
+            carData.modification ?? l10n.no_modification;
+      }
+
+      fuelType = carData.fuelType;
+      isCustom = false;
+      logger.d(
+          'CarInfoPage: _updateControllersWithCarData setting heater: ${heaterFuelConsumptionController.text}, capacity: ${passengerCapacityController.text}');
     });
   }
 
@@ -432,18 +495,30 @@ class _CarInfoPageState extends State<CarInfoPage> {
     if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
     final carProvider = context.read<CarProvider>();
-    final licensePlate = licensePlateController.text.trim();
+    final licensePlate = licensePlateController.text.replaceAll(' ', '');
     final brand = brandController.text.trim();
     final model = modelController.text.trim();
     final modification = modificationController.text.trim();
-    final baseCityNormText = baseCityNormController.text.trim().replaceAll(',', '.');
-    final baseHighwayNormText = baseHighwayNormController.text.trim().replaceAll(',', '.');
-    final baseCombinedNormText = baseCombinedNormController.text.trim().replaceAll(',', '.');
-    final heaterFuelConsumptionText = heaterFuelConsumptionController.text.trim().replaceAll(',', '.');
+    final baseCityNormText =
+        baseCityNormController.text.trim().replaceAll(',', '.');
+    final baseHighwayNormText =
+        baseHighwayNormController.text.trim().replaceAll(',', '.');
+    final baseCombinedNormText =
+        baseCombinedNormController.text.trim().replaceAll(',', '.');
+    final heaterFuelConsumptionText =
+        heaterFuelConsumptionController.text.trim().replaceAll(',', '.');
     final passengerCapacityText = passengerCapacityController.text.trim();
 
-    if (brand.isEmpty || model.isEmpty || vehicleType == null || modification.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.fill_all_fields)));
+    if (licensePlate.isNotEmpty &&
+        (licensePlate.length < 8 || licensePlate.length > 9)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.fill_license_plate_fully)));
+      return;
+    }
+
+    if (brand.isEmpty || model.isEmpty || vehicleType == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.fill_all_fields)));
       return;
     }
 
@@ -453,34 +528,44 @@ class _CarInfoPageState extends State<CarInfoPage> {
     final heaterFuelConsumption = double.tryParse(heaterFuelConsumptionText);
     final passengerCapacity = int.tryParse(passengerCapacityText);
 
-    if (baseCityNorm == null || baseCityNorm <= 0 || baseHighwayNorm == null || baseHighwayNorm <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.positive_norm)));
+    if (baseCityNorm == null ||
+        baseCityNorm <= 0 ||
+        baseHighwayNorm == null ||
+        baseHighwayNorm <= 0) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.positive_norm)));
       return;
     }
 
     if (vehicleType == 'Bus') {
       if (baseCombinedNorm == null || baseCombinedNorm <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.positive_norm)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l10n.positive_norm)));
         return;
       }
       if (passengerCapacity == null || passengerCapacity <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${l10n.passenger_capacity} ${l10n.positive_norm}')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content:
+                Text('${l10n.passenger_capacity} ${l10n.positive_norm}')));
         return;
       }
     }
 
     if (licensePlate.isNotEmpty) {
       try {
-        final isUnique = await DatabaseHelper.instance.isLicensePlateUnique(licensePlate, widget.carToEdit?.id);
+        final isUnique = await DatabaseHelper.instance
+            .isLicensePlateUnique(licensePlate, widget.carToEdit?.id);
         if (!isUnique) {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.duplicate_license_plate)));
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.duplicate_license_plate)));
           return;
         }
       } catch (e) {
         logger.e('Ошибка проверки уникальности номера: $e');
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.error)));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(l10n.error)));
         }
         return;
       }
@@ -515,7 +600,7 @@ class _CarInfoPageState extends State<CarInfoPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.car_saved)),
           );
-          Navigator.pop(context);
+          Navigator.pop(context, true);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.error)),
@@ -525,7 +610,8 @@ class _CarInfoPageState extends State<CarInfoPage> {
     } catch (e) {
       logger.e('Ошибка сохранения автомобиля: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.error)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l10n.error)));
       }
     }
   }
@@ -534,15 +620,251 @@ class _CarInfoPageState extends State<CarInfoPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+
+    final pageContent = _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GradientText(
+                  widget.carToEdit != null
+                      ? l10n.edit_car
+                      : l10n.enter_car_details,
+                  gradient: primaryActionGradient,
+                  style: theme.textTheme.headlineMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 24),
+                Card(
+                  elevation: 4.0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(l10n.car_form_step1_title,
+                            style: theme.textTheme.titleLarge),
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<String>(
+                          value: vehicleType,
+                          decoration: InputDecoration(
+                            labelText: l10n.vehicle_type,
+                            prefixIcon: Icon(Icons.commute,
+                                color: theme.colorScheme.primary),
+                          ),
+                          items: vehicleTypes.map((type) {
+                            return DropdownMenuItem(
+                              value: type,
+                              child: Text(
+                                type == 'Passenger Car'
+                                    ? l10n.passenger_car
+                                    : type == 'Bus'
+                                        ? l10n.bus
+                                        : type == 'Truck'
+                                            ? l10n.truck
+                                            : type == 'Tractor'
+                                                ? l10n.tractor
+                                                : type == 'Dump Truck'
+                                                    ? l10n.dump_truck
+                                                    : type == 'Van'
+                                                        ? l10n.van
+                                                        : l10n.special_equipment,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: _onVehicleTypeChanged,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: licensePlateController,
+                          focusNode: licensePlateFocus,
+                          inputFormatters: [licensePlateMask],
+                          keyboardType: TextInputType.visiblePassword,
+                          textCapitalization: TextCapitalization.characters,
+                          autocorrect: false,
+                          decoration: InputDecoration(
+                            labelText: l10n.license_plate,
+                            prefixIcon: Icon(Icons.confirmation_number,
+                                color: theme.colorScheme.primary),
+                            hintText: 'А 123 ВС 78',
+                          ),
+                        ),
+                        Visibility(
+                          visible: licensePlateController.text.isNotEmpty,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 16.0),
+                            child: Center(
+                              child: LicensePlateWidget(
+                                plateNumber: licensePlateController.text,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Card(
+                  elevation: 4.0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(l10n.car_form_step2_title,
+                            style: theme.textTheme.titleLarge),
+                        const SizedBox(height: 16),
+                        CustomTextField(
+                          controller: brandController,
+                          focusNode: brandFocus,
+                          labelKey: 'brand',
+                          icon: Icons.directions_car,
+                          readOnly: true,
+                          onTap: _showBrandDropdown,
+                        ),
+                        const SizedBox(height: 16),
+                        CustomTextField(
+                          controller: modelController,
+                          focusNode: modelFocus,
+                          labelKey: 'model',
+                          icon: Icons.directions_car,
+                          enabled: brandController.text.isNotEmpty,
+                          readOnly: true,
+                          onTap: _showModelDropdown,
+                        ),
+                        const SizedBox(height: 16),
+                        CustomTextField(
+                          controller: modificationController,
+                          focusNode: modificationFocus,
+                          labelKey: 'modification',
+                          icon: Icons.car_repair,
+                          enabled: modelController.text.isNotEmpty,
+                          readOnly: true,
+                          onTap: _showModificationDropdown,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Card(
+                  elevation: 4.0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(l10n.car_form_step3_title,
+                            style: theme.textTheme.titleLarge),
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<String>(
+                          value: fuelType,
+                          decoration: InputDecoration(
+                            labelText: l10n.fuel_type,
+                            prefixIcon: Icon(Icons.local_gas_station,
+                                color: theme.colorScheme.primary),
+                          ),
+                          items: [
+                            'Б', 'Д', 'СУГ', 'КПГ', 'Электро', 'Газодизель'
+                          ].map((type) {
+                            return DropdownMenuItem(
+                              value: type,
+                              child: Text(
+                                type == 'Б'
+                                    ? l10n.petrol
+                                    : type == 'Д'
+                                        ? l10n.diesel
+                                        : type == 'СУГ'
+                                            ? l10n.lpg
+                                            : type == 'КПГ'
+                                                ? l10n.cng
+                                                : type == 'Электро'
+                                                    ? l10n.electric
+                                                    : l10n.gas_diesel,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (mounted) setState(() => fuelType = value);
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        CustomTextField(
+                          controller: baseCityNormController,
+                          focusNode: baseCityNormFocus,
+                          labelKey: 'base_city_norm',
+                          isNumber: true,
+                          icon: Icons.location_city,
+                        ),
+                        const SizedBox(height: 16),
+                        CustomTextField(
+                          controller: baseHighwayNormController,
+                          focusNode: baseHighwayNormFocus,
+                          labelKey: 'base_highway_norm',
+                          isNumber: true,
+                          icon: Icons.add_road,
+                        ),
+                        const SizedBox(height: 16),
+                        CustomTextField(
+                          controller: baseCombinedNormController,
+                          focusNode: baseCombinedNormFocus,
+                          labelKey: 'base_combined_norm',
+                          isNumber: true,
+                          icon: Icons.blender,
+                        ),
+                        if (vehicleType == 'Bus') ...[
+                          const SizedBox(height: 16),
+                          CustomTextField(
+                            controller: heaterFuelConsumptionController,
+                            focusNode: heaterFuelConsumptionFocus,
+                            labelKey: 'heater_fuel_consumption',
+                            isNumber: true,
+                            icon: Icons.thermostat,
+                          ),
+                          const SizedBox(height: 16),
+                          CustomTextField(
+                            controller: passengerCapacityController,
+                            focusNode: passengerCapacityFocus,
+                            labelKey: 'passenger_capacity',
+                            isNumber: true,
+                            icon: Icons.people,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                GradientButton(
+                  text: l10n.save_and_continue,
+                  gradient: primaryActionGradient,
+                  iconData: Icons.save,
+                  onPressed: saveCar,
+                ),
+                const SizedBox(height: 12),
+                GradientButton(
+                  text: l10n.clear,
+                  gradient: secondaryActionGradient,
+                  iconData: Icons.clear_all,
+                  onPressed: clearFields,
+                ),
+              ],
+            ),
+          );
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         toolbarHeight: 120.0,
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        automaticallyImplyLeading: false, // Убираем автоматическую кнопку назад
+        automaticallyImplyLeading: false,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
           onPressed: () => Navigator.of(context).pop(),
@@ -557,220 +879,7 @@ class _CarInfoPageState extends State<CarInfoPage> {
           ),
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                // ✨ НАЧАЛО НОВОГО СПИСКА CHILDREN
-                children: [
-                  // --- ЗАГОЛОВОК СТРАНИЦЫ ---
-                  GradientText(
-                    widget.carToEdit != null ? l10n.edit_car : l10n.enter_car_details,
-                    gradient: blueGradient,
-                    style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 24),
-                  // --- КАРТОЧКА: ШАГ 1 ---
-                  Card(
-                    elevation: 4.0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(l10n.car_form_step1_title, style: theme.textTheme.titleLarge),
-                          const SizedBox(height: 16),
-                          // Выбор типа ТС
-                          DropdownButtonFormField<String>(
-                            value: vehicleType,
-                            decoration: InputDecoration(
-                              labelText: l10n.vehicle_type,
-                              prefixIcon: Icon(Icons.commute, color: theme.colorScheme.primary),
-                            ),
-                            items: vehicleTypes.map((type) {
-                      return DropdownMenuItem(
-                        value: type,
-                        child: Text( // Возвращаем простой Text
-                          // Ваша логика для названий
-                          type == 'Passenger Car' ? l10n.passenger_car :
-                          type == 'Bus' ? l10n.bus :
-                          type == 'Truck' ? l10n.truck :
-                          type == 'Tractor' ? l10n.tractor :
-                          type == 'Dump Truck' ? l10n.dump_truck :
-                          type == 'Van' ? l10n.van :
-                          l10n.special_equipment,
-                          overflow: TextOverflow.ellipsis, // Используем ellipsis для длинных строк
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: _onVehicleTypeChanged,
-                  ),
-                  const SizedBox(height: 16),
-                  // Гос. номер
-                  CustomTextField(
-                    controller: licensePlateController,
-                    focusNode: licensePlateFocus,
-                    labelKey: 'license_plate',
-                    icon: Icons.confirmation_number,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          // --- КАРТОЧКА: ШАГ 2 ---
-          Card(
-            elevation: 4.0,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.car_form_step2_title, style: theme.textTheme.titleLarge),
-                  const SizedBox(height: 16),
-                  // Марка
-                  CustomTextField(
-                    controller: brandController,
-                    focusNode: brandFocus,
-                    labelKey: 'brand',
-                    icon: Icons.directions_car,
-                    readOnly: true,
-                    onTap: _showBrandDropdown,
-                  ),
-                  const SizedBox(height: 16),
-                  // Модель
-                  CustomTextField(
-                    controller: modelController,
-                    focusNode: modelFocus,
-                    labelKey: 'model',
-                    icon: Icons.directions_car,
-                    enabled: brandController.text.isNotEmpty,
-                    readOnly: true,
-                    onTap: _showModelDropdown,
-                  ),
-                  const SizedBox(height: 16),
-                  // Модификация
-                  CustomTextField(
-                    controller: modificationController,
-                    focusNode: modificationFocus,
-                    labelKey: 'modification',
-                    icon: Icons.car_repair,
-                    enabled: modelController.text.isNotEmpty,
-                    readOnly: true,
-                    onTap: _showModificationDropdown,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          // --- КАРТОЧКА: ШАГ 3 ---
-          Card(
-            elevation: 4.0,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.car_form_step3_title, style: theme.textTheme.titleLarge),
-                  const SizedBox(height: 16),
-                  // Тип топлива
-                  DropdownButtonFormField<String>(
-                    value: fuelType,
-                    decoration: InputDecoration(
-                      labelText: l10n.fuel_type,
-                      prefixIcon: Icon(Icons.local_gas_station, color: theme.colorScheme.primary),
-                    ),
-                    items: ['Б', 'Д', 'СУГ', 'КПГ', 'Электро', 'Газодизель'].map((type) {
-                      return DropdownMenuItem(
-                        value: type,
-                        child: Text(
-                          // Ваша логика названий
-                          type == 'Б' ? l10n.petrol :
-                          type == 'Д' ? l10n.diesel :
-                          type == 'СУГ' ? l10n.lpg :
-                          type == 'КПГ' ? l10n.cng :
-                          type == 'Электро' ? l10n.electric :
-                          l10n.gas_diesel,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (mounted) setState(() => fuelType = value);
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  // Норма Город
-                  CustomTextField(
-                    controller: baseCityNormController,
-                    focusNode: baseCityNormFocus,
-                    labelKey: 'base_city_norm',
-                    isNumber: true,
-                    icon: Icons.location_city,
-                  ),
-                  const SizedBox(height: 16),
-                  // Норма Трасса
-                  CustomTextField(
-                    controller: baseHighwayNormController,
-                    focusNode: baseHighwayNormFocus,
-                    labelKey: 'base_highway_norm',
-                    isNumber: true,
-                    icon: Icons.add_road,
-                  ),
-                  const SizedBox(height: 16),
-                  CustomTextField(
-                    controller: baseCombinedNormController,
-                    focusNode: baseCombinedNormFocus,
-                    labelKey: 'base_combined_norm',
-                    isNumber: true,
-                    icon: Icons.blender, // Иконка, символизирующая "смешивание"
-                  ),
-                  // Поля для автобуса (появляются по условию)
-                  if (vehicleType == 'Bus') ...[
-                    const SizedBox(height: 16),
-                    CustomTextField(
-                      controller: heaterFuelConsumptionController,
-                      focusNode: heaterFuelConsumptionFocus,
-                      labelKey: 'heater_fuel_consumption',
-                      isNumber: true,
-                      icon: Icons.thermostat,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomTextField(
-                      controller: passengerCapacityController,
-                      focusNode: passengerCapacityFocus,
-                      labelKey: 'passenger_capacity',
-                      isNumber: true,
-                      icon: Icons.people,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 32),
-          // --- ФИНАЛЬНЫЕ КНОПКИ ---
-          GradientButton(
-            text: l10n.save_and_continue,
-            gradient: greenGradient,
-            iconData: Icons.save,
-            onPressed: saveCar,
-          ),
-          const SizedBox(height: 12),
-          GradientButton(
-            text: l10n.clear,
-            gradient: greyGradient,
-            iconData: Icons.clear_all,
-            onPressed: clearFields,
-          ),
-        ],
-        // ✨ КОНЕЦ НОВОГО СПИСКА CHILDREN
-      ),
-            ),
+      body: GradientBackground(child: pageContent),
     );
   }
 }
@@ -790,3 +899,4 @@ class Debouncer {
     _timer?.cancel();
   }
 }
+

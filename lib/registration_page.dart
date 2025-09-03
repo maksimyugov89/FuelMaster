@@ -17,6 +17,7 @@ import 'package:fuelmaster/widgets/gradient_button.dart';
 import 'package:fuelmaster/widgets/gradient_text.dart';
 import 'package:fuelmaster/theme.dart';
 import 'package:fuelmaster/utils/constants.dart';
+import 'package:fuelmaster/widgets/gradient_background.dart';
 
 class RegistrationPage extends StatefulWidget {
   final VoidCallback onRegistered;
@@ -519,13 +520,92 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark; // Проверяем тему
 
+    // --- ШАГ 1: Выносим всё содержимое страницы в отдельный виджет ---
+    final pageContent = FutureBuilder<String?>(
+      future: _locationFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: Lottie.asset('assets/loading_animation.json'));
+        }
+        return Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              elevation: 4.0,
+              shadowColor: theme.colorScheme.primary.withOpacity(0.2),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GradientText(
+                      _isLoginMode ? l10n.login : l10n.register,
+                      gradient: primaryActionGradient,
+                      style: theme.textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 24),
+                    CustomTextField(
+                      controller: emailController,
+                      focusNode: emailFocus,
+                      labelKey: 'email',
+                      icon: Icons.email,
+                    ),
+                    const SizedBox(height: 16),
+                    CustomTextField(
+                      controller: passwordController,
+                      focusNode: passwordFocus,
+                      labelKey: 'password',
+                      icon: Icons.lock,
+                      isPassword: true,
+                    ),
+                    if (!_isLoginMode) ...[
+                      const SizedBox(height: 16),
+                      _buildCityField(),
+                      const SizedBox(height: 12),
+                      GradientButton(
+                        text: l10n.detect_location,
+                        gradient: secondaryActionGradient,
+                        iconData: Icons.my_location,
+                        onPressed: _getCurrentLocation,
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    GradientButton(
+                      text: _isLoginMode ? l10n.login : l10n.register,
+                      gradient: primaryActionGradient,
+                      iconData: _isLoginMode ? Icons.login : Icons.person_add,
+                      onPressed: _isAuthenticating ? () {} : (_isLoginMode ? _signIn : _register),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isLoginMode = !_isLoginMode;
+                        });
+                      },
+                      child: Text(
+                        _isLoginMode ? l10n.register_instead : l10n.login_instead,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    
+    // --- ШАГ 2: Собираем финальный экран с фоном ---
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Colors.transparent, // <--- ИЗМЕНЕНИЕ
       appBar: AppBar(
         toolbarHeight: 120.0,
-        backgroundColor: theme.scaffoldBackgroundColor,
-        elevation: 0,
+        backgroundColor: Colors.transparent, // <--- ИЗМЕНЕНИЕ
+        elevation: 0, // <--- ИЗМЕНЕНИЕ
         automaticallyImplyLeading: false,
         flexibleSpace: FlexibleSpaceBar(
           background: Hero(
@@ -537,81 +617,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           ),
         ),
       ),
-      body: FutureBuilder<String?>(
-        future: _locationFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: Lottie.asset('assets/loading_animation.json'));
-          }
-          return Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                elevation: 4.0,
-                shadowColor: theme.colorScheme.primary.withOpacity(0.2),
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GradientText(
-                        _isLoginMode ? l10n.login : l10n.register,
-                        gradient: blueGradient,
-                        style: theme.textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 24),
-                      CustomTextField(
-                        controller: emailController,
-                        focusNode: emailFocus,
-                        labelKey: 'email',
-                        icon: Icons.email,
-                      ),
-                      const SizedBox(height: 16),
-                      CustomTextField(
-                        controller: passwordController,
-                        focusNode: passwordFocus,
-                        labelKey: 'password',
-                        icon: Icons.lock,
-                        isPassword: true,
-                      ),
-                      if (!_isLoginMode) ...[
-                        const SizedBox(height: 16),
-                        _buildCityField(),
-                        const SizedBox(height: 12),
-                        GradientButton(
-                          text: l10n.detect_location,
-                          gradient: greyGradient,
-                          iconData: Icons.my_location,
-                          onPressed: _getCurrentLocation,
-                        ),
-                      ],
-                      const SizedBox(height: 24),
-                      GradientButton(
-                        text: _isLoginMode ? l10n.login : l10n.register,
-                        gradient: greenGradient,
-                        iconData: _isLoginMode ? Icons.login : Icons.person_add,
-                        onPressed: _isAuthenticating ? () {} : (_isLoginMode ? _signIn : _register),
-                      ),
-                      const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _isLoginMode = !_isLoginMode;
-                          });
-                        },
-                        child: Text(
-                          _isLoginMode ? l10n.register_instead : l10n.login_instead,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+      body: GradientBackground(child: pageContent), // Для светлой - применяем наш новый фон
     );
   }
 }

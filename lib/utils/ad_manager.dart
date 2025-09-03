@@ -3,31 +3,40 @@ import 'package:fuelmaster/utils/yandex_ads_channel.dart';
 import 'package:fuelmaster/utils/logger.dart';
 
 class AdManager {
+  /// Инициализация SDK
   static Future<void> initialize() async {
     await YandexAdsChannel.initialize();
     logger.d('AdManager initialized');
   }
 
-  static Widget showBannerAd(BuildContext context) {
-    return YandexAdsChannel.showBannerAd(context);
+  /// Баннерная реклама
+  static Widget showBannerAd({
+    required BuildContext context,
+    required String adUnitId,
+    required int width,
+  }) {
+    return YandexAdsChannel.showBannerAd(
+      context,
+      adUnitId: adUnitId,
+      width: width,
+    );
   }
 
-  static Future<void> loadNativeAd() async {
-    await YandexAdsChannel.loadNativeAd();
+  /// Нативная реклама
+  static Widget buildNativeAdView({required String adUnitId}) {
+    return YandexAdsChannel.buildNativeAdView(adUnitId: adUnitId);
   }
 
-  static Widget buildNativeAdView() {
-    return YandexAdsChannel.buildNativeAdView();
-  }
-
-  static Future<void> loadInterstitialAd() async {
-    await YandexAdsChannel.loadInterstitialAd();
+  /// Межстраничная реклама
+  static Future<void> loadInterstitialAd({required String adUnitId}) async {
+    await YandexAdsChannel.loadInterstitialAd(adUnitId: adUnitId);
   }
 
   static Future<void> showInterstitialAd() async {
     await YandexAdsChannel.showInterstitialAd();
   }
 
+  /// Очистка ресурсов
   static void dispose() {
     YandexAdsChannel.dispose();
     logger.d('AdManager disposed');

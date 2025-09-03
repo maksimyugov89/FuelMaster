@@ -478,7 +478,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Weather data unavailable, using default values';
 
   @override
-  String get enter_city => 'Enter your city';
+  String get enter_city => 'Enter city';
 
   @override
   String get register => 'Register';
@@ -602,7 +602,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get geocoding_error => 'Unable to fetch location';
 
   @override
-  String get api_key_invalid => 'Invalid API key';
+  String get api_key_invalid => 'Invalid API key. Please check your settings.';
 
   @override
   String get winter => 'Winter';
@@ -686,9 +686,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get search => 'Search';
-
-  @override
-  String get correction_factor => 'Correction Factor (%)';
 
   @override
   String get heater_operating_time => 'Heater Operating Time (h)';
@@ -875,4 +872,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get car_form_step3_title => 'Step 3: Consumption Rates & Details';
+
+  @override
+  String get selected_car => 'Selected car';
+
+  @override
+  String get fill_license_plate_fully =>
+      'Please fill in the license plate completely';
+
+  @override
+  String get correction_factor => 'Correction Factor (%)';
+
+  @override
+  String get map => 'Map';
 }

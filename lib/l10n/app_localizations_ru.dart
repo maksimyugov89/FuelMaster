@@ -479,7 +479,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Погодные данные недоступны, используются значения по умолчанию';
 
   @override
-  String get enter_city => 'Введите ваш город';
+  String get enter_city => 'Введите город';
 
   @override
   String get register => 'Регистрация';
@@ -491,7 +491,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get password => 'Пароль';
 
   @override
-  String get detect_location => 'Определить местоположение';
+  String get detect_location => 'Определить текущее местоположение';
 
   @override
   String get location_service_disabled => 'Службы геолокации отключены';
@@ -526,7 +526,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get bus => 'Автобус';
 
   @override
-  String get truck => 'Грузовой бор. автомобиль';
+  String get truck => 'Грузовик';
 
   @override
   String get tractor => 'Тягач';
@@ -605,7 +605,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get geocoding_error => 'Не удалось определить местоположение';
 
   @override
-  String get api_key_invalid => 'Недействительный ключ API';
+  String get api_key_invalid =>
+      'Недействительный API-ключ. Проверьте настройки.';
 
   @override
   String get winter => 'Зима';
@@ -689,9 +690,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get search => 'Поиск';
-
-  @override
-  String get correction_factor => 'Поправочный коэффициент (%)';
 
   @override
   String get heater_operating_time => 'Время работы отопителя (ч)';
@@ -879,4 +877,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get car_form_step3_title => 'Шаг 3: Нормы расхода и детали';
+
+  @override
+  String get selected_car => 'Выбранный автомобиль';
+
+  @override
+  String get fill_license_plate_fully => 'Заполните гос. номер полностью';
+
+  @override
+  String get correction_factor => 'Поправочный коэффициент (%)';
+
+  @override
+  String get map => 'Карта';
 }
