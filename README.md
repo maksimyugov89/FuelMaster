@@ -29,6 +29,8 @@
 **ВНИМАНИЕ:** API-ключи для **WeatherAPI** и **OpenRouter (DeepSeek)** в настоящее время жестко закодированы непосредственно в исходных файлах Dart (`weather_service.dart`, `deepseek_service.dart`). Это представляет собой серьезную уязвимость безопасности и должно быть немедленно устранено путем перемещения этих ключей в файл `.env` или аналогичный безопасный механизм. Также рекомендуется переместить `yandex_mobile_ads_app_id` из `AndroidManifest.xml` в `.env` для единообразия и безопасности.
 
 ## Скриншоты
+![Screenshot_2025-09-04-02-30-09-10_00ed68a25f49ddc81dfbde00b62141e1](https://github.com/user-attachments/assets/2b646849-1ba2-4b50-b5be-7a50ef011d7e)
+![Screenshot_2025-09-04-02-30-23-94_00ed68a25f49ddc81dfbde00b62141e1](https://github.com/user-attachments/assets/acdcca64-7f8d-426c-b49b-0a5c2fae65ea)
 ![Screenshot_2025-09-04-02-06-47-69_00ed68a25f49ddc81dfbde00b62141e1](https://github.com/user-attachments/assets/4f50cbec-52e2-4df9-82fc-4b6483858d1b)
 ![Screenshot_2025-09-04-02-06-57-95_00ed68a25f49ddc81dfbde00b62141e1](https://github.com/user-attachments/assets/d5bf34be-5b4f-4886-953a-0c023fa4f412)
 ![Screenshot_2025-09-04-02-07-41-11_00ed68a25f49ddc81dfbde00b62141e1](https://github.com/user-attachments/assets/48bc266a-abbf-4476-8a8f-f94f5cec8223)
