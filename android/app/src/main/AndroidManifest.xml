@@ -5,23 +5,25 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
     <application
+        android:name=".MainApplication"
         android:label="FuelMaster"
         android:icon="@mipmap/launcher_icon"
         android:enableOnBackInvokedCallback="true"
         android:hardwareAccelerated="false"
-        tools:replace="android:hardwareAccelerated">
-
-        <meta-data
-            android:name="yandex_mobile_ads_app_id"
-            android:value="y0__xDT56mVBhjnjC0gl4a8jxQw6pWHmwiGEtSKAeuTk9Lc_GVwrPI_rJ-QWA" />
+        tools:replace="android:hardwareAccelerated" tools:ignore="MissingSettingReceiver">
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713"/>
 
+        <meta-data
+            android:name="com.yandex.maps.apikey"
+            android:value="5ca14097-6f12-48fd-823e-55811fe3b956"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -45,5 +47,15 @@
             android:name="com.google.firebase.provider.FirebaseInitProvider"
             android:authorities="${applicationId}.firebaseinitprovider"
             tools:node="remove" />
+
+        <receiver
+            android:name="com.yandex.runtime.connectivity.internal.ConnectivitySubscription"
+            android:enabled="true"
+            android:exported="false"
+            tools:node="merge">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

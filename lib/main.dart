@@ -1,4 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,14 +25,21 @@ import 'package:fuelmaster/providers/app_settings_provider.dart';
 import 'package:fuelmaster/utils/constants.dart';
 import 'package:fuelmaster/providers/history_provider.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:fuelmaster/services/map_page.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   final initialData = await AppInitializer.initialize();
   final SharedPreferences prefs = initialData['sharedPreferences'] as SharedPreferences;
   final Locale initialLocale = initialData['initialLocale'] as Locale;
   final bool initialDarkMode = initialData['isDarkMode'] as bool;
 
-    runApp(
+  runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => CarProvider()),
@@ -65,7 +74,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _initializeApp() async {
-    // Минимальная инициализация, загрузка в SplashScreen
     if (mounted) {
       setState(() {
         _initializePages();
@@ -88,11 +96,10 @@ class _MyAppState extends State<MyApp> {
         locale: appSettings.locale,
         isDarkMode: appSettings.isDarkMode,
       ),
+      const MapPage(), // <--- ШАГ 2: СТРАНИЦА ДОБАВЛЕНА В СПИСОК
       const SettingsPage(),
     ];
   }
-
-  
 
   @override
   void dispose() {
@@ -103,27 +110,28 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-    Widget _buildBottomNavigationBar(BuildContext context) {
+  Widget _buildBottomNavigationBar(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final isDarkMode = theme.brightness == Brightness.dark;
 
-    // Определяем, какой градиент использовать в зависимости от темы
-    final navBarGradient = theme.brightness == Brightness.light 
-        ? blueGradient // Синий для светлой темы
-        : orangeGradient; // Оранжевый для темной темы
+    final navBarDecoration = BoxDecoration(
+      color: isDarkMode ? const Color(0xFF1D2939) : null,
+      gradient: isDarkMode ? null : primaryActionGradient,
+      borderRadius: BorderRadius.circular(25),
+      boxShadow: isDarkMode
+          ? null
+          : [
+              BoxShadow(
+                blurRadius: 20,
+                color: Colors.black.withOpacity(.2),
+              )
+            ],
+    );
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      decoration: BoxDecoration(
-        gradient: navBarGradient, // Используем градиент
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 20,
-            color: Colors.black.withOpacity(.2),
-          )
-        ],
-      ),
+      decoration: navBarDecoration,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
@@ -137,6 +145,12 @@ class _MyAppState extends State<MyApp> {
                 icon: Icons.history,
                 text: l10n.history,
               ),
+              // v--- ШАГ 3: ДОБАВЛЕНА НОВАЯ КНОПКА ---v
+              GButton(
+                icon: Icons.map,
+                text: l10n.map,
+              ),
+              // ^--- КОНЕЦ НОВОГО БЛОКА ---^
               GButton(
                 icon: Icons.settings,
                 text: l10n.settings,
@@ -148,16 +162,15 @@ class _MyAppState extends State<MyApp> {
                 _selectedIndex = index;
               });
             },
-            // Стилизация
-            rippleColor: Colors.white.withOpacity(0.2),
-            hoverColor: Colors.white.withOpacity(0.1),
-            gap: 8,
-            activeColor: Colors.white,
+            rippleColor: isDarkMode ? Colors.grey[800]! : Colors.white.withOpacity(0.2),
+            hoverColor: isDarkMode ? Colors.grey[700]! : Colors.white.withOpacity(0.1),
+            gap: 5,
+            activeColor: isDarkMode ? const Color(0xFF007BFF) : Colors.white,
             iconSize: 24,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             duration: const Duration(milliseconds: 400),
-            tabBackgroundColor: Colors.white.withOpacity(0.15),
-            color: Colors.white.withOpacity(0.7),
+            tabBackgroundColor: isDarkMode ? const Color(0xFF007BFF).withOpacity(0.15) : Colors.white.withOpacity(0.15),
+            color: isDarkMode ? Colors.grey[500]! : Colors.white.withOpacity(0.7),
           ),
         ),
       ),

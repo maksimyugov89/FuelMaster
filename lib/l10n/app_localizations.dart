@@ -1013,7 +1013,7 @@ abstract class AppLocalizations {
   /// Message shown when city input is empty
   ///
   /// In en, this message translates to:
-  /// **'Enter your city'**
+  /// **'Enter city'**
   String get enter_city;
 
   /// Label for registration page and button
@@ -1259,7 +1259,7 @@ abstract class AppLocalizations {
   /// Message shown when the API key is invalid
   ///
   /// In en, this message translates to:
-  /// **'Invalid API key'**
+  /// **'Invalid API key. Please check your settings.'**
   String get api_key_invalid;
 
   /// Label for winter condition toggle in fuel calculation
@@ -1423,12 +1423,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search'**
   String get search;
-
-  /// Label for correction factor input in fuel calculation for buses
-  ///
-  /// In en, this message translates to:
-  /// **'Correction Factor (%)'**
-  String get correction_factor;
 
   /// Label for heater operating time input in fuel calculation for buses
   ///
@@ -1783,6 +1777,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Step 3: Consumption Rates & Details'**
   String get car_form_step3_title;
+
+  /// No description provided for @selected_car.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected car'**
+  String get selected_car;
+
+  /// No description provided for @fill_license_plate_fully.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in the license plate completely'**
+  String get fill_license_plate_fully;
+
+  /// Label for correction factor input in fuel calculation for buses
+  ///
+  /// In en, this message translates to:
+  /// **'Correction Factor (%)'**
+  String get correction_factor;
+
+  /// No description provided for @map.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get map;
 }
 
 class _AppLocalizationsDelegate

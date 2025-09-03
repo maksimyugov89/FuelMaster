@@ -7,6 +7,7 @@ import 'car_info_page.dart';
 import 'package:fuelmaster/providers/car_provider.dart';
 import 'package:fuelmaster/widgets/gradient_text.dart';
 import 'package:fuelmaster/theme.dart';
+import 'package:fuelmaster/widgets/gradient_background.dart';
 
 class CarListPage extends StatefulWidget {
   final List<CarData> cars;
@@ -217,16 +218,53 @@ class _CarListPageState extends State<CarListPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark; // Проверяем тему
     final carProvider = context.watch<CarProvider>();
     // Обновляем список при каждой перерисовке
     _filterCars();
 
+    // --- ШАГ 1: Выносим всё содержимое страницы в отдельный виджет ---
+    final pageContent = Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: TextField(
+            controller: searchController,
+            decoration: InputDecoration(
+              labelText: l10n.search_car,
+              prefixIcon: Icon(Icons.search, color: theme.colorScheme.primary),
+            ),
+          ),
+        ),
+        Expanded(
+          child: carProvider.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : filteredCars.isEmpty
+                  ? Center(
+                      child: Text(
+                        searchController.text.isEmpty ? l10n.no_cars : l10n.no_data_found,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.only(top: 8, bottom: 16),
+                      itemCount: filteredCars.length,
+                      itemBuilder: (context, index) {
+                        final car = filteredCars[index];
+                        return _buildCarCard(car, index);
+                      },
+                    ),
+        ),
+      ],
+    );
+
+    // --- ШАГ 2: Собираем финальный экран с фоном ---
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Colors.transparent, // <--- ИЗМЕНЕНИЕ
       appBar: AppBar(
         toolbarHeight: 120.0,
-        backgroundColor: theme.scaffoldBackgroundColor,
-        elevation: 0,
+        backgroundColor: Colors.transparent, // <--- ИЗМЕНЕНИЕ
+        elevation: 0, // <--- ИЗМЕНЕНИЕ
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
@@ -242,39 +280,7 @@ class _CarListPageState extends State<CarListPage> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                labelText: l10n.search_car,
-                prefixIcon: Icon(Icons.search, color: theme.colorScheme.primary),
-              ),
-            ),
-          ),
-          Expanded(
-            child: carProvider.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : filteredCars.isEmpty
-                    ? Center(
-                        child: Text(
-                          searchController.text.isEmpty ? l10n.no_cars : l10n.no_data_found,
-                          style: theme.textTheme.bodyMedium,
-                        ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.only(top: 8, bottom: 16),
-                        itemCount: filteredCars.length,
-                        itemBuilder: (context, index) {
-                          final car = filteredCars[index];
-                          return _buildCarCard(car, index);
-                        },
-                      ),
-          ),
-        ],
-      ),
+      body: GradientBackground(child: pageContent), // Для светлой - применяем наш новый фон
     );
   }
 }

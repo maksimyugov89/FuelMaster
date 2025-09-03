@@ -9,6 +9,7 @@ import 'package:fuelmaster/utils/ad_manager.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/constants.dart';
+import 'package:fuelmaster/services/location_service.dart'; // <-- ИМПОРТ СЕРВИСА
 
 class AppInitializer {
   static Future<Map<String, dynamic>> initialize() async {
@@ -31,6 +32,25 @@ class AppInitializer {
 
     final prefs = await SharedPreferences.getInstance();
     final isDarkMode = prefs.getBool(AppConstants.isDarkModeKey) ?? false;
+
+    // --- НАЧАЛО ИЗМЕНЕНИЙ: ОПРЕДЕЛЕНИЕ ГОРОДА ---
+    // Проверяем, был ли город сохранен ранее
+    if (prefs.getString(AppConstants.userCityKey) == null) {
+      logger.d('Город пользователя не найден, попытка определения...');
+      // Если нет, вызываем наш новый сервис
+      final locationService = LocationService();
+      final city = await locationService.getCurrentCity();
+      if (city != null) {
+        // Если город успешно определен, сохраняем его
+        await prefs.setString(AppConstants.userCityKey, city);
+        logger.d('Город ($city) успешно сохранен в SharedPreferences.');
+      } else {
+        logger.w('Не удалось определить и сохранить город пользователя.');
+      }
+    } else {
+      logger.d('Используется ранее сохраненный город: ${prefs.getString(AppConstants.userCityKey)}');
+    }
+    // --- КОНЕЦ ИЗМЕНЕНИЙ ---
 
     String language = prefs.getString(AppConstants.languageKey) ?? 'en';
     if (prefs.getString(AppConstants.languageKey) == null) {

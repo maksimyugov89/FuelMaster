@@ -22,7 +22,7 @@
   "history_empty_export": "История пуста",
   "fuel_history_message": "История расчетов топлива",
   "email_subject": "История топлива",
-  "error": "Ошибка",
+  "error": "Произошла ошибка",
   "error_email": "Не удалось открыть почтовый клиент",
   "error_telegram": "Не удалось открыть Telegram",
   "error_whatsapp": "Не удалось открыть WhatsApp",
@@ -98,7 +98,7 @@
   "no_cars": "Нет добавленных автомобилей",
   "delete_car": "Удалить автомобиль",
   "delete_car_confirm": "Вы уверены, что хотите удалить этот автомобиль?",
-  "fill_all_fields": "Заполните все поля!",
+  "fill_all_fields": "Заполните все поля",
   "delete": "Удалить",
   "settings": "Настройки",
   "home": "Главная",
@@ -153,8 +153,6 @@
     "description": "Текст, отображаемый на заставке во время загрузки приложения"
   },
   "ad_not_available": "Реклама недоступна",
-  "city_mileage": "Пробег по городу",
-  "highway_mileage": "Пробег по трассе",
   "period": "Период",
   "@city_mileage": {
     "description": "Метка для пробега по городу в истории расчётов"
@@ -397,18 +395,6 @@
   "@api_key_invalid": {
     "description": "Сообщение, отображаемое при неверном API-ключе"
   },
-  "location_service_disabled": "Службы геолокации отключены",
-  "@location_service_disabled": {
-    "description": "Сообщение, отображаемое при отключённых службах геолокации"
-  },
-  "location_permission_denied": "Разрешение на геолокацию отклонено",
-  "@location_permission_denied": {
-    "description": "Сообщение, отображаемое при отклонении разрешения на геолокацию"
-  },
-  "location_permission_denied_forever": "Разрешение на геолокацию отклонено навсегда",
-  "@location_permission_denied_forever": {
-    "description": "Сообщение, отображаемое при постоянном отклонении разрешения на геолокацию"
-  },
   "winter": "Зима",
   "@winter": {
     "description": "Метка для переключателя зимних условий в расчёте топлива"
@@ -423,11 +409,7 @@
   },
   "vehicle_type": "Тип транспортного средства",
   "passenger_car": "Легковой автомобиль",
-  "bus": "Автобус",
-  "truck": "Грузовой бор. автомобиль",
-  "tractor": "Тягач",
   "dump_truck": "Самосвал",
-  "van": "Фургон",
   "special_equipment": "Спецтехника",
   "select_preset_car": "Выберите предустановленный автомобиль",
   "custom_input": "Ручной ввод",
@@ -473,7 +455,6 @@
   "error_sharing": "Ошибка при попытке поделиться советом",
   "no_advice_to_share": "Нет советов для отправки",
   "search": "Поиск",
-  "correction_factor": "Поправочный коэффициент (%)",
   "@correction_factor": {
     "description": "Метка для поля ввода поправочного коэффициента в расчете топлива для автобусов"
   },
@@ -497,16 +478,10 @@
   "@passenger_capacity": {
     "description": "Label for passenger capacity"
   },
-  "sync_success": "Данные успешно синхронизированы", 
+  "sync_success": "Данные успешно синхронизированы",
   "sync_error": "Не удалось синхронизировать данные. Попробуйте снова.",
-  "register": "Регистрация",
   "login": "Вход",
   "email": "Электронная почта",
-  "password": "Пароль",
-  "city": "Город",
-  "enter_city": "Введите ваш город",
-  "detect_location": "Определить местоположение",
-  "fill_all_fields": "Заполните все поля",
   "invalid_email": "Недействительный адрес электронной почты",
   "weak_password": "Пароль должен содержать не менее 6 символов",
   "registration_success": "Регистрация прошла успешно",
@@ -515,12 +490,7 @@
   "invalid_credentials": "Недействительный email или пароль",
   "register_instead": "Нет аккаунта? Зарегистрируйтесь",
   "login_instead": "Уже есть аккаунт? Войдите",
-  "error": "Произошла ошибка",
   "geocoding_error": "Не удалось определить местоположение",
-  "location_service_disabled": "Службы геолокации отключены",
-  "location_permission_denied": "Разрешение на геолокацию отклонено",
-  "location_permission_denied_forever": "Разрешение на геолокацию отклонено навсегда",
-  "api_key_invalid": "Недействительный ключ API",
   "sign_out": "Выйти из аккаунта",
   "sign_out_success": "Выход выполнен успешно",
   "loading_car_database": "Загрузка базы данных автотранспорта...",
@@ -546,7 +516,6 @@
   "condition_winter": "Зима",
   "condition_ac": "Кондиционер",
   "condition_mountain": "Горная местность",
-  "liters": "л",
   "confirm_delete_record_title": "Подтвердите удаление",
   "confirm_delete_record_content": "Вы уверены, что хотите удалить эту запись?",
   "no_modification": "Нет модификации",
@@ -563,5 +532,15 @@
   "onboarding_button": "Начать работу",
   "car_form_step1_title": "Шаг 1: Идентификация",
   "car_form_step2_title": "Шаг 2: Выбор модели (автозаполнение)",
-  "car_form_step3_title": "Шаг 3: Нормы расхода и детали"
+  "car_form_step3_title": "Шаг 3: Нормы расхода и детали",
+  "selected_car": "Выбранный автомобиль",
+  "fill_license_plate_fully": "Заполните гос. номер полностью",
+  "correction_factor": "Поправочный коэффициент (%)",
+  "@correction_factor": {
+    "description": "Метка для поля ввода поправочного коэффициента в расчете топлива для автобусов"
+  },
+  "home": "Главная",
+  "history": "История",
+  "settings": "Настройки",
+  "map": "Карта"
 }

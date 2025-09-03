@@ -4,14 +4,17 @@ class GradientButton extends StatelessWidget {
   final String text;
   final Gradient gradient;
   final VoidCallback onPressed;
-  final IconData iconData; // Используем только стандартные иконки
+  final IconData iconData;
+  // 1. Добавляем новое необязательное поле `padding`
+  final EdgeInsetsGeometry? padding;
 
   const GradientButton({
     super.key,
     required this.text,
     required this.gradient,
     required this.onPressed,
-    required this.iconData, // Иконка теперь обязательна
+    required this.iconData,
+    this.padding, // 2. Добавляем его в конструктор
   });
 
   @override
@@ -37,16 +40,14 @@ class GradientButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: borderRadius,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            // 3. Используем новое свойство `padding` со значением по умолчанию
+            padding: padding ?? const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              // ✨ ЗАМЕНИТЕ ЭТОТ СПИСОК:
               children: [
                 Icon(iconData, color: Colors.white, size: 22),
                 const SizedBox(width: 8),
-                // Flexible говорит контейнеру с текстом занять ВСЁ оставшееся место
                 Flexible(
-                  // FittedBox уменьшает текст, если он не помещается в это место
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(

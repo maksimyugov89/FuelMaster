@@ -26,7 +26,11 @@ allprojects {
         maven { url = uri("https://sdk.tapjoy.com/") }
         maven { url = uri("https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea") }
         maven { url = uri("https://cboost.jfrog.io/artifactory/chartboost-ads/") }
-        maven { url = uri("https://maven.yandex.com") }
+        
+        // v--- ИСПРАВЛЕННЫЙ АДРЕС РЕПОЗИТОРИЯ ЯНДЕКСА ---v
+        maven { url = uri("https://maven.yandex.ru/repository/yandex_sdk/") }
+        // ^-------------------------------------------------^
+        
         maven { url = uri("https://artifactory.appodeal.com/appodeal") }
         maven { url = uri("https://dl.appnext.com/") }
         maven { url = uri("https://developer.huawei.com/repo/") }

@@ -3,7 +3,7 @@
   "welcome_message": "Welcome to Fuel Master!",
   "go_to_history": "Go to History",
   "history_title": "Calculation History",
-  "select_car": "Select Car",
+  "select_car": "Select a car",
   "all_cars": "All Cars",
   "fuel_usage_chart": "Fuel Usage Chart",
   "no_chart_data": "No Chart Data",
@@ -22,7 +22,7 @@
   "history_empty_export": "History is Empty",
   "fuel_history_message": "Fuel Calculation History",
   "email_subject": "Fuel History",
-  "error": "Error",
+  "error": "An error occurred",
   "error_email": "Unable to open email client",
   "error_telegram": "Unable to open Telegram",
   "error_whatsapp": "Unable to open WhatsApp",
@@ -46,7 +46,7 @@
   "refuel": "Refuel",
   "fuel_used": "Fuel Used",
   "final_fuel": "Final Fuel",
-  "liters": "liters",
+  "liters": "L",
   "kilometers": "km",
   "success": "Calculation completed",
   "current_calculations": "Current Calculations",
@@ -98,7 +98,7 @@
   "no_cars": "No cars added",
   "delete_car": "Delete Car",
   "delete_car_confirm": "Are you sure you want to delete this car?",
-  "fill_all_fields": "Please fill all fields!",
+  "fill_all_fields": "Please fill in all fields",
   "delete": "Delete",
   "settings": "Settings",
   "home": "Home",
@@ -153,8 +153,6 @@
     "description": "Text displayed on the splash screen while the app is loading"
   },
   "ad_not_available": "Advertisement not available",
-  "city_mileage": "City Mileage",
-  "highway_mileage": "Highway Mileage",
   "period": "Period",
   "@city_mileage": {
     "description": "Label for city mileage in fuel calculation history"
@@ -332,7 +330,7 @@
   "@password": {
     "description": "Label for password input field"
   },
-  "detect_location": "Detect Current Location",
+  "detect_location": "Detect Location",
   "@detect_location": {
     "description": "Button text for detecting current location"
   },
@@ -344,7 +342,7 @@
   "@location_permission_denied": {
     "description": "Message shown when location permission is denied"
   },
-  "location_permission_denied_forever": "Location permission denied forever",
+  "location_permission_denied_forever": "Location permission permanently denied",
   "@location_permission_denied_forever": {
     "description": "Message shown when location permission is permanently denied"
   },
@@ -397,18 +395,6 @@
   "@api_key_invalid": {
     "description": "Message shown when the API key is invalid"
   },
-  "location_service_disabled": "Location services are disabled",
-  "@location_service_disabled": {
-    "description": "Message shown when location services are disabled"
-  },
-  "location_permission_denied": "Location permission denied",
-  "@location_permission_denied": {
-    "description": "Message shown when location permission is denied"
-  },
-  "location_permission_denied_forever": "Location permission denied forever",
-  "@location_permission_denied_forever": {
-    "description": "Message shown when location permission is permanently denied"
-  },
   "winter": "Winter",
   "@winter": {
     "description": "Label for winter condition toggle in fuel calculation"
@@ -423,11 +409,7 @@
   },
   "vehicle_type": "Vehicle Type",
   "passenger_car": "Passenger Car",
-  "bus": "Bus",
-  "truck": "Truck",
-  "tractor": "Tractor",
   "dump_truck": "Dump Truck",
-  "van": "Van",
   "special_equipment": "Special Equipment",
   "select_preset_car": "Select Predefined Car",
   "custom_input": "Custom Input",
@@ -473,7 +455,6 @@
   "error_sharing": "Error while trying to share advice",
   "no_advice_to_share": "No advice available to share",
   "search": "Search",
-  "correction_factor": "Correction Factor (%)",
   "@correction_factor": {
     "description": "Label for correction factor input in fuel calculation for buses"
   },
@@ -497,16 +478,10 @@
   "@passenger_capacity": {
     "description": "Label for passenger capacity"
   },
-  "sync_success": "Data synced successfully", 
+  "sync_success": "Data synced successfully",
   "sync_error": "Failed to sync data. Please try again.",
-  "register": "Register",
   "login": "Log In",
   "email": "Email",
-  "password": "Password",
-  "city": "City",
-  "enter_city": "Enter your city",
-  "detect_location": "Detect Location",
-  "fill_all_fields": "Please fill in all fields",
   "invalid_email": "Invalid email address",
   "weak_password": "Password must be at least 6 characters",
   "registration_success": "Registration successful",
@@ -515,12 +490,7 @@
   "invalid_credentials": "Invalid email or password",
   "register_instead": "Don't have an account? Register",
   "login_instead": "Already have an account? Log In",
-  "error": "An error occurred",
   "geocoding_error": "Unable to fetch location",
-  "location_service_disabled": "Location services are disabled",
-  "location_permission_denied": "Location permission denied",
-  "location_permission_denied_forever": "Location permission permanently denied",
-  "api_key_invalid": "Invalid API key",
   "sign_out": "Sign Out",
   "sign_out_success": "Signed out successfully",
   "loading_car_database": "Loading car database...",
@@ -546,7 +516,6 @@
   "condition_winter": "Winter",
   "condition_ac": "A/C",
   "condition_mountain": "Mountain",
-  "liters": "L",
   "confirm_delete_record_title": "Confirm Deletion",
   "confirm_delete_record_content": "Are you sure you want to delete this record?",
   "no_modification": "No modification",
@@ -563,5 +532,15 @@
   "onboarding_button": "Get Started",
   "car_form_step1_title": "Step 1: Identification",
   "car_form_step2_title": "Step 2: Model Selection (Autocomplete)",
-  "car_form_step3_title": "Step 3: Consumption Rates & Details"
+  "car_form_step3_title": "Step 3: Consumption Rates & Details",
+  "selected_car": "Selected car",
+  "fill_license_plate_fully": "Please fill in the license plate completely",
+    "correction_factor": "Correction Factor (%)",
+  "@correction_factor": {
+    "description": "Label for correction factor input in fuel calculation for buses"
+  },
+  "home": "Home",
+  "history": "History",
+  "settings": "Settings",
+  "map": "Map"
 }
