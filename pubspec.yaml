@@ -1,6 +1,7 @@
 name: fuelmaster
 description: Приложение на Flutter для управления расходом топлива и данными автомобилей.
 version: 1.0.1+7
+homepage: https://github.com/maksimyugov89/FuelMaster
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
