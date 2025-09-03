@@ -74,10 +74,20 @@
 
     Пример содержимого файла `.env`:
     ```
-    WEATHER_API_KEY=ваш_погодный_api_ключ
-    DEEPSEEK_API_KEY=ваш_deepseek_api_ключ
-    GEOAPIFY_API_KEY=ваш_geoapify_api_ключ
-    YANDEX_MOBILE_ADS_APP_ID=ваш_yandex_mobile_ads_app_id
+      WEATHER_API_KEY=your_weather_api_key_here
+      DEEPSEEK_API_KEY=your_deepseek_api_key_here
+      GEOAPIFY_API_KEY=your_geoapify_api_key_here
+      YANDEX_MOBILE_ADS_APP_ID=your_yandex_mobile_ads_app_id_here"
+      Firebase Android Keys"
+      FIREBASE_ANDROID_API_KEY=your_android_api_key_here
+      FIREBASE_ANDROID_APP_ID=your_android_app_id_here
+      FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id_here
+      FIREBASE_PROJECT_ID=your_project_id_here
+      FIREBASE_STORAGE_BUCKET=your_storage_bucket_here
+      # Firebase iOS Keys
+      FIREBASE_IOS_API_KEY=your_ios_api_key_here"
+      FIREBASE_IOS_APP_ID=your_ios_app_id_here"
+      FIREBASE_IOS_BUNDLE_ID=your_ios_bundle_id_here"
     ```
     **Важно:** Файл `.env` содержит конфиденциальную информацию и **не должен** быть добавлен в систему контроля версий (Git). Он уже добавлен в `.gitignore`.
 
