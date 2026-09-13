@@ -6,16 +6,23 @@ import 'package:fuelmaster/utils/ad_manager.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
 import 'package:fuelmaster/utils/history_manager.dart';
 import 'package:fuelmaster/utils/logger.dart';
+import 'package:fuelmaster/utils/feature_flags.dart';
 import 'package:fuelmaster/utils/constants.dart';
 import 'package:fuelmaster/services/location_service.dart'; // <-- ИМПОРТ СЕРВИСА
 
 class AppInitializer {
   static Future<Map<String, dynamic>> initialize() async {
-    try {
-      await AdManager.initialize();
-      logger.d('AdManager успешно инициализирован');
-    } catch (e) {
-      logger.e('Ошибка инициализации AdManager: $e');
+    // F-1: реклама отложена — не поднимаем её SDK на старте. Лишний сетевой
+    // слой на запуске приложения ничего не даёт, а точкой отказа быть может.
+    if (FeatureFlags.ads) {
+      try {
+        await AdManager.initialize();
+        logger.d('AdManager успешно инициализирован');
+      } catch (e) {
+        logger.e('Ошибка инициализации AdManager: $e');
+      }
+    } else {
+      logger.d('Реклама отключена (F-1): SDK не инициализируется');
     }
 
     final prefs = await SharedPreferences.getInstance();
@@ -65,14 +72,17 @@ class AppInitializer {
       }
     }
 
-    final InAppPurchase iap = InAppPurchase.instance;
-    final isIapAvailable = await iap.isAvailable();
-    if (!isIapAvailable) {
-      // ВАЖНО: раньше здесь писалось isPremium = false, и пользователь,
-      // купивший премиум, терял его навсегда, если магазин в этот момент
-      // недоступен (офлайн, нет Google Play). Статус меняет только
-      // PremiumService по подтверждению магазина.
-      logger.w('InAppPurchase недоступен — покупки внутри приложения отключены');
+    // F-1: подписка отложена — к магазину на старте не обращаемся вовсе.
+    if (FeatureFlags.premium) {
+      final InAppPurchase iap = InAppPurchase.instance;
+      final isIapAvailable = await iap.isAvailable();
+      if (!isIapAvailable) {
+        // ВАЖНО: раньше здесь писалось isPremium = false, и пользователь,
+        // купивший премиум, терял его навсегда, если магазин в этот момент
+        // недоступен (офлайн, нет Google Play). Статус меняет только
+        // PremiumService по подтверждению магазина.
+        logger.w('InAppPurchase недоступен — покупки внутри приложения отключены');
+      }
     }
 
     final hasMigrated = prefs.getBool(AppConstants.hasMigratedKey) ?? false;
