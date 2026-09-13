@@ -17,7 +17,6 @@ import 'settings_page.dart';
 import 'main_menu_page.dart';
 import 'history_page.dart';
 import 'car_info_page.dart';
-import 'fuel_calculator_page.dart';
 import 'car_list_page.dart';
 import 'registration_page.dart';
 import 'splash_screen.dart';
@@ -26,7 +25,6 @@ import 'theme.dart';
 import 'package:fuelmaster/providers/car_provider.dart';
 import 'package:fuelmaster/utils/app_initializer.dart';
 import 'package:fuelmaster/providers/app_settings_provider.dart';
-import 'package:fuelmaster/utils/constants.dart';
 import 'package:fuelmaster/providers/history_provider.dart';
 import 'package:fuelmaster/services/premium_service.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -92,7 +90,7 @@ class MyApp extends StatefulWidget {
   });
 
   @override
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {

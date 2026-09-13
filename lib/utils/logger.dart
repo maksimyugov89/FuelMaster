@@ -18,7 +18,7 @@ final Logger logger = Logger(
     lineLength: 120,
     colors: !kReleaseMode,
     printEmojis: !kReleaseMode,
-    printTime: !kReleaseMode,
+    dateTimeFormat: kReleaseMode ? DateTimeFormat.none : DateTimeFormat.onlyTimeAndSinceStart,
   ),
   level: kReleaseMode ? Level.warning : Level.debug,
 );

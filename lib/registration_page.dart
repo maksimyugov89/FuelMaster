@@ -14,7 +14,6 @@ import 'package:fuelmaster/widgets.dart';
 import 'package:fuelmaster/widgets/gradient_button.dart';
 import 'package:fuelmaster/widgets/gradient_text.dart';
 import 'package:fuelmaster/theme.dart';
-import 'package:fuelmaster/utils/constants.dart';
 import 'package:fuelmaster/widgets/gradient_background.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -24,7 +23,7 @@ class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key, required this.onRegistered, required this.locale});
 
   @override
-  _RegistrationPageState createState() => _RegistrationPageState();
+  State<RegistrationPage> createState() => _RegistrationPageState();
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
@@ -563,7 +562,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark; // Проверяем тему
 
     final pageContent = FutureBuilder<String?>(
       future: _locationFuture,

@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
@@ -12,7 +10,6 @@ import 'package:fuelmaster/utils/utils.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:fuelmaster/utils/history_manager.dart';
 import 'package:fuelmaster/utils/ad_manager.dart';
-import 'package:fuelmaster/utils/database_helper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
 import 'package:fuelmaster/utils/deepseek_service.dart';
@@ -275,7 +272,7 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
                   final messenger = ScaffoldMessenger.of(context);
                   if (advice!.isNotEmpty) {
                     try {
-                      await Share.share(advice);
+                      await SharePlus.instance.share(ShareParams(text: advice));
                     } catch (e) {
                       logger.e('Ошибка при попытке поделиться советом: $e');
                       messenger.showSnackBar(

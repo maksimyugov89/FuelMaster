@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:fuelmaster/utils/database_helper.dart';
@@ -162,8 +161,8 @@ class InitialData {
         double baseHighwayNorm = 0.0;
         double? baseCombinedNorm;
         String? fuelType;
-        int? yearFrom = null;
-        int? yearTo = null;
+        int? yearFrom;
+        int? yearTo;
         int? passengerCapacity;
         double? heaterFuelConsumption;
         double? fuelConsumptionPerTonKm;

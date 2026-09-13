@@ -705,7 +705,7 @@ class DatabaseHelper {
       } catch (e) {
         retries--;
         logger.w('Retry sync: $retries left');
-        if (retries == 0) throw e;
+        if (retries == 0) rethrow;
         await Future.delayed(const Duration(seconds: 5));
       }
     }

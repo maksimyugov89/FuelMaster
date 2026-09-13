@@ -14,7 +14,6 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark; // Проверяем тему
     final l10n = AppLocalizations.of(context)!;
 
     final pageContent = SafeArea(

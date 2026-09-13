@@ -13,7 +13,7 @@ class LocationService {
       if (permission.isGranted) {
         // 2. Если разрешение получено, получаем текущие координаты
         Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.medium,
+          locationSettings: LocationSettings(accuracy: LocationAccuracy.medium),
         );
 
         // 3. Преобразуем координаты в адрес (обратное геокодирование)

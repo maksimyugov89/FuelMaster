@@ -5,8 +5,6 @@ import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'car_info_page.dart';
 import 'package:fuelmaster/providers/car_provider.dart';
-import 'package:fuelmaster/widgets/gradient_text.dart';
-import 'package:fuelmaster/theme.dart';
 import 'package:fuelmaster/widgets/gradient_background.dart';
 
 class CarListPage extends StatefulWidget {
@@ -20,7 +18,7 @@ class CarListPage extends StatefulWidget {
   });
 
   @override
-  _CarListPageState createState() => _CarListPageState();
+  State<CarListPage> createState() => _CarListPageState();
 }
 
 class _CarListPageState extends State<CarListPage> {
@@ -219,7 +217,6 @@ class _CarListPageState extends State<CarListPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark; // Проверяем тему
     final carProvider = context.watch<CarProvider>();
     // Обновляем список при каждой перерисовке
     _filterCars();

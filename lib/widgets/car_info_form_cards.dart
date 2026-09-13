@@ -37,7 +37,7 @@ class CarInfoStep1Card extends StatelessWidget {
             Text(l10n.car_form_step1_title, style: theme.textTheme.titleLarge),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: vehicleType,
+              initialValue: vehicleType,
               decoration: InputDecoration(
                 labelText: l10n.vehicle_type,
                 prefixIcon: Icon(Icons.commute, color: theme.colorScheme.primary),
@@ -223,7 +223,7 @@ class CarInfoStep3Card extends StatelessWidget {
             Text(l10n.car_form_step3_title, style: theme.textTheme.titleLarge),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: fuelType,
+              initialValue: fuelType,
               decoration: InputDecoration(
                 labelText: l10n.fuel_type,
                 prefixIcon: Icon(Icons.local_gas_station, color: theme.colorScheme.primary),

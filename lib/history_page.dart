@@ -1,19 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:cross_file/cross_file.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
 import 'package:fuelmaster/services/premium_service.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:logger/logger.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:fuelmaster/utils/history_manager.dart';
 import 'package:fuelmaster/utils/logger.dart';
-import 'package:fuelmaster/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:fuelmaster/utils/ad_manager.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
@@ -45,7 +38,7 @@ class HistoryPage extends StatefulWidget {
   });
 
   @override
-  _HistoryPageState createState() => _HistoryPageState();
+  State<HistoryPage> createState() => _HistoryPageState();
 }
 
 class _HistoryPageState extends State<HistoryPage> {
@@ -63,7 +56,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   int? _expandedRecordId;
   final Map<int, GlobalKey> _cardKeys = {};
-  final Map<int, ExpansionTileController> _tileControllers = {};
+  final Map<int, ExpansibleController> _tileControllers = {};
 
   @override
   void initState() {
@@ -241,7 +234,7 @@ class _HistoryPageState extends State<HistoryPage> {
     await file.writeAsString(content);
 
     try {
-      await Share.shareXFiles([XFile(file.path)], subject: l10n.fuel_history_message);
+      await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], subject: l10n.fuel_history_message));
     } catch (e) {
       logger.e('Ошибка при экспорте: $e');
     }
@@ -309,7 +302,7 @@ class _HistoryPageState extends State<HistoryPage> {
     final isExpanded = _expandedRecordId == recordId;
 
     final cardKey = _cardKeys.putIfAbsent(recordId, () => GlobalKey());
-    final tileController = _tileControllers.putIfAbsent(recordId, () => ExpansionTileController());
+    final tileController = _tileControllers.putIfAbsent(recordId, () => ExpansibleController());
 
     return Card(
       key: cardKey,
@@ -514,7 +507,7 @@ class _HistoryPageState extends State<HistoryPage> {
     for (var record in filteredHistory) {
       final recordId = record['id'] as int;
       _cardKeys.putIfAbsent(recordId, () => GlobalKey());
-      _tileControllers.putIfAbsent(recordId, () => ExpansionTileController());
+      _tileControllers.putIfAbsent(recordId, () => ExpansibleController());
     }
 
     final pageContent = _isLoading

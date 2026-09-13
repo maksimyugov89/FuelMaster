@@ -38,7 +38,7 @@ class _MapPageState extends State<MapPage> {
   Future<void> _moveToCurrentLocation() async {
     try {
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
       );
       final controller = await _controller.future;
       await controller.moveCamera(
@@ -291,8 +291,8 @@ class _MapPageState extends State<MapPage> {
             onPressed: _isMeasuring ? null : _searchGasStations,
             backgroundColor:
                 _isMeasuring ? Colors.grey : Theme.of(context).primaryColor,
-            child: const Icon(Icons.local_gas_station),
             tooltip: 'Найти АЗС в радиусе 50 км',
+            child: const Icon(Icons.local_gas_station),
           ),
           const SizedBox(height: 16),
           FloatingActionButton(
@@ -301,16 +301,16 @@ class _MapPageState extends State<MapPage> {
             backgroundColor: _isMeasuring
                 ? Colors.redAccent
                 : Theme.of(context).colorScheme.secondary,
-            child: Icon(_isMeasuring ? Icons.close : Icons.straighten),
             tooltip:
                 _isMeasuring ? 'Отменить измерение' : 'Замерить расстояние',
+            child: Icon(_isMeasuring ? Icons.close : Icons.straighten),
           ),
           const SizedBox(height: 16),
           FloatingActionButton(
             heroTag: "current_location",
             onPressed: _moveToCurrentLocation,
-            child: const Icon(Icons.my_location),
             tooltip: 'Мое местоположение',
+            child: const Icon(Icons.my_location),
           ),
         ],
       ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
-import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/utils.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:fuelmaster/utils/history_manager.dart';

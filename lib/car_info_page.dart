@@ -5,8 +5,6 @@ import 'package:fuelmaster/l10n/app_localizations.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
 import 'package:fuelmaster/utils/logger.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:fuelmaster/widgets.dart';
 import 'package:fuelmaster/providers/car_provider.dart';
 import 'package:fuelmaster/utils/preset_data_loader.dart';
 import 'package:fuelmaster/widgets/gradient_button.dart';
@@ -31,7 +29,7 @@ class CarInfoPage extends StatefulWidget {
   });
 
   @override
-  _CarInfoPageState createState() => _CarInfoPageState();
+  State<CarInfoPage> createState() => _CarInfoPageState();
 }
 
 class _CarInfoPageState extends State<CarInfoPage> {

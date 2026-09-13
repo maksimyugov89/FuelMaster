@@ -30,7 +30,7 @@ class MainMenuPage extends StatefulWidget {
   });
 
   @override
-  _MainMenuPageState createState() => _MainMenuPageState();
+  State<MainMenuPage> createState() => _MainMenuPageState();
 }
 
 class _MainMenuPageState extends State<MainMenuPage> with WidgetsBindingObserver {
@@ -238,7 +238,7 @@ void _refreshCarListAndSetSelection() {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<CarData>(
-              value: _selectedCar,
+              initialValue: _selectedCar,
               isExpanded: true,
               decoration: InputDecoration(
                 labelText: l10n.selected_car,

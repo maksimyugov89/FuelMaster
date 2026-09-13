@@ -21,7 +21,7 @@ class SettingsPage extends StatefulWidget {
   });
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
@@ -174,7 +174,6 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark; // Проверяем тему
     final appSettings = Provider.of<AppSettingsProvider>(context);
     final currentLanguage = appSettings.locale.languageCode;
     final isSignedIn = FirebaseAuth.instance.currentUser != null;

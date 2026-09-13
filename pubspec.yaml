@@ -52,6 +52,8 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.4
   sqflite_common_ffi: ^2.3.6
   coverage: ^1.7.2
+  # Нужен сгенерированным mockito-мокам (sqflite_common/sqlite_api.dart)
+  sqflite_common: ^2.5.6
 
 flutter:
   uses-material-design: true

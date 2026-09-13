@@ -4,7 +4,6 @@ import 'package:fuelmaster/l10n/app_localizations.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/initial_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'widgets.dart';
 
 class SplashScreen extends StatefulWidget {
   final VoidCallback? onDataLoaded;
@@ -12,7 +11,7 @@ class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key, this.onDataLoaded});
 
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
