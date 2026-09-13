@@ -516,9 +516,15 @@ class DatabaseHelper {
         whereArgs: [0],
       );
       final cars = maps.map((map) => CarData.fromJson(map)).toList();
+      // B-1 аудита: ключом дедупликации служил `car.licensePlate ?? ''`, поэтому
+      // ВСЕ машины без номера схлопывались в одну запись (и потом уезжали в синк
+      // как «лишние»). Дедуплицируем только по непустому номеру, остальные
+      // машины сохраняем как есть.
       final uniqueCars = cars.fold<List<CarData>>([], (list, car) {
-        final licensePlateKey = car.licensePlate ?? '';
-        if (!list.any((c) => c.licensePlate == licensePlateKey)) {
+        final plate = car.licensePlate;
+        if (plate == null || plate.isEmpty) {
+          list.add(car);
+        } else if (!list.any((c) => c.licensePlate == plate)) {
           list.add(car);
         }
         return list;

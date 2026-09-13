@@ -128,5 +128,37 @@ void main() {
         whereArgs: [id],
       )).called(1);
     });
+
+    test('Машины без номера не схлопываются в одну запись (B-1)', () async {
+      Map<String, Object?> carRow(int id, String brand, String? plate) => {
+            'id': id,
+            'brand': brand,
+            'model': 'X',
+            'license_plate': plate,
+            'engine_volume': 0.0,
+            'power_hp': 0.0,
+            'power_kw': 0.0,
+            'transmission_speeds': 0,
+            'base_rate_city': 8.0,
+            'base_rate_highway': 6.0,
+            'vehicle_type': 'Passenger Car',
+            'is_preset': 0,
+          };
+
+      when(mockDatabase.query('cars', where: 'is_preset = ?', whereArgs: [0]))
+          .thenAnswer((_) async => [
+                carRow(1, 'Toyota', null),
+                carRow(2, 'Lada', null),
+                carRow(3, 'KIA', 'A123BC'),
+                carRow(4, 'Ford', 'A123BC'),
+              ]);
+
+      final cars = await databaseHelper.getUserCars();
+
+      // Две машины без номера + одна из двух с одинаковым номером = 3.
+      expect(cars.length, 3);
+      expect(cars.where((c) => c.licensePlate == null).length, 2);
+      expect(cars.where((c) => c.licensePlate == 'A123BC').length, 1);
+    });
   });
 }
