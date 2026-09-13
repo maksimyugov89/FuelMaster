@@ -4,9 +4,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fuelmaster/services/premium_service.dart';
 import 'package:fuelmaster/services/sync_outbox.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
@@ -60,6 +57,8 @@ class DatabaseHelper {
       await db.transaction((txn) async {
         await txn.delete('fuel_logs');
         await txn.delete('cars', where: 'is_preset = ?', whereArgs: [0]);
+        // D-4: операции удалённых строк отправлять больше нечего.
+        await txn.delete(SyncOutbox.table);
       });
       logger.d('Локальные данные пользователя удалены');
     } catch (e) {
@@ -528,7 +527,7 @@ class DatabaseHelper {
       });
 
       logger.d('Inserted car with ID: $insertedId');
-      await _syncCarToFirestoreIfAuthenticated(carToInsert.copyWith(id: insertedId));
+      // Отправку делает SyncWorker из очереди (D-4): путь записи сети не ждёт.
     } catch (e) {
       logger.e('Error inserting car: $e');
       rethrow;
@@ -607,7 +606,7 @@ class DatabaseHelper {
       });
 
       logger.d('Updated car id=${carWithTimestamp.id}');
-      await _syncCarToFirestoreIfAuthenticated(carWithTimestamp);
+      // Операция уже в очереди — её отправит SyncWorker (D-4).
     } catch (e) {
       logger.e('Error updating car: $e');
       rethrow;
@@ -650,7 +649,7 @@ class DatabaseHelper {
       });
 
       logger.d('Deleted car with id: $id');
-      await _deleteCarFromFirestoreIfAuthenticated(id);
+      // Удаление в облаке выполнит SyncWorker по операции из очереди (D-4).
     } catch (e) {
       logger.e('Error deleting car: $e');
       rethrow;
@@ -714,127 +713,120 @@ class DatabaseHelper {
     }
   }
 
+  /// Синхронизация авто с Firestore (D-4, фаза 2).
+  ///
+  /// Тянет облачные изменения к себе, а свои **ставит в очередь**: отправляет
+  /// их SyncWorker, поэтому UI сети не ждёт. Ключ сущности — uuid; документы
+  /// старого формата (с локальным id в имени) читаются в переходный период.
+  ///
+  /// F-1: синхронизация больше не премиум-функция — монетизация отложена.
   Future<void> syncCarsWithFirestore(String uid) async {
-    int retries = 3;
-    while (retries > 0) {
-      try {
-        final db = await database;
-        final isPremium = PremiumService.instance.isPremium;
-        if (!isPremium) {
-          logger.d('Sync skipped: User is not premium');
-          return;
-        }
+    final firestore = FirebaseFirestore.instance;
+    final db = await database;
+    final List<CarData> localCars = await getUserCars();
+    final snapshot =
+        await firestore.collection('users').doc(uid).collection('cars').get();
 
-        final firestore = FirebaseFirestore.instance;
-        final localCars = await getUserCars();
-        final remoteCarsSnapshot = await firestore.collection('users').doc(uid).collection('cars').get();
-
-        final remoteCars = remoteCarsSnapshot.docs.map((doc) {
-          final data = doc.data();
-          return CarData.fromJson({
-            ...data,
-            'id': int.parse(doc.id),
-          });
-        }).toList();
-
-        for (var localCar in localCars) {
-          final remoteCar = remoteCars.firstWhere(
-            (rc) => rc.id == localCar.id,
-            orElse: () => CarData(
-              id: 0,
-              brand: '',
-              model: '',
-              baseCityNorm: 0.0,
-              baseHighwayNorm: 0.0,
-            ),
-          );
-          if (remoteCar.id == 0 || (localCar.lastModified ?? 0) > (remoteCar.lastModified ?? 0)) {
-            await _syncCarToFirestore(uid, localCar);
-          } else if ((remoteCar.lastModified ?? 0) > (localCar.lastModified ?? 0)) {
-            await db.update(
-              'cars',
-              remoteCar.toJson(),
-              where: 'id = ?',
-              whereArgs: [remoteCar.id],
-            );
-            logger.d('Updated local car id=${remoteCar.id} from Firestore');
-          }
-        }
-
-        for (var remoteCar in remoteCars) {
-          if (!localCars.any((lc) => lc.id == remoteCar.id)) {
-            await db.insert('cars', remoteCar.toJson());
-            logger.d('Inserted remote car id=${remoteCar.id} to local');
-          }
-        }
-
-        // B-1 аудита: раньше локальные авто, отсутствующие в облаке, здесь
-        // удалялись из БД. Сбой сети или частичное чтение стирали машины
-        // вместе с историей. В первом релизе исправления ничего не удаляем
-        // автоматически: только журналируем и отдаём запись наверх
-        // (мягкое удаление с tombstone — отдельная задача).
-        for (var localCar in localCars) {
-          if (!remoteCars.any((rc) => rc.id == localCar.id)) {
-            logger.w('Локальное авто id=${localCar.id} отсутствует в облаке — оставлено локально (B-1)');
-            await _syncCarToFirestore(uid, localCar);
-          }
-        }
-
-        logger.d('Car sync with Firestore completed');
-        break; // Success, exit loop
-      } catch (e) {
-        retries--;
-        logger.w('Retry sync: $retries left');
-        if (retries == 0) rethrow;
-        await Future.delayed(const Duration(seconds: 5));
+    // Документы нового формата — по uuid, старого — по локальному id.
+    final Map<String, Map<String, dynamic>> remoteByUuid = {};
+    final Map<int, Map<String, dynamic>> remoteByLegacyId = {};
+    for (final doc in snapshot.docs) {
+      final Map<String, dynamic> data = <String, dynamic>{...doc.data()};
+      final String? uuid = (data['uuid'] as String?)?.trim();
+      if (isUuidV4(uuid)) {
+        remoteByUuid[uuid!] = data;
+      } else {
+        final int? legacyId = int.tryParse(doc.id);
+        if (legacyId != null) remoteByLegacyId[legacyId] = data;
       }
     }
-  }
 
-  Future<void> _syncCarToFirestoreIfAuthenticated(CarData car) async {
-    if (Firebase.apps.isEmpty) return;
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await _syncCarToFirestore(user.uid, car);
+    for (final CarData local in localCars) {
+      final String? uuid = local.uuid;
+      Map<String, dynamic>? remote =
+          (uuid != null && isUuidV4(uuid)) ? remoteByUuid[uuid] : null;
+      remote ??= remoteByLegacyId[local.id];
+
+      final int localTime = local.lastModified ?? 0;
+      final int remoteTime = (remote?['last_modified'] as num?)?.toInt() ?? 0;
+
+      if (remote == null) {
+        // Локального авто нет в облаке. Раньше его удаляли из БД, и сбой сети
+        // стирал машину вместе с историей (B-1) — теперь отправляем в облако.
+        await _enqueueCarUpsert(local);
+      } else if (remoteTime > localTime) {
+        await db.update(
+          'cars',
+          _carRowFromRemote(remote, localId: local.id, uuid: local.uuid),
+          where: 'id = ?',
+          whereArgs: <Object?>[local.id],
+        );
+        logger.d('Авто id=${local.id} обновлено из облака');
+      } else if (localTime > remoteTime) {
+        await _enqueueCarUpsert(local);
       }
-    } catch (e) {
-      logger.w('Пропуск синхронизации авто с Firestore: $e');
     }
+
+    // Облачные авто, которых нет на устройстве. Локальный id НЕ переносим:
+    // чужой id на этом устройстве занят другой машиной (класс ошибок B-1).
+    for (final MapEntry<String, Map<String, dynamic>> entry
+        in remoteByUuid.entries) {
+      if (localCars.any((CarData c) => c.uuid == entry.key)) continue;
+      await db.insert(
+        'cars',
+        _carRowFromRemote(entry.value, uuid: entry.key),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    for (final MapEntry<int, Map<String, dynamic>> entry
+        in remoteByLegacyId.entries) {
+      if (localCars.any((CarData c) => c.id == entry.key)) continue;
+      final String? uuid = (entry.value['uuid'] as String?)?.trim();
+      if (!isUuidV4(uuid)) continue; // без uuid синхронизировать нечем
+      await db.insert(
+        'cars',
+        _carRowFromRemote(entry.value, uuid: uuid),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    logger.d('Авто: облако проверено, свои изменения — в очереди синка');
   }
 
-  Future<void> _deleteCarFromFirestoreIfAuthenticated(int id) async {
-    if (Firebase.apps.isEmpty) return;
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await _deleteCarFromFirestore(user.uid, id);
-      }
-    } catch (e) {
-      logger.w('Пропуск удаления авто из Firestore: $e');
-    }
+  /// Кладёт в очередь отправку машины (правку делает SyncWorker).
+  Future<void> _enqueueCarUpsert(CarData car) async {
+    final String uuid = ensureUuid(car.uuid);
+    final Map<String, dynamic> row = car.copyWith(uuid: uuid).toJson();
+    await SyncOutbox.enqueue(
+      entity: SyncOutbox.entityCar,
+      entityUuid: uuid,
+      entityId: car.id,
+      op: SyncOutbox.opUpsert,
+      payload: row,
+    );
   }
 
-  Future<void> _syncCarToFirestore(String uid, CarData car) async {
-    try {
-      final firestore = FirebaseFirestore.instance;
-      await firestore.collection('users').doc(uid).collection('cars').doc(car.id.toString()).set(car.toJson());
-      logger.d('Synced car id=${car.id} to Firestore');
-    } catch (e) {
-      logger.e('Error syncing car to Firestore: $e');
-      throw Exception('Failed to sync car: $e');
+  /// Строка для локальной записи из облачного документа.
+  ///
+  /// [localId] подставляется только при слиянии с уже существующей локальной
+  /// машиной; для новых строк id не переносим — его выдаст SQLite, а личность
+  /// определяется uuid.
+  Map<String, dynamic> _carRowFromRemote(
+    Map<String, dynamic> data, {
+    String? uuid,
+    int? localId,
+  }) {
+    final Map<String, dynamic> json = <String, dynamic>{
+      ...data,
+      'uuid': ensureUuid(uuid ?? data['uuid'] as String?),
+      'is_preset': 0,
+    };
+    if (localId != null) {
+      json['id'] = localId;
+    } else {
+      json.remove('id');
     }
-  }
-
-  Future<void> _deleteCarFromFirestore(String uid, int id) async {
-    try {
-      final firestore = FirebaseFirestore.instance;
-      await firestore.collection('users').doc(uid).collection('cars').doc(id.toString()).delete();
-      logger.d('Deleted car from Firestore: id=$id');
-    } catch (e) {
-      logger.e('Error deleting car from Firestore: $e');
-      throw Exception('Failed to delete car: $e');
-    }
+    return CarData.fromJson(json).toJson();
   }
 
   /// D-4: таблица очереди операций для синхронизации.

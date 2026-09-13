@@ -1466,6 +1466,36 @@ abstract class AppLocalizations {
   /// **'Could not send the letter. Please try again later.'**
   String get email_verify_error;
 
+  /// Title of the synchronization card in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Sync'**
+  String get sync_title;
+
+  /// Shown when the sync queue is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is uploaded'**
+  String get sync_all_sent;
+
+  /// Number of operations still waiting in the sync queue
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting to be sent: {count}'**
+  String sync_pending_count(int count);
+
+  /// Button that forces the sync queue to be processed
+  ///
+  /// In en, this message translates to:
+  /// **'Send now'**
+  String get sync_send_now;
+
+  /// Result of a manual sync run
+  ///
+  /// In en, this message translates to:
+  /// **'Operations sent: {count}'**
+  String sync_sent_now(int count);
+
   /// Button text for sharing content, such as AI fuel efficiency advice
   ///
   /// In en, this message translates to:

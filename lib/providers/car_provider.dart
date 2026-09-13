@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
 import 'package:fuelmaster/utils/logger.dart';
+import 'package:fuelmaster/services/sync_worker.dart';
 
 class CarProvider with ChangeNotifier {
   final DatabaseHelper _dbHelper;
@@ -35,6 +36,8 @@ class CarProvider with ChangeNotifier {
       // по времени, а сами изменения уходят в облако сразу — их пишет
       // _syncCarToFirestoreIfAuthenticated из insert/update/deleteCar.
       await syncWithFirestore();
+      // Отправка накопленного — забота воркера, UI её не ждёт (D-4).
+      SyncWorker.instance.scheduleDrain();
       logger.d('Loaded ${_cars.length} cars in CarProvider');
     } catch (e) {
       logger.e('Error loading cars in CarProvider: $e');
@@ -102,6 +105,7 @@ class CarProvider with ChangeNotifier {
       // ✨ FIX: Убрана логика, которая приравнивала baseHighwayNorm к baseCityNorm.
       // Теперь данные сохраняются как есть.
       await _dbHelper.insertCar(car);
+      SyncWorker.instance.scheduleDrain();
       await loadCars();
       logger.d('Car added successfully: id=${car.id}');
       return true;
@@ -133,6 +137,7 @@ class CarProvider with ChangeNotifier {
       // ✨ FIX: Убрана логика, которая приравнивала baseHighwayNorm к baseCityNorm.
       // Теперь данные обновляются как есть.
       await _dbHelper.updateCar(car);
+      SyncWorker.instance.scheduleDrain();
       await loadCars();
       logger.d('Car updated successfully: id=${car.id}');
       return true;
@@ -146,6 +151,7 @@ class CarProvider with ChangeNotifier {
   Future<bool> deleteCar(int id) async {
     try {
       await _dbHelper.deleteCar(id);
+      SyncWorker.instance.scheduleDrain();
       await loadCars();
       logger.d('Car deleted successfully: ID $id');
       return true;

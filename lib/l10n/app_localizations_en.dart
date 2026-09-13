@@ -718,6 +718,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not send the letter. Please try again later.';
 
   @override
+  String get sync_title => 'Sync';
+
+  @override
+  String get sync_all_sent => 'Everything is uploaded';
+
+  @override
+  String sync_pending_count(int count) {
+    return 'Waiting to be sent: $count';
+  }
+
+  @override
+  String get sync_send_now => 'Send now';
+
+  @override
+  String sync_sent_now(int count) {
+    return 'Operations sent: $count';
+  }
+
+  @override
   String get share => 'Share';
 
   @override

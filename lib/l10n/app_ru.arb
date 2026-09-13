@@ -507,6 +507,36 @@
   "@email_verify_error": {
     "description": "Сообщение об ошибке отправки письма"
   },
+  "sync_title": "Синхронизация",
+  "@sync_title": {
+    "description": "Заголовок карточки синхронизации в настройках"
+  },
+  "sync_all_sent": "Все изменения отправлены",
+  "@sync_all_sent": {
+    "description": "Показывается, когда очередь синка пуста"
+  },
+  "sync_pending_count": "Ждёт отправки: {count}",
+  "@sync_pending_count": {
+    "description": "Сколько операций ещё в очереди синка",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sync_send_now": "Отправить сейчас",
+  "@sync_send_now": {
+    "description": "Кнопка принудительного разбора очереди"
+  },
+  "sync_sent_now": "Отправлено операций: {count}",
+  "@sync_sent_now": {
+    "description": "Итог ручного запуска синхронизации",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "share": "Поделиться",
   "@share": {
     "description": "Текст кнопки для шаринга контента, например, AI-советов по экономии топлива"

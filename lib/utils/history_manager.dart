@@ -1,15 +1,13 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
 import 'package:fuelmaster/utils/logger.dart';
-import 'package:fuelmaster/services/premium_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:fuelmaster/services/sync_outbox.dart';
 import 'package:fuelmaster/utils/uuid_v4.dart';
+import 'package:fuelmaster/services/sync_worker.dart';
 
 /// Управление историей расчётов. Единственный источник правды — SQLite.
 class HistoryManager {
@@ -27,11 +25,6 @@ class HistoryManager {
         record['highway_mileage'] == newRecord['highway_mileage'] &&
         record['initial_fuel'] == newRecord['initial_fuel'] &&
         record['refuel'] == newRecord['refuel']);
-  }
-
-  static Future<bool> _isPremiumUser() async {
-    // Статус ведёт PremiumService; prefs остаётся офлайн-копией внутри него.
-    return PremiumService.instance.isPremium;
   }
 
   static Map<String, Object?> _fuelLogRow(Map<String, dynamic> record) {
@@ -242,10 +235,7 @@ class HistoryManager {
   }
 
   static Future<void> syncHistoryWithFirestore(String uid) async {
-    if (!await _isPremiumUser()) {
-      logger.d('Синхронизация истории пропущена: нет premium');
-      return;
-    }
+    // F-1: монетизация отложена — синхронизация истории доступна всем.
 
     const maxRetries = 2;
     for (var attempt = 0; attempt <= maxRetries; attempt++) {
@@ -260,63 +250,101 @@ class HistoryManager {
     }
   }
 
+  /// Слияние истории с Firestore (D-4, фаза 2).
+  ///
+  /// Тянет облачные записи к себе, а свои **ставит в очередь**: отправляет их
+  /// SyncWorker. Ключ — uuid; записи старого формата (ключ — локальный id)
+  /// читаются в переходный период.
   static Future<void> _performFirestoreSync(String uid) async {
     final firestore = FirebaseFirestore.instance;
-    final localHistory = await loadHistoryFromDatabase();
+    final List<Map<String, dynamic>> localHistory =
+        await loadHistoryFromDatabase();
     final remoteSnapshot =
         await firestore.collection('users').doc(uid).collection('history').get();
 
-    final remoteHistory = remoteSnapshot.docs.map((doc) {
-      return {...doc.data(), 'id': int.tryParse(doc.id) ?? 0};
-    }).toList();
+    final Map<String, Map<String, dynamic>> remoteByUuid = {};
+    final Map<int, Map<String, dynamic>> remoteByLegacyId = {};
+    for (final doc in remoteSnapshot.docs) {
+      final Map<String, dynamic> data = <String, dynamic>{...doc.data()};
+      final String? uuid = (data['uuid'] as String?)?.trim();
+      if (isUuidV4(uuid)) {
+        remoteByUuid[uuid!] = data;
+      } else {
+        final int? legacyId = int.tryParse(doc.id);
+        if (legacyId != null) remoteByLegacyId[legacyId] = data;
+      }
+    }
 
     final db = await DatabaseHelper.instance.database;
 
-    for (final localRecord in localHistory) {
-      final remoteRecord = remoteHistory.firstWhere(
-        (rr) => rr['id'] == localRecord['id'],
-        orElse: () => <String, dynamic>{},
-      );
-      if (remoteRecord.isEmpty ||
-          (localRecord['last_modified'] ?? 0) > (remoteRecord['last_modified'] ?? 0)) {
-        await _syncHistoryRecordToFirestore(uid, localRecord);
-      } else if ((remoteRecord['last_modified'] ?? 0) > (localRecord['last_modified'] ?? 0)) {
+    for (final Map<String, dynamic> local in localHistory) {
+      final String? uuid = local['uuid'] as String?;
+      Map<String, dynamic>? remote =
+          (uuid != null && isUuidV4(uuid)) ? remoteByUuid[uuid] : null;
+      remote ??= remoteByLegacyId[(local['id'] as num?)?.toInt() ?? -1];
+
+      final int localTime = (local['last_modified'] as num?)?.toInt() ?? 0;
+      final int remoteTime = (remote?['last_modified'] as num?)?.toInt() ?? 0;
+
+      if (remote == null || localTime > remoteTime) {
+        await _enqueueHistoryUpsert(local);
+      } else if (remoteTime > localTime) {
         await db.update(
           'fuel_logs',
-          _fuelLogRow(remoteRecord),
+          _fuelLogRow(<String, dynamic>{
+            ...remote,
+            'id': local['id'],
+            'uuid': uuid,
+          }),
           where: 'id = ?',
-          whereArgs: [remoteRecord['id']],
+          whereArgs: <Object?>[local['id']],
         );
       }
     }
 
-    for (final remoteRecord in remoteHistory) {
-      if (!localHistory.any((lr) => lr['id'] == remoteRecord['id'])) {
-        await db.insert('fuel_logs', _fuelLogRow(remoteRecord));
+    // Облачные записи, которых нет на устройстве. Локальный id не переносим:
+    // он принадлежит другой строке (класс ошибок B-1), личность — в uuid.
+    for (final MapEntry<String, Map<String, dynamic>> entry
+        in remoteByUuid.entries) {
+      if (localHistory.any((Map<String, dynamic> lr) => lr['uuid'] == entry.key)) {
+        continue;
       }
+      final Map<String, Object?> row = _fuelLogRow(<String, dynamic>{
+        ...entry.value,
+        'uuid': entry.key,
+      })..remove('id');
+      await db.insert('fuel_logs', row,
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+    for (final MapEntry<int, Map<String, dynamic>> entry
+        in remoteByLegacyId.entries) {
+      if (localHistory.any(
+          (Map<String, dynamic> lr) => (lr['id'] as num?)?.toInt() == entry.key)) {
+        continue;
+      }
+      final String? uuid = (entry.value['uuid'] as String?)?.trim();
+      if (!isUuidV4(uuid)) continue; // без uuid синхронизировать нечем
+      final Map<String, Object?> row = _fuelLogRow(<String, dynamic>{
+        ...entry.value,
+        'uuid': uuid,
+      })..remove('id');
+      await db.insert('fuel_logs', row,
+          conflictAlgorithm: ConflictAlgorithm.replace);
     }
 
-    logger.d('Синхронизация истории с Firestore завершена');
+    logger.d('История: облако проверено, свои изменения — в очереди синка');
   }
 
-  static Future<void> _syncHistoryRecordToFirestore(
-    String uid,
-    Map<String, dynamic> record,
-  ) async {
-    final id = record['id'];
-    if (id == null) return;
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('history')
-          .doc(id.toString())
-          .set(record);
-    } catch (e) {
-      logger.e('Ошибка синхронизации записи с Firestore: $e');
-      rethrow;
-    }
+  /// Кладёт в очередь отправку записи истории (отправляет SyncWorker).
+  static Future<void> _enqueueHistoryUpsert(Map<String, dynamic> record) async {
+    final Map<String, Object?> row = _fuelLogRow(record);
+    await SyncOutbox.enqueue(
+      entity: SyncOutbox.entityHistory,
+      entityUuid: row['uuid']! as String,
+      entityId: row['id'] as int?,
+      op: SyncOutbox.opUpsert,
+      payload: Map<String, dynamic>.from(row),
+    );
   }
 
   /// Отправка записи в облако — необязательный шаг (D-4).
@@ -325,30 +353,14 @@ class HistoryManager {
   /// отсутствие Firebase (тесты, офлайн) или ошибка сети не должны ломать
   /// сохранение: очередь отправит запись позже.
   static Future<void> _syncHistoryRecordToCloud(Map<String, dynamic> record) async {
-    if (Firebase.apps.isEmpty) return;
-    try {
-      final User? user = FirebaseAuth.instance.currentUser;
-      if (user == null || !await _isPremiumUser()) return;
-      await _syncHistoryRecordToFirestore(user.uid, record);
-    } catch (e) {
-      logger.w('Пропуск синхронизации записи истории: $e');
-    }
+    // Операция уже лежит в очереди (D-4) — просим воркер разобрать её, но
+    // ничего не ждём: сохранение не зависит от сети.
+    SyncWorker.instance.scheduleDrain();
   }
 
   static Future<void> _deleteHistoryRecordFromCloud(int id) async {
-    if (Firebase.apps.isEmpty) return;
-    try {
-      final User? user = FirebaseAuth.instance.currentUser;
-      if (user == null || !await _isPremiumUser()) return;
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('history')
-          .doc(id.toString())
-          .delete();
-    } catch (e) {
-      logger.w('Пропуск удаления записи истории в облаке: $e');
-    }
+    // Удаление уже в очереди (D-4) — отправкой займётся воркер.
+    SyncWorker.instance.scheduleDrain();
   }
 
   static Future<void> deleteHistoryRecord(int id) async {

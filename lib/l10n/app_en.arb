@@ -507,6 +507,36 @@
   "@email_verify_error": {
     "description": "Snackbar shown when sending the confirmation letter failed"
   },
+  "sync_title": "Sync",
+  "@sync_title": {
+    "description": "Title of the synchronization card in settings"
+  },
+  "sync_all_sent": "Everything is uploaded",
+  "@sync_all_sent": {
+    "description": "Shown when the sync queue is empty"
+  },
+  "sync_pending_count": "Waiting to be sent: {count}",
+  "@sync_pending_count": {
+    "description": "Number of operations still waiting in the sync queue",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sync_send_now": "Send now",
+  "@sync_send_now": {
+    "description": "Button that forces the sync queue to be processed"
+  },
+  "sync_sent_now": "Operations sent: {count}",
+  "@sync_sent_now": {
+    "description": "Result of a manual sync run",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "share": "Share",
   "@share": {
     "description": "Button text for sharing content, such as AI fuel efficiency advice"

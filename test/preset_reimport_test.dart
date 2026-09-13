@@ -19,6 +19,9 @@ void main() {
   setUpAll(() async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
+    // Свой каталог баз: тест-файлы идут параллельно и не должны делить файл БД.
+    final dir = Directory.systemTemp.createTempSync('fm_presets_');
+    await databaseFactory.setDatabasesPath(dir.path);
 
     final file = File('assets/cars.csv');
     expect(file.existsSync(), isTrue, reason: 'нужен реальный assets/cars.csv');

@@ -33,6 +33,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:fuelmaster/services/map_page.dart';
 import 'package:fuelmaster/services/account_service.dart';
 import 'package:fuelmaster/services/email_verification_service.dart';
+import 'package:fuelmaster/services/sync_worker.dart';
 import 'package:fuelmaster/utils/feature_flags.dart';
 
 Future<void> main() async {
@@ -206,6 +207,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       final settings = context.read<AppSettingsProvider>();
       settings.setRegistered(user != null);
       settings.setEmailVerified(user?.emailVerified ?? false);
+      // D-4: без аккаунта отправлять нечего, с аккаунтом — разбираем очередь.
+      if (user == null) {
+        SyncWorker.instance.stop();
+      } else {
+        SyncWorker.instance.start();
+      }
       if (user != null) {
         AccountService.ensureUserProfile(user.uid);
         if (!user.emailVerified) {
@@ -226,8 +233,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // В фоне таймер синка не нужен: разбудим при возврате.
+      SyncWorker.instance.stop();
+      return;
+    }
     if (state != AppLifecycleState.resumed) return;
     unawaited(_refreshVerificationStatus());
+    // D-4: вернулись в приложение — самое время отправить накопленное.
+    SyncWorker.instance.start();
   }
 
   /// Тихая проверка подтверждения при возврате в приложение (F-2).

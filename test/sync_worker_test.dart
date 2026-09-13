@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -13,9 +15,13 @@ void main() {
   late List<SyncOperation> sent;
   late bool failNext;
 
-  setUpAll(() {
+  setUpAll(() async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
+    // Свой каталог баз: при полном прогоне несколько тест-файлов работают
+    // параллельно, и общий fuelmaster.db блокируется чужим соединением.
+    final dir = Directory.systemTemp.createTempSync('fm_sync_worker_');
+    await databaseFactory.setDatabasesPath(dir.path);
   });
 
   setUp(() async {

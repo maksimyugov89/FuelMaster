@@ -722,6 +722,25 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не удалось отправить письмо. Попробуйте позже.';
 
   @override
+  String get sync_title => 'Синхронизация';
+
+  @override
+  String get sync_all_sent => 'Все изменения отправлены';
+
+  @override
+  String sync_pending_count(int count) {
+    return 'Ждёт отправки: $count';
+  }
+
+  @override
+  String get sync_send_now => 'Отправить сейчас';
+
+  @override
+  String sync_sent_now(int count) {
+    return 'Отправлено операций: $count';
+  }
+
+  @override
   String get share => 'Поделиться';
 
   @override

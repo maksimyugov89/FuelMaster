@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fuelmaster/services/premium_service.dart';
+import 'package:fuelmaster/services/sync_worker.dart';
 import 'package:fuelmaster/utils/feature_flags.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
 import 'package:fuelmaster/utils/logger.dart';
@@ -33,6 +36,8 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     _wasPremium = PremiumService.instance.isPremium;
     PremiumService.instance.addListener(_onPremiumChanged);
+    // D-4: показываем реальное число неотправленных операций.
+    unawaited(SyncWorker.instance.refreshPendingCount());
   }
 
   @override
@@ -293,6 +298,66 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
 
         const SizedBox(height: 24),
+
+        // --- 4.5 Синхронизация (D-4): видно, что ждёт отправки ---
+        if (isSignedIn) ...[
+          Card(
+            elevation: 4.0,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GradientText(
+                    l10n.sync_title,
+                    gradient: primaryActionGradient,
+                    style: theme.textTheme.headlineMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 12),
+                  ValueListenableBuilder<int>(
+                    valueListenable: SyncWorker.instance.pendingCount,
+                    builder: (context, pending, _) => Row(
+                      children: [
+                        Icon(
+                          pending == 0
+                              ? Icons.cloud_done_outlined
+                              : Icons.cloud_upload_outlined,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            pending == 0
+                                ? l10n.sync_all_sent
+                                : l10n.sync_pending_count(pending),
+                            style: theme.textTheme.bodyMedium,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton.icon(
+                    onPressed: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final sent = await SyncWorker.instance.drain();
+                      messenger.showSnackBar(
+                        SnackBar(content: Text(l10n.sync_sent_now(sent))),
+                      );
+                    },
+                    icon: const Icon(Icons.sync, size: 18),
+                    label: Text(l10n.sync_send_now,
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
 
         // --- 5. Документы (B-12 аудита) ---
         Card(
