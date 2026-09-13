@@ -47,16 +47,15 @@
     @android.webkit.JavascriptInterface <methods>;
 }
 
-# Дополнительно для фикса R8 AssertionError
--keep class com.android.tools.r8.** { *; }
--dontwarn com.android.tools.r8.**
--dontnote com.android.tools.r8.**
--dontwarn com.android.tools.r8.internal.**
--dontnote com.android.tools.r8.internal.**
+# Отсутствующие классы-заглушки в сторонних SDK: без -dontwarn R8 валится
+# на missing-class warnings при включённой минификации.
 -dontwarn io.netty.**
 -dontnote io.netty.**
 -dontwarn commons-logging.**
 -dontnote commons-logging.**
--dontoptimize
--dontshrink
--dontobfuscate  # Отключение обфускации для фикса R8
+
+# ВНИМАНИЕ: здесь больше нет -dontoptimize / -dontshrink / -dontobfuscate.
+# Эти три правила полностью отменяли isMinifyEnabled/isShrinkResources из
+# android/app/build.gradle.kts: release-APK не обфусцировался и не ужимался,
+# а имена классов оставались снаружи. Выше — только конкретные -keep для
+# библиотек, которые работают через рефлексию.
