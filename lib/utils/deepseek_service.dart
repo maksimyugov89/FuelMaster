@@ -106,17 +106,18 @@ class DeepSeekService {
     return data['choices']?[0]?['message']?['content'] as String?;
   }
 
-  Future<String?> getFuelEfficiencyAdvice(
-      String carModel, BuildContext context, Map<String, dynamic>? calculationRecord) async {
-    final l10n = AppLocalizations.of(context)!;
+  /// B-13: принимает `AppLocalizations`, а не `BuildContext`: вызов идёт
+  /// после await, и передавать туда контекст нельзя. Сообщение об ошибке
+  /// показывает вызывающий экран (он и так рисует его при пустом ответе).
+  /// B-13: текст последней ошибки AI, чтобы экран мог показать его без
+  /// BuildContext (сервис вызывается после await).
+  String? lastErrorMessage;
 
+  Future<String?> getFuelEfficiencyAdvice(
+      String carModel, AppLocalizations l10n, Map<String, dynamic>? calculationRecord) async {
+    lastErrorMessage = null;
     if (!_useProxy && _directApiKey.isEmpty) {
       logger.e('AI недоступен: не задан AI_PROXY_URL и нет ключа провайдера');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.error)),
-        );
-      }
       return null;
     }
 
@@ -162,27 +163,15 @@ class DeepSeekService {
           if (retryCount <= maxRetries) await Future.delayed(const Duration(seconds: 2));
         } else if (response.statusCode == 402) {
           logger.e('AI: 402, ${l10n.insufficient_balance}');
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.insufficient_balance)),
-            );
-          }
+          lastErrorMessage = l10n.insufficient_balance;
           return null;
         } else if (response.statusCode == 401 || response.statusCode == 403) {
           logger.e('AI: отказ авторизации (${response.statusCode})');
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.error)),
-            );
-          }
+          lastErrorMessage = l10n.error;
           return null;
         } else {
           logger.e('AI error: ${response.statusCode}');
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.error)),
-            );
-          }
+          lastErrorMessage = l10n.error;
           return null;
         }
       } on TimeoutException {
@@ -197,11 +186,7 @@ class DeepSeekService {
     }
 
     logger.e('Max retries reached for $carModel');
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.error)),
-      );
-    }
+    lastErrorMessage = l10n.error;
     return null;
   }
 }

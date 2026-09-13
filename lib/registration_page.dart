@@ -135,28 +135,31 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   Future<String?> _fetchLocation() async {
+    // B-13: l10n берём до первого await — иначе BuildContext используется
+    // после асинхронного разрыва (Geolocator, HTTP-запрос).
+    final l10n = AppLocalizations.of(context)!;
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        return _setDefaultCity(AppLocalizations.of(context)!.location_service_disabled);
+        return _setDefaultCity(l10n.location_service_disabled);
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          return _setDefaultCity(AppLocalizations.of(context)!.location_permission_denied);
+          return _setDefaultCity(l10n.location_permission_denied);
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        return _setDefaultCity(AppLocalizations.of(context)!.location_permission_denied_forever);
+        return _setDefaultCity(l10n.location_permission_denied_forever);
       }
 
       Position position = await Geolocator.getCurrentPosition();
       final apiKey = EnvConfig.getOptional('GEOAPIFY_API_KEY');
       if (apiKey == null || apiKey.isEmpty) {
-        return _setDefaultCity(AppLocalizations.of(context)!.api_key_invalid);
+        return _setDefaultCity(l10n.api_key_invalid);
       }
 
       final response = await http
@@ -191,13 +194,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
         return city;
       } else if (response.statusCode == 401) {
         logger.e('Geoapify API error: ${data['message'] ?? 'Invalid API key'}');
-        return _setDefaultCity(AppLocalizations.of(context)!.api_key_invalid);
+        return _setDefaultCity(l10n.api_key_invalid);
       } else {
-        return _setDefaultCity(AppLocalizations.of(context)!.geocoding_error);
+        return _setDefaultCity(l10n.geocoding_error);
       }
     } catch (e) {
       logger.e('Error fetching location: $e');
-      return _setDefaultCity(AppLocalizations.of(context)!.geocoding_error);
+      return _setDefaultCity(l10n.geocoding_error);
     }
   }
 

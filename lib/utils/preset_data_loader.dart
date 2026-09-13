@@ -25,7 +25,7 @@ class PresetDataLoader {
       final brands = await carProvider.getPresetBrands(vehicleType ?? 'Passenger Car');
       onLoadingChanged(false);
       logger.d('Loaded ${brands.length} preset brands for vehicle type ${vehicleType ?? 'Passenger Car'}');
-      if (brands.isEmpty) {
+      if (brands.isEmpty && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.no_data_found)),
         );
@@ -34,9 +34,11 @@ class PresetDataLoader {
     } catch (e) {
       logger.e('Ошибка загрузки предустановленных марок: $e');
       onLoadingChanged(false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.error)),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.error)),
+        );
+      }
       return [];
     }
   }
@@ -51,7 +53,7 @@ class PresetDataLoader {
       );
       logger.d('Loaded ${models.length} preset models for brand $brand: $models');
       onLoadingChanged(false);
-      if (models.isEmpty) {
+      if (models.isEmpty && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.no_data_found)),
         );
@@ -79,9 +81,11 @@ class PresetDataLoader {
     } catch (e) {
       logger.e('Ошибка загрузки предустановленных поколений: $e');
       onLoadingChanged(false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.error)),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.error)),
+        );
+      }
       return [];
     }
   }
@@ -102,9 +106,11 @@ class PresetDataLoader {
     } catch (e) {
       logger.e('Ошибка загрузки предустановленных модификаций: $e');
       onLoadingChanged(false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.error)),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.error)),
+        );
+      }
       return [];
     }
   }
@@ -129,16 +135,20 @@ class PresetDataLoader {
         return car;
       } else {
         logger.w('No full car data found for the selection.');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.no_data_found)),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.no_data_found)),
+          );
+        }
         return null;
       }
     } catch (e) {
       logger.e('Ошибка загрузки предустановленных данных автомобиля: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.error)),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.error)),
+        );
+      }
       return null;
     }
   }

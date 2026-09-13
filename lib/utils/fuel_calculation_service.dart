@@ -168,7 +168,11 @@ class FuelCalculationService {
     );
     if (record != null) {
       if (_isDuplicateRecord(record, localHistory)) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.duplicate_record)));
+        // B-13: показ сообщения только при живом контексте.
+        if (context.mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(l10n.duplicate_record)));
+        }
         onCalculationComplete(null, false);
         return;
       }

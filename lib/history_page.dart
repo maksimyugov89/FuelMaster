@@ -166,11 +166,14 @@ class _HistoryPageState extends State<HistoryPage> {
 
     if (confirm == true && mounted) {
       try {
+        // B-13: мессенджер берём до await — после разрыва контекст мёртв.
+        final messenger = ScaffoldMessenger.of(context);
         await HistoryManager.deleteHistoryRecord(record['id']);
+        if (!mounted) return;
         setState(() {
           _history.removeWhere((r) => r['id'] == record['id']);
         });
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.record_deleted)));
+        messenger.showSnackBar(SnackBar(content: Text(l10n.record_deleted)));
       } catch (e) {
         logger.e('Ошибка при удалении записи: $e');
       }
@@ -193,6 +196,8 @@ class _HistoryPageState extends State<HistoryPage> {
     );
 
     if (confirm == true && mounted) {
+      // B-13: мессенджер берём до await.
+      final messenger = ScaffoldMessenger.of(context);
       try {
         final db = await DatabaseHelper.instance.database;
         await db.delete('fuel_logs');
@@ -204,7 +209,7 @@ class _HistoryPageState extends State<HistoryPage> {
             doc.reference.delete();
           }
         }
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.history_cleared)));
+        messenger.showSnackBar(SnackBar(content: Text(l10n.history_cleared)));
       } catch (e) {
         logger.e('Ошибка при очистке истории: $e');
       }
@@ -263,7 +268,7 @@ class _HistoryPageState extends State<HistoryPage> {
     if (!mounted) return;
     final now = DateTime.now();
     final pickedStart = await showDatePicker(context: context, initialDate: _startDate ?? now, firstDate: DateTime(2000), lastDate: now);
-    if (pickedStart == null) return;
+    if (pickedStart == null || !mounted) return; // B-13
     final pickedEnd = await showDatePicker(context: context, initialDate: _endDate ?? now, firstDate: pickedStart, lastDate: now);
     if (pickedEnd == null) return;
     setState(() {
@@ -356,7 +361,7 @@ class _HistoryPageState extends State<HistoryPage> {
             
             Future.delayed(const Duration(milliseconds: 250), () {
               final cardContext = cardKey.currentContext;
-              if (cardContext != null && mounted) {
+              if (cardContext != null && cardContext.mounted) { // B-13
                 Scrollable.ensureVisible(
                   cardContext,
                   duration: const Duration(milliseconds: 400),

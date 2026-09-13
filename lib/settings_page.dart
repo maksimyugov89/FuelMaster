@@ -59,7 +59,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _purchasePremium(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final errorKey = await PremiumService.instance.buy();
-    if (!mounted) return;
+    if (!context.mounted) return; // B-13
 
     if (errorKey == null) {
       // Магазин открыл окно оплаты; подтверждение придёт в _onPremiumChanged.
@@ -89,12 +89,15 @@ class _SettingsPageState extends State<SettingsPage> {
       await DatabaseHelper.instance.clearUserData();
       await PremiumService.instance.setPremium(false);
       appSettings.setRegistered(false);
+      // B-13: экран мог быть уничтожен, пока шли выход и очистка данных.
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.sign_out_success)),
       );
       logger.d('User signed out successfully');
     } catch (e) {
       logger.e('Sign out error: $e');
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${l10n.error}: $e')),
       );

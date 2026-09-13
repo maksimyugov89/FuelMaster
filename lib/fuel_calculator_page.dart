@@ -226,7 +226,12 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
 
   Future<void> _showFuelAdvice() async {
     final l10n = AppLocalizations.of(context)!;
-    if (!kDebugMode && !_isPremium && await _hasUsedDailyAdvice()) {
+    // B-13: await вынесен из условия, чтобы проверка mounted стояла между
+    // асинхронным шагом и обращением к контексту.
+    final bool dailyLimitReached =
+        !kDebugMode && !_isPremium ? await _hasUsedDailyAdvice() : false;
+    if (dailyLimitReached) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.premium_feature)),
       );
@@ -243,7 +248,7 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
           localHistory.isNotEmpty ? localHistory.first : null;
       // B-3 аудита: повторный вызов сервиса при пустом ответе множил платные
       // запросы — у самого сервиса внутри уже есть ретраи, второй попытки нет.
-      advice = await DeepSeekService().getFuelEfficiencyAdvice(carModel, context, lastRecord);
+      advice = await DeepSeekService().getFuelEfficiencyAdvice(carModel, l10n, lastRecord);
       if (advice != null && advice.isNotEmpty) {
         await DeepSeekService().cacheAdvice(carModel, advice);
       }
@@ -265,23 +270,22 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
               ),
               TextButton(
                 onPressed: () async {
+                  // B-13: мессенджер берём до await — контекст диалога
+                  // после асинхронного шага недействителен.
+                  final messenger = ScaffoldMessenger.of(context);
                   if (advice!.isNotEmpty) {
                     try {
                       await Share.share(advice);
                     } catch (e) {
                       logger.e('Ошибка при попытке поделиться советом: $e');
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.error_sharing)),
-                        );
-                      }
-                    }
-                  } else {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.no_advice_to_share)),
+                      messenger.showSnackBar(
+                        SnackBar(content: Text(l10n.error_sharing)),
                       );
                     }
+                  } else {
+                    messenger.showSnackBar(
+                      SnackBar(content: Text(l10n.no_advice_to_share)),
+                    );
                   }
                 },
                 child: Text(l10n.share),
@@ -290,8 +294,10 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
           ),
         );
       } else {
+        // B-13: сообщение об ошибке показывает экран — у сервиса нет контекста.
+        final adviceError = DeepSeekService().lastErrorMessage ?? l10n.error;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.error)),
+          SnackBar(content: Text(adviceError)),
         );
       }
     }
@@ -482,6 +488,9 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
   }
 
   Future<void> _saveAndExit() async {
+    // B-13: навигатор берём до await — после асинхронных шагов контекст
+    // может быть уже недействителен.
+    final navigator = Navigator.of(context);
     final record = await _fuelCalculationService.prepareCalculationRecord(
       totalMileage: totalMileage,
       isWinter: isWinter,
@@ -490,16 +499,12 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
     );
     if (record != null) {
       await HistoryManager.saveHistoryEntry(record);
-      if (mounted) {
-        Navigator.pop(context, {
-          'cars': List<CarData>.from(widget.cars),
-          'history': List<Map<String, dynamic>>.from(localHistory),
-        });
-      }
-    } else {
-      if (!_isDirty()) {
-        Navigator.pop(context);
-      }
+      navigator.pop({
+        'cars': List<CarData>.from(widget.cars),
+        'history': List<Map<String, dynamic>>.from(localHistory),
+      });
+    } else if (!_isDirty()) {
+      navigator.pop();
     }
   }
 
@@ -675,7 +680,7 @@ if (correctionFactor != null && correctionFactor != 0.0) {
                       calculatedFactor.toStringAsFixed(2);
                 } catch (e) {
                   logger.e('Ошибка получения погоды: $e');
-                  if (mounted) {
+                  if (context.mounted) { // B-13
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(l10n.auto_factor_error)),
                     );
@@ -683,7 +688,7 @@ if (correctionFactor != null && correctionFactor != 0.0) {
                   }
                   return;
                 } finally {
-                  if (mounted) {
+                  if (context.mounted) {
                     setState(() => _isLoading = false);
                   }
                 }
@@ -702,6 +707,10 @@ if (correctionFactor != null && correctionFactor != 0.0) {
             },
             onSaveAndBack: () async {
               if (!mounted) return;
+              // B-13: навигатор и мессенджер берём до await — после
+              // асинхронного шага контекст может быть недействителен.
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
               showDialog(
                 context: context,
                 barrierDismissible: false,
@@ -712,22 +721,15 @@ if (correctionFactor != null && correctionFactor != 0.0) {
                 await _saveHistory();
                 logger.d(
                     'Возврат с FuelCalculatorPage с сохранением истории: $localHistory');
-                if (mounted) Navigator.pop(context);
-                if (mounted) {
-                  Navigator.pop(context, {
-                    'cars': List<CarData>.from(widget.cars),
-                    'history':
-                        List<Map<String, dynamic>>.from(localHistory),
-                  });
-                }
+                navigator.pop();
+                navigator.pop({
+                  'cars': List<CarData>.from(widget.cars),
+                  'history': List<Map<String, dynamic>>.from(localHistory),
+                });
               } catch (e) {
                 logger.e('Ошибка при сохранении и возврате: $e');
-                if (mounted) Navigator.pop(context);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.error)),
-                  );
-                }
+                navigator.pop();
+                messenger.showSnackBar(SnackBar(content: Text(l10n.error)));
               }
             },
             onContinue: _handleContinueCalculation,
@@ -760,6 +762,8 @@ if (correctionFactor != null && correctionFactor != 0.0) {
           ),
           onPressed: () async {
             if (_isDirty()) {
+              // B-13: навигатор берём до await.
+              final navigator = Navigator.of(context);
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -780,7 +784,7 @@ if (correctionFactor != null && correctionFactor != 0.0) {
               if (confirm == true) {
                 await _saveAndExit();
               } else {
-                Navigator.pop(context);
+                navigator.pop();
               }
             } else {
               Navigator.pop(context);

@@ -3,3 +3,6 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   errors:
     deprecated_member_use: warning
+    # B-13 аудита: предупреждений больше нет (было 53), включаем как ошибку,
+    # чтобы использование BuildContext после await снова не просочилось.
+    use_build_context_synchronously: error

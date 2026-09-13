@@ -131,13 +131,15 @@ class _MapPageState extends State<MapPage> {
             );
           }
         }
-      } else {
+      } else if (mounted) {
         debugPrint("❌ Поиск АЗС: ничего не найдено");
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('АЗС не найдены в радиусе 50 км.')),
         );
       }
 
+      // B-13: после await экран мог быть закрыт.
+      if (!mounted) return;
       setState(() {
         // И здесь мы присваиваем этот новый список
         _mapObjects = newPlacemarks;
@@ -145,6 +147,7 @@ class _MapPageState extends State<MapPage> {
 
     } catch (e) {
       debugPrint("Ошибка поиска: $e");
+      if (!mounted) return; // B-13
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Произошла ошибка при поиске. Попробуйте снова.')),
       );
@@ -229,13 +232,14 @@ class _MapPageState extends State<MapPage> {
           );
           _measuredDistance = route.metadata.weight.distance.text;
         });
-      } else {
+      } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Не удалось построить маршрут.')),
         );
       }
     } catch (e) {
       debugPrint("Ошибка построения маршрута: $e");
+      if (!mounted) return; // B-13
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ошибка построения маршрута: $e')),
       );

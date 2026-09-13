@@ -68,6 +68,7 @@ class _CarListPageState extends State<CarListPage> {
       ),
     );
     // После возвращения обновляем список, т.к. данные могли измениться
+    if (!mounted) return; // B-13: экран мог быть закрыт, пока шёл переход
     context.read<CarProvider>().loadCars();
   }
 
@@ -86,22 +87,19 @@ class _CarListPageState extends State<CarListPage> {
           ),
           TextButton(
             onPressed: () async {
-              if (mounted) {
-                try {
-                  await context.read<CarProvider>().deleteCar(carId);
-                  Navigator.pop(context); // Закрываем диалог
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.car_deleted)),
-                  );
-                } catch (e) {
-                  logger.e('Ошибка удаления автомобиля: $e');
-                  if (mounted) {
-                    Navigator.pop(context); // Закрываем диалог
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.error)),
-                    );
-                  }
-                }
+              // B-13: провайдер, навигатор и мессенджер берём до await — после
+              // удаления контекст диалога уже недействителен.
+              final carProvider = context.read<CarProvider>();
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
+              try {
+                await carProvider.deleteCar(carId);
+                navigator.pop(); // Закрываем диалог
+                messenger.showSnackBar(SnackBar(content: Text(l10n.car_deleted)));
+              } catch (e) {
+                logger.e('Ошибка удаления автомобиля: $e');
+                navigator.pop(); // Закрываем диалог
+                messenger.showSnackBar(SnackBar(content: Text(l10n.error)));
               }
             },
             child: Text(l10n.delete),
