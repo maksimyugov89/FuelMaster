@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:fuelmaster/utils/logger.dart';
@@ -61,6 +64,33 @@ class EmailVerificationService {
     }
   }
 
+  /// Адрес нашего отправщика писем (Apps Script) и ключ доступа.
+  static const String _mailerUrl = String.fromEnvironment('FM_MAIL_URL');
+  static const String _mailerSecret = String.fromEnvironment('FM_MAIL_SECRET');
+
+  /// Отправляет брендированное письмо через собственный сервис.
+  /// Возвращает false, если сервис недоступен — тогда нужен запасной путь.
+  static Future<bool> _sendBranded(String address) async {
+    if (_mailerUrl.isEmpty) return false;
+    try {
+      final res = await http
+          .post(
+            Uri.parse(_mailerUrl),
+            headers: const {'Content-Type': 'application/json'},
+            body: jsonEncode({'secret': _mailerSecret, 'email': address}),
+          )
+          .timeout(const Duration(seconds: 20));
+      if (res.statusCode == 200 && jsonDecode(res.body)['ok'] == true) {
+        logger.d('Письмо отправлено брендированным отправщиком');
+        return true;
+      }
+      logger.w('Отправщик ответил: ${res.statusCode}');
+    } catch (e) {
+      logger.w('Отправщик недоступен: $e');
+    }
+    return false;
+  }
+
   /// Отправляет письмо подтверждения.
   ///
   /// [respectCooldown] false — для письма сразу после регистрации: пользователя
@@ -75,7 +105,11 @@ class EmailVerificationService {
       if (respectCooldown && await secondsUntilResend() > 0) {
         return VerificationSendResult.cooldown;
       }
-      await current.sendEmailVerification();
+      final String? address = current.email;
+      final bool branded = address != null && await _sendBranded(address);
+      if (!branded) {
+        await current.sendEmailVerification();
+      }
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(
         _lastSentKey,
