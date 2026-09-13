@@ -1496,6 +1496,48 @@ abstract class AppLocalizations {
   /// **'Registration successful'**
   String get registration_success;
 
+  /// No description provided for @registration_profile_pending.
+  ///
+  /// In en, this message translates to:
+  /// **'The account was created, but the profile could not be saved (no network). Sign in — the profile will be created automatically'**
+  String get registration_profile_pending;
+
+  /// No description provided for @delete_account.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get delete_account;
+
+  /// No description provided for @delete_account_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the account and all data without the ability to restore?'**
+  String get delete_account_confirm;
+
+  /// No description provided for @delete_account_done.
+  ///
+  /// In en, this message translates to:
+  /// **'Account and data deleted'**
+  String get delete_account_done;
+
+  /// No description provided for @delete_account_relogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in again and repeat to delete the account'**
+  String get delete_account_relogin;
+
+  /// No description provided for @privacy_policy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacy_policy;
+
+  /// No description provided for @terms_of_use.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Use'**
+  String get terms_of_use;
+
   /// No description provided for @email_already_in_use.
   ///
   /// In en, this message translates to:

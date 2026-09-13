@@ -320,7 +320,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
         'created_at': FieldValue.serverTimestamp(),
       });
 
-      _showSnackBar(l10n.registration_success);
+      final bool profileSaved = await _saveUserProfile(
+        credential.user!.uid,
+        email: emailController.text.trim(),
+        city: cityController.text,
+        country: _countryCode,
+      );
+
+      if (profileSaved) {
+        _showSnackBar(l10n.registration_success);
+      } else {
+        // B-10 аудита: аккаунт в Auth уже создан. Если оставить пользователя на
+        // форме регистрации, повторная попытка ответит «email already in use», а
+        // профиля в базе так и не будет. Переводим в режим входа — профиль
+        // досоздастся сам (AccountService.ensureUserProfile).
+        _showSnackBar(l10n.registration_profile_pending);
+        setState(() => _isLoginMode = true);
+      }
       widget.onRegistered();
     } on FirebaseAuthException catch (e) {
       String errorMessage;
@@ -398,6 +414,39 @@ class _RegistrationPageState extends State<RegistrationPage> {
         });
       }
     }
+  }
+
+  /// Пишет профиль пользователя в Firestore с ретраями (B-10 аудита).
+  ///
+  /// Раньше единственная попытка записи шла сразу после создания аккаунта: при
+  /// сбое сети профиль терялся навсегда, а повторная регистрация тем же email
+  /// уже невозможна. `merge: true` не затирает поля, если документ существует.
+  Future<bool> _saveUserProfile(
+    String uid, {
+    required String email,
+    required String city,
+    required String? country,
+  }) async {
+    for (var attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .set({
+          'email': email,
+          'city': city,
+          'country': country,
+          'created_at': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+        return true;
+      } catch (e) {
+        logger.e('Профиль не сохранён (попытка $attempt из 3): $e');
+        if (attempt < 3) {
+          await Future.delayed(Duration(seconds: attempt * 2));
+        }
+      }
+    }
+    return false;
   }
 
   bool _isValidEmail(String email) {

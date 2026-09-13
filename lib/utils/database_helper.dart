@@ -40,6 +40,25 @@ class DatabaseHelper {
     return _database!;
   }
 
+  /// Удаляет данные текущего пользователя на устройстве (B-11/B-12 аудита).
+  ///
+  /// При выходе или удалении аккаунта локальные авто и история не должны
+  /// достаться следующему пользователю этого же телефона. Каталог
+  /// предустановленных моделей (`is_preset = 1`) — не пользовательские данные
+  /// и остаётся на месте.
+  Future<void> clearUserData() async {
+    try {
+      final db = await database;
+      await db.transaction((txn) async {
+        await txn.delete('fuel_logs');
+        await txn.delete('cars', where: 'is_preset = ?', whereArgs: [0]);
+      });
+      logger.d('Локальные данные пользователя удалены');
+    } catch (e) {
+      logger.e('Не удалось удалить локальные данные пользователя: $e');
+    }
+  }
+
   Future<Database> _initDB() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'fuelmaster.db');

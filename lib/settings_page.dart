@@ -3,6 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fuelmaster/services/premium_service.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
 import 'package:fuelmaster/utils/logger.dart';
+import 'package:fuelmaster/services/account_service.dart';
+import 'package:fuelmaster/utils/database_helper.dart';
+import 'package:fuelmaster/legal_pages.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:fuelmaster/providers/app_settings_provider.dart';
@@ -81,6 +84,10 @@ class _SettingsPageState extends State<SettingsPage> {
       await prefs.remove(AppConstants.userEmailKey);
       await prefs.remove(AppConstants.userCityKey);
       await prefs.remove(AppConstants.userCountryKey);
+      // B-11 аудита: локальные авто и история не должны достаться следующему
+      // пользователю этого устройства; премиум восстановится из Play при входе.
+      await DatabaseHelper.instance.clearUserData();
+      await PremiumService.instance.setPremium(false);
       appSettings.setRegistered(false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.sign_out_success)),
@@ -91,6 +98,44 @@ class _SettingsPageState extends State<SettingsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${l10n.error}: $e')),
       );
+    }
+  }
+
+  /// Удаление аккаунта и всех связанных данных (B-12 аудита).
+  Future<void> _deleteAccount(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        content: Text(l10n.delete_account_confirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.delete_account),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final AccountDeletionResult result = await AccountService.deleteAccount();
+    if (!context.mounted) return;
+
+    final String message = switch (result) {
+      AccountDeletionResult.success => l10n.delete_account_done,
+      AccountDeletionResult.requiresRecentLogin => l10n.delete_account_relogin,
+      AccountDeletionResult.noUser || AccountDeletionResult.error => l10n.error,
+    };
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+
+    if (result == AccountDeletionResult.success) {
+      Provider.of<AppSettingsProvider>(context, listen: false)
+          .setRegistered(false);
     }
   }
 
@@ -235,6 +280,45 @@ class _SettingsPageState extends State<SettingsPage> {
             iconData: Icons.logout,
             onPressed: () => _signOut(context),
           ),
+
+        const SizedBox(height: 24),
+
+        // --- 5. Документы (B-12 аудита) ---
+        Card(
+          elevation: 4.0,
+          child: Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.privacy_tip_outlined),
+                title: Text(l10n.privacy_policy),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PrivacyPolicyPage()),
+                ),
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.description_outlined),
+                title: Text(l10n.terms_of_use),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const TermsOfUsePage()),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // --- 6. Удаление аккаунта (B-12 аудита) ---
+        if (isSignedIn) ...[
+          const SizedBox(height: 24),
+          TextButton.icon(
+            onPressed: () => _deleteAccount(context),
+            icon: const Icon(Icons.delete_forever),
+            label: Text(l10n.delete_account),
+            style: TextButton.styleFrom(foregroundColor: Colors.red.shade700),
+          ),
+        ],
       ],
     );
 

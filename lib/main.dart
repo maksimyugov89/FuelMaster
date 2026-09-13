@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +31,7 @@ import 'package:fuelmaster/providers/history_provider.dart';
 import 'package:fuelmaster/services/premium_service.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:fuelmaster/services/map_page.dart';
+import 'package:fuelmaster/services/account_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +45,11 @@ Future<void> main() async {
   // Премиум-статус: prefs + восстановление покупок в магазине при старте
   // (после AppInitializer, чтобы не мешать миграциям prefs).
   await PremiumService.instance.init();
+  // B-10 аудита: аккаунт мог создаться без профиля в Firestore — восстанавливаем.
+  final User? restoredUser = FirebaseAuth.instance.currentUser;
+  if (restoredUser != null) {
+    AccountService.ensureUserProfile(restoredUser.uid);
+  }
   final SharedPreferences prefs = initialData['sharedPreferences'] as SharedPreferences;
   final Locale initialLocale = initialData['initialLocale'] as Locale;
   final bool initialDarkMode = initialData['isDarkMode'] as bool;
@@ -90,6 +99,7 @@ class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
   bool _isLoading = true;
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+  StreamSubscription<User?>? _authSubscription;
 
   /// Страницы собираются на каждой сборке из провайдеров (B-8 аудита).
   ///
@@ -123,6 +133,27 @@ class _MyAppState extends State<MyApp> {
 
   // Реклама живёт жизнью приложения: SDK больше не гасится в dispose экранов
   // (иначе после ухода с истории он не оживал до перезапуска — B-8).
+
+  @override
+  void initState() {
+    super.initState();
+    // B-11 аудита: источник правды о сессии — FirebaseAuth, а не флаг в prefs.
+    // Раньше выход на другом устройстве и отзыв токена не отражались: приложение
+    // продолжало считать пользователя зарегистрированным.
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (!mounted) return;
+      context.read<AppSettingsProvider>().setRegistered(user != null);
+      if (user != null) {
+        AccountService.ensureUserProfile(user.uid);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
+  }
 
   Widget _buildBottomNavigationBar(BuildContext context) {
     final theme = Theme.of(context);

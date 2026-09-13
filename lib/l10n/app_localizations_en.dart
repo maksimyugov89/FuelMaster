@@ -726,6 +726,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registration_success => 'Registration successful';
 
   @override
+  String get registration_profile_pending =>
+      'The account was created, but the profile could not be saved (no network). Sign in — the profile will be created automatically';
+
+  @override
+  String get delete_account => 'Delete account';
+
+  @override
+  String get delete_account_confirm =>
+      'Delete the account and all data without the ability to restore?';
+
+  @override
+  String get delete_account_done => 'Account and data deleted';
+
+  @override
+  String get delete_account_relogin =>
+      'Sign in again and repeat to delete the account';
+
+  @override
+  String get privacy_policy => 'Privacy Policy';
+
+  @override
+  String get terms_of_use => 'Terms of Use';
+
+  @override
   String get email_already_in_use => 'Email already in use';
 
   @override

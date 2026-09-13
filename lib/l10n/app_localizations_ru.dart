@@ -731,6 +731,30 @@ class AppLocalizationsRu extends AppLocalizations {
   String get registration_success => 'Регистрация прошла успешно';
 
   @override
+  String get registration_profile_pending =>
+      'Аккаунт создан, но профиль не сохранился (нет сети). Войдите — профиль создастся автоматически';
+
+  @override
+  String get delete_account => 'Удалить аккаунт';
+
+  @override
+  String get delete_account_confirm =>
+      'Удалить аккаунт и все данные без возможности восстановления?';
+
+  @override
+  String get delete_account_done => 'Аккаунт и данные удалены';
+
+  @override
+  String get delete_account_relogin =>
+      'Для удаления нужно войти заново и повторить';
+
+  @override
+  String get privacy_policy => 'Политика конфиденциальности';
+
+  @override
+  String get terms_of_use => 'Условия использования';
+
+  @override
   String get email_already_in_use => 'Электронная почта уже используется';
 
   @override
