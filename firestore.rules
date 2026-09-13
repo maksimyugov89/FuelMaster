@@ -1,4 +1,64 @@
-{
-  "indexes": [],
-  "fieldOverrides": []
+rules_version = '2';
+
+// Правила Firestore для FuelMaster.
+//
+// Модель данных приложения:
+//   users/{uid}                     — профиль (email, city, country, created_at)
+//   users/{uid}/cars/{carId}        — машины пользователя
+//   users/{uid}/history/{recordId}  — записи о заправках
+//
+// Принцип: доступ только владельцу своих данных; всё, что не разрешено явно,
+// запрещено (Firestore deny-by-default). Раньше в этом файле лежали индексы
+// ({"indexes": []}), то есть правил не было вовсе.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    match /users/{uid} {
+      // Профиль читает и правит только его владелец.
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 320
+        && request.resource.data.size() <= 20;
+      allow delete: if isOwner(uid);
+
+      match /cars/{carId} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.brand is string
+          && request.resource.data.brand.size() > 0
+          && request.resource.data.brand.size() <= 120
+          && request.resource.data.model is string
+          && request.resource.data.model.size() > 0
+          && request.resource.data.model.size() <= 120
+          && request.resource.data.base_rate_city is number
+          && request.resource.data.base_rate_highway is number
+          && request.resource.data.base_rate_city >= 0
+          && request.resource.data.base_rate_city <= 200
+          && request.resource.data.base_rate_highway >= 0
+          && request.resource.data.base_rate_highway <= 200
+          && request.resource.data.size() <= 60;
+        allow delete: if isOwner(uid);
+      }
+
+      match /history/{recordId} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.last_modified is int
+          && request.resource.data.size() <= 60;
+        allow delete: if isOwner(uid);
+      }
+    }
+
+    // Ничего больше не разрешаем: любые другие коллекции и чужие документы
+    // недоступны (в том числе чтение списка пользователей).
+  }
 }
