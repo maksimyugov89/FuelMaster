@@ -28,6 +28,8 @@ from firebase_admin import auth as fb_auth
 from firebase_admin import credentials
 from pydantic import BaseModel, Field
 
+import entitlements
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(message)s",
@@ -81,6 +83,13 @@ class AdviceRequest(BaseModel):
     car_model: str = Field(default="автомобиль", max_length=200)
     details: Dict[str, Any] | None = None
     prompt: str = Field(default="", max_length=8000)
+
+
+class EntitlementRequest(BaseModel):
+    """Чек Google Play для серверной проверки премиума (A-7 аудита)."""
+
+    purchase_token: str = Field(min_length=8, max_length=4096)
+    product_id: str = Field(min_length=1, max_length=200)
 
 
 # ------------------------------------------------------------------- служебное
@@ -164,6 +173,74 @@ async def health() -> Dict[str, Any]:
         "status": "ok",
         "provider_configured": bool(PROVIDER_KEY),
         "auth_configured": AUTH_READY,
+    }
+
+
+@app.post("/v1/entitlement")
+async def confirm_entitlement(
+    payload: EntitlementRequest,
+    authorization: str | None = Header(default=None),
+) -> Dict[str, Any]:
+    """Проверяет чек Google Play и записывает вердикт в Firestore.
+
+    503 `verification_unavailable` — проверить нельзя (нет сервисного
+    аккаунта, Play недоступен): клиент в этом случае статус не меняет.
+    """
+    uid = _verify_user(authorization)
+
+    if not entitlements.is_configured():
+        raise HTTPException(status_code=503, detail="verification_unavailable")
+
+    try:
+        verdict = entitlements.verify_purchase(
+            payload.purchase_token, payload.product_id
+        )
+    except entitlements.VerifyUnavailable as exc:
+        log.warning("Проверка чека недоступна uid=%s err=%s", uid[:8], exc)
+        raise HTTPException(status_code=503, detail="verification_unavailable") from exc
+
+    try:
+        entitlements.store_entitlement(uid, verdict)
+    except Exception as exc:  # noqa: BLE001 — вердикт важнее записи
+        log.error("Не записал entitlement uid=%s err=%s", uid[:8], type(exc).__name__)
+
+    log.info(
+        "Премиум uid=%s premium=%s reason=%s",
+        uid[:8],
+        verdict.premium,
+        verdict.reason,
+    )
+    return {
+        "premium": verdict.premium,
+        "reason": verdict.reason,
+        "expires_at": verdict.expires_at,
+    }
+
+
+@app.get("/v1/entitlement")
+async def get_entitlement(
+    authorization: str | None = Header(default=None),
+) -> Dict[str, Any]:
+    """Сохранённый вердикт для сверки при старте приложения.
+
+    Вердиктом считается только 200. Если записи нет — 404 `no_record`:
+    клиент оставит локальный статус, пока чек не придёт из магазина.
+    """
+    uid = _verify_user(authorization)
+
+    try:
+        data = entitlements.read_entitlement(uid)
+    except Exception as exc:  # noqa: BLE001
+        log.error("Не прочитал entitlement uid=%s err=%s", uid[:8], type(exc).__name__)
+        raise HTTPException(status_code=503, detail="entitlement_unavailable") from exc
+
+    if data is None:
+        raise HTTPException(status_code=404, detail="no_record")
+
+    return {
+        "premium": bool(data.get("premium")),
+        "reason": data.get("reason", "no_record"),
+        "expires_at": data.get("expires_at"),
     }
 
 

@@ -88,6 +88,33 @@ flutter build apk --release --dart-define-from-file=env.defines.json
 | release | да | запрос через прокси (ключей в APK нет) |
 | release | нет | AI-совет недоступен, в лог пишется пояснение |
 
+## Премиум: проверка чека (`/v1/entitlement`)
+
+Клиентский флаг премиума в prefs — только офлайн-кэш. Правду о покупке знает
+сервер: `POST /v1/entitlement` с телом `{"purchase_token": ..., "product_id": ...}`
+проверяет чек в Google Play Developer API и пишет вердикт в Firestore
+(`users/{uid}/entitlements/premium`). Подколлекция `entitlements` закрыта
+правилами для клиента — подделать статус из приложения нельзя.
+
+`GET /v1/entitlement` отдаёт сохранённый вердикт для сверки при старте;
+`404 no_record` означает «записи ещё нет» — клиент оставляет локальный статус.
+
+Главное правило: **вердиктом считается только HTTP 200**. `503
+verification_unavailable` (не настроен сервисный аккаунт, Play недоступен) и
+сетевые ошибки статус НЕ меняют, иначе платящий пользователь терял бы премиум
+из-за обрыва связи.
+
+| Переменная | Назначение |
+|---|---|
+| `PLAY_PACKAGE_NAME` | `applicationId` приложения, например `com.example.fuelmaster` |
+| `PLAY_SERVICE_ACCOUNT_FILE` | путь к json сервисного аккаунта Play Console |
+| `PLAY_SERVICE_ACCOUNT_JSON` | тот же json строкой (альтернатива файлу) |
+| `PLAY_SUBSCRIPTION_PRODUCTS` | `product_id` подписок через запятую (иначе — разовая покупка) |
+
+Самопроверка логики без сети и без Play: `python selfcheck_entitlements.py`.
+Сервисному аккаунту в Play Console нужно выдать доступ к заказам и подпискам
+приложения (Users and permissions).
+
 ## Эксплуатация
 
 * Логи: `journalctl -u ai_proxy -f` — пишутся только uid (8 символов), модель,

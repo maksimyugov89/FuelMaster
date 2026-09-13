@@ -2,3 +2,6 @@ fastapi==0.115.6
 uvicorn[standard]==0.34.0
 httpx==0.28.1
 firebase-admin==6.6.0
+# Транспорт для google-auth: обновление access token сервисного аккаунта
+# Play Developer API (проверка чеков, хвост A-7).
+requests==2.32.3
