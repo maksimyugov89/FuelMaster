@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:fuelmaster/services/premium_service.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,63 +22,54 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  bool _wasPremium = false;
+
   @override
   void initState() {
     super.initState();
+    _wasPremium = PremiumService.instance.isPremium;
+    PremiumService.instance.addListener(_onPremiumChanged);
   }
 
+  @override
+  void dispose() {
+    PremiumService.instance.removeListener(_onPremiumChanged);
+    super.dispose();
+  }
+
+  /// Подтверждение покупки показываем, когда магазин реально подтвердил её
+  /// (раньше в этом файле жил отдельный подписчик purchaseStream).
+  void _onPremiumChanged() {
+    if (!mounted) return;
+    final isPremium = PremiumService.instance.isPremium;
+    if (isPremium && !_wasPremium) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.premium_activated)),
+      );
+      logger.d('Premium activated successfully');
+    }
+    _wasPremium = isPremium;
+  }
+
+  /// Покупка идёт через PremiumService: он единственный держит подписчика
+  /// purchaseStream, завершает транзакцию и сохраняет статус.
   Future<void> _purchasePremium(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    final appSettings = Provider.of<AppSettingsProvider>(context, listen: false);
-    const String premiumProductId = 'fuelmaster_premium_subscription';
-    final InAppPurchase iap = InAppPurchase.instance;
+    final errorKey = await PremiumService.instance.buy();
+    if (!mounted) return;
 
-    try {
-      final bool available = await iap.isAvailable();
-      if (!available) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.store_unavailable)),
-        );
-        return;
-      }
-
-      final ProductDetailsResponse response = await iap.queryProductDetails({premiumProductId});
-      if (response.productDetails.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.product_not_found)),
-        );
-        return;
-      }
-
-      final ProductDetails product = response.productDetails.first;
-      final PurchaseParam purchaseParam = PurchaseParam(productDetails: product);
-      await iap.buyNonConsumable(purchaseParam: purchaseParam);
-
-      iap.purchaseStream.listen((List<PurchaseDetails> purchases) async {
-        for (var purchase in purchases) {
-          if (purchase.status == PurchaseStatus.purchased) {
-            appSettings.setPremium(true);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.premium_activated)),
-            );
-            logger.d('Premium activated successfully');
-          } else if (purchase.status == PurchaseStatus.error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.purchase_error)),
-            );
-            logger.e('Purchase error: ${purchase.error}');
-          }
-          if (purchase.pendingCompletePurchase) {
-            await iap.completePurchase(purchase);
-          }
-        }
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${l10n.error}: $e')),
-      );
-      logger.e('Purchase exception: $e');
+    if (errorKey == null) {
+      // Магазин открыл окно оплаты; подтверждение придёт в _onPremiumChanged.
+      return;
     }
+
+    final String message = switch (errorKey) {
+      'store_unavailable' => l10n.store_unavailable,
+      'product_not_found' => l10n.product_not_found,
+      _ => l10n.purchase_error,
+    };
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    logger.e('Ошибка покупки премиума: $errorKey');
   }
 
   Future<void> _signOut(BuildContext context) async {

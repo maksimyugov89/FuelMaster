@@ -1,4 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fuelmaster/utils/env_config.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -24,6 +26,7 @@ import 'package:fuelmaster/utils/app_initializer.dart';
 import 'package:fuelmaster/providers/app_settings_provider.dart';
 import 'package:fuelmaster/utils/constants.dart';
 import 'package:fuelmaster/providers/history_provider.dart';
+import 'package:fuelmaster/services/premium_service.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:fuelmaster/services/map_page.dart';
 
@@ -33,8 +36,12 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await _activateAppCheck();
 
   final initialData = await AppInitializer.initialize();
+  // Премиум-статус: prefs + восстановление покупок в магазине при старте
+  // (после AppInitializer, чтобы не мешать миграциям prefs).
+  await PremiumService.instance.init();
   final SharedPreferences prefs = initialData['sharedPreferences'] as SharedPreferences;
   final Locale initialLocale = initialData['initialLocale'] as Locale;
   final bool initialDarkMode = initialData['isDarkMode'] as bool;
@@ -51,6 +58,24 @@ Future<void> main() async {
       child: const MyApp(),
     ),
   );
+}
+
+/// Включает Firebase App Check один раз на старте приложения.
+///
+/// Раньше вызов жил в initState экрана регистрации: до него (и после, при
+/// повторных запросах) Firebase-трафик уходил без attestation, а асинхронный
+/// вызов не дожидался результата. В debug-сборках используется debug-провайдер,
+/// иначе Play Integrity на неподписанном релизным ключом APK всегда падает.
+Future<void> _activateAppCheck() async {
+  try {
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+      appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
+    );
+    logger.d('App Check активирован (${kDebugMode ? 'debug' : 'release'})');
+  } catch (e) {
+    logger.e('Не удалось активировать App Check: $e');
+  }
 }
 
 class MyApp extends StatefulWidget {

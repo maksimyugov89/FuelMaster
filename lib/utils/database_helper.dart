@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fuelmaster/services/premium_service.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:meta/meta.dart';
@@ -613,8 +614,7 @@ class DatabaseHelper {
     while (retries > 0) {
       try {
         final db = await database;
-        final prefs = await SharedPreferences.getInstance();
-        final isPremium = prefs.getBool('isPremium') ?? false;
+        final isPremium = PremiumService.instance.isPremium;
         if (!isPremium) {
           logger.d('Sync skipped: User is not premium');
           return;

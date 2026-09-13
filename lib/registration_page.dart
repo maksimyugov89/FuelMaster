@@ -10,7 +10,6 @@ import 'package:fuelmaster/utils/logger.dart';
 import 'package:lottie/lottie.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:fuelmaster/widgets.dart';
 import 'package:fuelmaster/widgets/gradient_button.dart';
 import 'package:fuelmaster/widgets/gradient_text.dart';
@@ -50,7 +49,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   void initState() {
     super.initState();
-    _initializeAppCheck();
     final apiKey = EnvConfig.getOptional('GEOAPIFY_API_KEY');
     _isApiKeyMissing = apiKey == null || apiKey.isEmpty;
     if (_isApiKeyMissing) {
@@ -71,17 +69,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     passwordFocus.dispose();
     cityFocus.dispose();
     super.dispose();
-  }
-
-  Future<void> _initializeAppCheck() async {
-    try {
-      await FirebaseAppCheck.instance.activate(
-        androidProvider: AndroidProvider.playIntegrity,
-      );
-      logger.d('App Check initialized successfully');
-    } catch (e) {
-      logger.e('Error initializing App Check: $e');
-    }
   }
 
   Future<String?> _loadInitialLocation() async {

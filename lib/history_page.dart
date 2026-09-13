@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fuelmaster/services/premium_service.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:logger/logger.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
@@ -75,10 +75,19 @@ class _HistoryPageState extends State<HistoryPage> {
     _checkPremiumStatus();
   }
 
-  Future<void> _checkPremiumStatus() async {
+  /// Премиум берём из PremiumService (раньше читали prefs напрямую, из-за
+  /// чего экран не узнавал о покупке, оформленной в этом же сеансе).
+  void _checkPremiumStatus() {
     if (!mounted) return;
-    final prefs = await SharedPreferences.getInstance();
-    setState(() => _isPremium = prefs.getBool('isPremium') ?? false);
+    _isPremium = PremiumService.instance.isPremium;
+    PremiumService.instance.removeListener(_onPremiumChanged);
+    PremiumService.instance.addListener(_onPremiumChanged);
+    setState(() {});
+  }
+
+  void _onPremiumChanged() {
+    if (!mounted) return;
+    setState(() => _isPremium = PremiumService.instance.isPremium);
   }
 
   Future<void> _loadCars() async {
@@ -103,6 +112,7 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void dispose() {
     AdManager.dispose();
+    PremiumService.instance.removeListener(_onPremiumChanged);
     for (var controller in _tileControllers.values) {
       controller.dispose();
     }

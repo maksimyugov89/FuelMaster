@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/constants.dart';
+import 'package:fuelmaster/services/premium_service.dart';
 
 class AppSettingsProvider with ChangeNotifier {
   late SharedPreferences _prefs;
   late Locale _locale;
   late bool _isDarkMode;
-  late bool _isPremium;
   late bool _isRegistered;
   late bool _onboardingCompleted;
   late String _themeMode;
 
   Locale get locale => _locale;
   bool get isDarkMode => _isDarkMode;
-  bool get isPremium => _isPremium;
+  // Единственный источник правды — PremiumService (prefs + магазин).
+  bool get isPremium => PremiumService.instance.isPremium;
   bool get isRegistered => _isRegistered;
   bool get onboardingCompleted => _onboardingCompleted;
   String get themeMode => _themeMode;
@@ -22,11 +23,12 @@ class AppSettingsProvider with ChangeNotifier {
   AppSettingsProvider(SharedPreferences prefs, Locale initialLocale, bool initialDarkMode) {
     _prefs = prefs;
     _locale = initialLocale;
-    _isPremium = _prefs.getBool(AppConstants.isPremiumKey) ?? false;
     _isRegistered = _prefs.getBool(AppConstants.isRegisteredKey) ?? false;
     _onboardingCompleted = _prefs.getBool(AppConstants.onboardingCompletedKey) ?? false;
     _themeMode = _prefs.getString(AppConstants.themeModeKey) ?? 'auto';
     _updateDarkModeBasedOnThemeMode(initialDarkMode: initialDarkMode);
+    // Обновляем подписчиков, когда премиум приходит из магазина.
+    PremiumService.instance.addListener(notifyListeners);
   }
 
   void _updateDarkModeBasedOnThemeMode({bool? initialDarkMode}) {
@@ -62,10 +64,7 @@ class AppSettingsProvider with ChangeNotifier {
   }
 
   void setPremium(bool isPremium) {
-    if (_isPremium == isPremium) return;
-    _isPremium = isPremium;
-    _prefs.setBool(AppConstants.isPremiumKey, _isPremium);
-    notifyListeners();
+    PremiumService.instance.setPremium(isPremium);
   }
 
   void setRegistered(bool isRegistered) {

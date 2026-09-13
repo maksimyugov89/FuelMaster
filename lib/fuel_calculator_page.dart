@@ -16,7 +16,7 @@ import 'package:fuelmaster/utils/database_helper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
 import 'package:fuelmaster/utils/deepseek_service.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:fuelmaster/services/premium_service.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:fuelmaster/utils/fuel_calculation_service.dart';
 import 'package:fuelmaster/utils/weather_service.dart';
@@ -69,7 +69,6 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
   bool _isLoading = false;
   bool _useAutoCorrectionFactor = false;
   bool _bannerShown = false; // ✅ новый флаг
-  StreamSubscription<List<PurchaseDetails>>? _purchaseSubscription;
 
   @override
   void initState() {
@@ -119,7 +118,8 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
         }
       }
     });
-    _checkPremiumStatus();
+    _isPremium = PremiumService.instance.isPremium;
+    PremiumService.instance.addListener(_onPremiumChanged);
 
     // ❌ Убрал показ баннера из initState()
 
@@ -193,23 +193,12 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
     }
   }
 
-  Future<void> _checkPremiumStatus() async {
-    final iap = InAppPurchase.instance;
-    if (await iap.isAvailable()) {
-      _purchaseSubscription = iap.purchaseStream.listen((purchases) {
-        setState(() {
-          _isPremium = purchases.any((purchase) =>
-              purchase.productID == 'supergrok_monthly' &&
-              (purchase.status == PurchaseStatus.restored ||
-                  purchase.status == PurchaseStatus.purchased));
-        });
-      }, onDone: () {
-        _purchaseSubscription?.cancel();
-      }, onError: (e) {
-        logger.e('Error in purchase stream: $e');
-      });
-      await iap.restorePurchases();
-    }
+  /// Статус премиума приходит из PremiumService (раньше здесь был свой
+  /// подписчик purchaseStream, ждавший покупку с чужим productId
+  /// 'supergrok_monthly', поэтому премиум в калькуляторе не включался).
+  void _onPremiumChanged() {
+    if (!mounted) return;
+    setState(() => _isPremium = PremiumService.instance.isPremium);
   }
 
   Future<bool> _hasUsedDailyAdvice() async {
@@ -309,7 +298,7 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
 
   @override
   void dispose() {
-    _purchaseSubscription?.cancel();
+    PremiumService.instance.removeListener(_onPremiumChanged);
     initialMileageController.removeListener(_updateTotalMileage);
     finalMileageController.removeListener(_updateTotalMileage);
     initialMileageController.dispose();

@@ -4,6 +4,9 @@ class AppConstants {
   static const String onboardingCompletedKey = 'onboarding_completed';
   static const String isRegisteredKey = 'is_registered';
   static const String isPremiumKey = 'isPremium';
+
+  /// Единственный идентификатор премиум-товара в магазинах.
+  static const String premiumProductId = 'fuelmaster_premium_subscription';
   static const String hasMigratedKey = 'has_migrated';
   static const String historyPrefsMigratedKey = 'history_prefs_migrated';
   static const String themeModeKey = 'theme_mode';

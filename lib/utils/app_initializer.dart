@@ -59,8 +59,11 @@ class AppInitializer {
     final InAppPurchase iap = InAppPurchase.instance;
     final isIapAvailable = await iap.isAvailable();
     if (!isIapAvailable) {
+      // ВАЖНО: раньше здесь писалось isPremium = false, и пользователь,
+      // купивший премиум, терял его навсегда, если магазин в этот момент
+      // недоступен (офлайн, нет Google Play). Статус меняет только
+      // PremiumService по подтверждению магазина.
       logger.w('InAppPurchase недоступен — покупки внутри приложения отключены');
-      await prefs.setBool(AppConstants.isPremiumKey, false);
     }
 
     final hasMigrated = prefs.getBool(AppConstants.hasMigratedKey) ?? false;

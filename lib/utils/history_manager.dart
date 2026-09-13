@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fuelmaster/utils/constants.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
 import 'package:fuelmaster/utils/logger.dart';
+import 'package:fuelmaster/services/premium_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -27,8 +28,8 @@ class HistoryManager {
   }
 
   static Future<bool> _isPremiumUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(AppConstants.isPremiumKey) ?? false;
+    // Статус ведёт PremiumService; prefs остаётся офлайн-копией внутри него.
+    return PremiumService.instance.isPremium;
   }
 
   static Map<String, Object?> _fuelLogRow(Map<String, dynamic> record) {
