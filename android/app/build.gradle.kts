@@ -37,11 +37,20 @@ android {
     }
 
     defaultConfig {
+        // ВНИМАНИЕ: applicationId до сих пор шаблонный (com.example.*).
+        // Google Play такой идентификатор не принимает, но смена applicationId
+        // — это НОВОЕ приложение для системы: обновление «поверх» у друзей
+        // станет невозможным (только удалить и поставить заново), плюс нужно
+        // обновить ограничения ключа Yandex Maps (package + SHA-1) и App Check.
+        // Менять осознанно и вместе с google-services.json и AndroidManifest.xml.
         applicationId = "com.example.fuelmaster"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        // Единственный источник версии — pubspec.yaml (`version: 1.0.1+7`).
+        // Раньше здесь были зашиты versionCode = 1 / versionName = "1.0.0",
+        // поэтому все сборки выходили одной и той же версией.
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
         multiDexEnabled = true
 
         manifestPlaceholders["YANDEX_MAPS_API_KEY"] = yandexMapsApiKey

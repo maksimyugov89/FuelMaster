@@ -27,7 +27,9 @@
 ## Безопасность секретов
 
 - **Не коммитьте** `.env`, `env.defines.json`, `android/keystore.properties`, `android/local.properties`, файлы `*.jks`.
-- Файл `.env` **не включается** в assets приложения и читается только в debug-сборках — в APK он не попадает.
+- Файл `.env` **не включается** в assets приложения, поэтому приложением он не читается вообще
+  (`flutter_dotenv` умеет читать только из asset-бандла). Все ключи передаются
+  через `--dart-define-from-file=env.defines.json` — и в debug, и в release.
 - Для запуска и сборки используйте `--dart-define-from-file=env.defines.json` (см. `env.defines.json.example`).
 - **AI-советы в release идут через собственный прокси** (`AI_PROXY_URL`, код и инструкция — `server/ai_proxy/`). Ключ провайдера в release-сборке не читается вообще: `EnvConfig` его не отдаёт, в APK его нет.
 - Ключ Yandex MapKit задаётся в `android/local.properties` → `yandex.maps.apikey` (см. `android/local.properties.example`).
@@ -90,7 +92,10 @@
     flutter build apk --dart-define-from-file=env.defines.json
     ```
 
-**Альтернатива для локальной разработки:** файл `.env` в корне (см. `.env.example`). В debug `EnvConfig` попытается его прочитать, но для мобильных сборок предпочтителен `env.defines.json`.
+**О `.env`:** после отказа от `.env` в assets этот файл приложением не читается —
+единственный рабочий способ передать ключи это `--dart-define-from-file=env.defines.json`
+(в VS Code — готовая конфигурация в `.vscode/launch.json`). Шаблон ключей — `env.defines.json.example`.
+Старый `.env.example` оставлен только как справка по именам ключей.
 
 ### Настройка Android (карта Yandex)
 

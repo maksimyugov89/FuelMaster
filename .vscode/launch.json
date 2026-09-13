@@ -9,12 +9,6 @@
       "toolArgs": [
         "--dart-define-from-file=env.defines.json"
       ]
-    },
-    {
-      "name": "FuelMaster (debug .env)",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/main.dart"
     }
   ]
 }
