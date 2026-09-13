@@ -465,9 +465,9 @@ class DatabaseHelper {
             where: 'car_id = ?',
             whereArgs: [carId],
           );
-          logger.d('Deleted car with model: $model and associated fuel logs');
+          logger.d('Deleted car id=$carId with associated fuel logs');
         } else {
-          logger.e('Car ID is null for model: $model');
+          logger.e('Car ID is null при удалении по модели');
         }
       }
     } catch (e) {
@@ -486,7 +486,7 @@ class DatabaseHelper {
         carToInsert.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      logger.d('Inserted car with ID: $insertedId, data: ${carToInsert.toJson()}');
+      logger.d('Inserted car with ID: $insertedId');
       await _syncCarToFirestoreIfAuthenticated(carToInsert.copyWith(id: insertedId));
     } catch (e) {
       logger.e('Error inserting car: $e');
@@ -499,7 +499,7 @@ class DatabaseHelper {
     try {
       final List<Map<String, dynamic>> maps = await db.query('cars');
       final cars = List.generate(maps.length, (i) => CarData.fromJson(maps[i]));
-      logger.d('Loaded ${cars.length} cars from database: ${cars.map((c) => c.toJson()).toList()}');
+      logger.d('Loaded ${cars.length} cars from database');
       return cars;
     } catch (e) {
       logger.e('Error loading cars: $e');
@@ -529,7 +529,7 @@ class DatabaseHelper {
         }
         return list;
       });
-      logger.d('Loaded ${uniqueCars.length} user cars from database: ${uniqueCars.map((c) => c.toJson()).toList()}');
+      logger.d('Loaded ${uniqueCars.length} user cars from database');
       return uniqueCars;
     } catch (e) {
       logger.e('Error loading user cars: $e');
@@ -548,7 +548,7 @@ class DatabaseHelper {
         where: 'id = ?',
         whereArgs: [car.id],
       );
-      logger.d('Updated car: ${carWithTimestamp.toJson()}');
+      logger.d('Updated car id=${carWithTimestamp.id}');
       await _syncCarToFirestoreIfAuthenticated(carWithTimestamp);
     } catch (e) {
       logger.e('Error updating car: $e');
@@ -622,7 +622,7 @@ class DatabaseHelper {
             car.toJson(),
             conflictAlgorithm: ConflictAlgorithm.ignore,
           );
-          logger.d('Added preset car: ${car.toJson()}');
+          logger.d('Added preset car id=${car.id}');
         } else {
           logger.d('Skipping duplicate preset car: ${car.brand} ${car.model}');
         }
@@ -677,14 +677,14 @@ class DatabaseHelper {
               where: 'id = ?',
               whereArgs: [remoteCar.id],
             );
-            logger.d('Updated local car from Firestore: ${remoteCar.toJson()}');
+            logger.d('Updated local car id=${remoteCar.id} from Firestore');
           }
         }
 
         for (var remoteCar in remoteCars) {
           if (!localCars.any((lc) => lc.id == remoteCar.id)) {
             await db.insert('cars', remoteCar.toJson());
-            logger.d('Inserted remote car to local: ${remoteCar.toJson()}');
+            logger.d('Inserted remote car id=${remoteCar.id} to local');
           }
         }
 
@@ -739,7 +739,7 @@ class DatabaseHelper {
     try {
       final firestore = FirebaseFirestore.instance;
       await firestore.collection('users').doc(uid).collection('cars').doc(car.id.toString()).set(car.toJson());
-      logger.d('Synced car to Firestore: ${car.toJson()}');
+      logger.d('Synced car id=${car.id} to Firestore');
     } catch (e) {
       logger.e('Error syncing car to Firestore: $e');
       throw Exception('Failed to sync car: $e');

@@ -15,7 +15,7 @@ class HistoryProvider with ChangeNotifier {
     try {
       _history = await HistoryManager.loadHistory();
       notifyListeners();
-      logger.d('История загружена в HistoryProvider: $_history');
+      logger.d('История загружена в HistoryProvider: ${_history.length} записей');
     } catch (e) {
       logger.e('Ошибка загрузки истории в HistoryProvider: $e');
     }
@@ -24,7 +24,7 @@ class HistoryProvider with ChangeNotifier {
   void updateHistory(List<Map<String, dynamic>> newHistory) {
     _history = newHistory;
     notifyListeners();
-    logger.d('История обновлена в HistoryProvider: $_history');
+    logger.d('История обновлена в HistoryProvider: ${_history.length} записей');
   }
 
   Future<void> addHistoryEntry(Map<String, dynamic> entry) async {

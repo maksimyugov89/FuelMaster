@@ -35,7 +35,7 @@ class WeatherService {
         return await _getCachedWeatherData(city);
       }
     } on TimeoutException {
-      logger.e('WeatherAPI: таймаут ${_timeout.inSeconds} с для $city');
+      logger.e('WeatherAPI: таймаут ${_timeout.inSeconds} с');
       return await _getCachedWeatherData(city);
     } catch (e) {
       logger.e('Error fetching weather data: $e');
@@ -58,7 +58,7 @@ class WeatherService {
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    logger.d('Cached weather data for $city at $now');
+    logger.d('Погода закэширована на $now');
   }
 
   Future<Map<String, dynamic>?> _getCachedWeatherData(String city) async {
@@ -72,7 +72,7 @@ class WeatherService {
     if (result.isNotEmpty) {
       final weatherData = result.first['weather_data'] as String?;
       if (weatherData != null) {
-        logger.d('Using cached weather data for $city');
+        logger.d('Использую кэш погоды');
         return {'current': jsonDecode(weatherData)};
       }
     }
@@ -82,13 +82,13 @@ class WeatherService {
   Future<double> getWeatherMultiplier(String city) async {
     final weatherData = await getWeatherData(city);
     if (weatherData == null) {
-      logger.w('No weather data available for $city, using default multiplier');
+      logger.w('Нет данных о погоде, использую коэффициент по умолчанию');
       return 1.0;
     }
 
     final current = weatherData['current'];
     if (current is! Map) {
-      logger.w('Некорректные данные о погоде для $city — множитель 1.0');
+      logger.w('Некорректные данные о погоде — множитель 1.0');
       return 1.0;
     }
 

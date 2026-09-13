@@ -29,7 +29,7 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
         logger.w('Город пользователя не найден в SharedPreferences.');
         return null;
       }
-      logger.d('Загрузка погоды для города: $city');
+      logger.d('Загрузка погоды для сохранённого города');
       return await _weatherService.getWeatherData(city);
     } catch (e) {
       logger.e('Ошибка при загрузке погоды: $e');

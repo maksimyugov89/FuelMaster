@@ -1,13 +1,24 @@
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
-final logger = Logger(
+/// Единый логгер приложения.
+///
+/// В release-сборке (пункт C-3 аудита):
+///  * уровень поднят до [Level.warning] — отладочные дампы с данными пользователя
+///    (авто, история заправок, город, ответы API) в лог не попадают;
+///  * отключены цвета, эмодзи, метки времени и стек вызовов — их всё равно некуда
+///    выводить, а лишний объём в logcat только вредит.
+///
+/// Правило: данные пользователя не логировать даже в debug. Можно id и
+/// количество записей, нельзя номер авто, цену, маршрут, email.
+final Logger logger = Logger(
   printer: PrettyPrinter(
-    methodCount: 2, // Количество строк стека вызовов
-    errorMethodCount: 8, // Количество строк для ошибок
-    lineLength: 120, // Длина строки в логах
-    colors: true, // Включить цветной вывод
-    printEmojis: true, // Включить эмодзи
-    printTime: true, // Включить временные метки
+    methodCount: kReleaseMode ? 0 : 2,
+    errorMethodCount: kReleaseMode ? 0 : 8,
+    lineLength: 120,
+    colors: !kReleaseMode,
+    printEmojis: !kReleaseMode,
+    printTime: !kReleaseMode,
   ),
-  level: Level.debug, // Минимальный уровень логов
+  level: kReleaseMode ? Level.warning : Level.debug,
 );

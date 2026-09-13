@@ -83,7 +83,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         _isProgrammaticChange = false;
         _isInitialLoad = false;
       });
-      logger.d('Loaded cached city: $savedCity, country: $_countryCode');
+      logger.d('Загружен сохранённый город (${savedCity.length} симв.)');
       return savedCity;
     }
     return _setDefaultCity();
@@ -112,7 +112,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (errorMessage != null && mounted) {
       _showSnackBar(errorMessage);
     }
-    logger.d('Set default city: $defaultCity, country: $defaultCountry');
+    logger.d('Установлен город по умолчанию');
     return defaultCity;
   }
 
@@ -190,7 +190,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         await prefs.setString('user_city', city);
         await prefs.setString('user_country', country);
         await _setDefaultLanguage(country);
-        logger.d('Detected city: $city, country: $country');
+        logger.d('Город определён (${city.length} симв.)');
         return city;
       } else if (response.statusCode == 401) {
         logger.e('Geoapify API error: ${data['message'] ?? 'Invalid API key'}');
@@ -549,7 +549,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     emailFocus.unfocus();
                     passwordFocus.unfocus();
                     _setDefaultLanguage(_countryCode ?? _mapLocaleToCountryCode(widget.locale.languageCode));
-                    logger.d('Selected city: $cityName, country: $_countryCode');
+                    logger.d('Город выбран вручную');
                   },
                 );
               },

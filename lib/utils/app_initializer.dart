@@ -38,14 +38,14 @@ class AppInitializer {
           );
       if (city != null) {
         await prefs.setString(AppConstants.userCityKey, city);
-        logger.d('Город ($city) успешно сохранен в SharedPreferences.');
+        logger.d('Город успешно сохранён в SharedPreferences.');
       } else {
         logger.w('Не удалось определить и сохранить город пользователя.');
       }
     } else if (!isRegistered) {
       logger.d('Геолокация на старте пропущена: пользователь ещё не зарегистрирован (B-6)');
     } else {
-      logger.d('Используется ранее сохраненный город: ${prefs.getString(AppConstants.userCityKey)}');
+      logger.d('Используется ранее сохранённый город из SharedPreferences');
     }
     // --- КОНЕЦ ИЗМЕНЕНИЙ ---
 

@@ -73,7 +73,7 @@ class _MainMenuPageState extends State<MainMenuPage> with WidgetsBindingObserver
 
       // Сравниваем новый город с сохраненным
       if (currentCity != null && currentCity != savedCity) {
-        logger.i('Обнаружен новый город: $currentCity. Обновление погоды.');
+        logger.i('Обнаружен новый город. Обновление погоды.');
         // Сохраняем новый город
         await prefs.setString(AppConstants.userCityKey, currentCity);
         // Обновляем ключ, чтобы пересоздать виджет погоды
@@ -83,7 +83,7 @@ class _MainMenuPageState extends State<MainMenuPage> with WidgetsBindingObserver
           });
         }
       } else {
-        logger.d('Местоположение не изменилось. Текущий город: $savedCity');
+        logger.d('Местоположение не изменилось.');
       }
     } catch (e) {
       logger.e('Ошибка при обновлении местоположения: $e');
@@ -129,7 +129,7 @@ void _refreshCarListAndSetSelection() {
         if (!_listEquality.equals(historyProvider.history, loadedHistory)) {
           historyProvider.updateHistory(loadedHistory);
         }
-        logger.d('История загружена в MainMenuPage: ${historyProvider.history}');
+        logger.d('История загружена в MainMenuPage: ${historyProvider.history.length} записей');
       }
     } catch (e) {
       logger.e('Ошибка загрузки истории в MainMenuPage: $e');

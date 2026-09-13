@@ -103,7 +103,7 @@ class CarProvider with ChangeNotifier {
       // Теперь данные сохраняются как есть.
       await _dbHelper.insertCar(car);
       await loadCars();
-      logger.d('Car added successfully: ${car.toJson()}');
+      logger.d('Car added successfully: id=${car.id}');
       return true;
     } catch (e) {
       logger.e('Error adding car in CarProvider: $e');
@@ -134,7 +134,7 @@ class CarProvider with ChangeNotifier {
       // Теперь данные обновляются как есть.
       await _dbHelper.updateCar(car);
       await loadCars();
-      logger.d('Car updated successfully: ${car.toJson()}');
+      logger.d('Car updated successfully: id=${car.id}');
       return true;
     } catch (e) {
       logger.e('Error updating car in CarProvider: $e');

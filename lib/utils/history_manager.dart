@@ -95,7 +95,7 @@ class HistoryManager {
     try {
       final existing = await loadHistoryFromDatabase();
       if (_isDuplicateRecord(entry, existing)) {
-        logger.d('Запись истории — дубликат, пропускаем: $entry');
+        logger.d('Запись истории — дубликат, пропускаем');
         return;
       }
 
@@ -107,7 +107,7 @@ class HistoryManager {
       );
 
       final saved = {...entry, 'id': id};
-      logger.d('Запись истории сохранена в SQLite: $saved');
+      logger.d('Запись истории сохранена в SQLite');
 
       final user = FirebaseAuth.instance.currentUser;
       if (user != null && await _isPremiumUser()) {

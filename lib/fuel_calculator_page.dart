@@ -191,7 +191,7 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
           localHistory = filteredHistory;
         });
         final timestamp = DateFormat('HH:mm:ss').format(DateTime.now());
-        logger.d('[$timestamp] Загружена история для автомобиля ${widget.car.id}: $localHistory');
+        logger.d('[$timestamp] История авто ${widget.car.id}: ${localHistory.length} записей');
       }
     } catch (e) {
       final timestamp = DateFormat('HH:mm:ss').format(DateTime.now());
@@ -393,7 +393,7 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
         }
       }
       await HistoryManager.saveHistory(existingHistory);
-      logger.d('История сохранена из FuelCalculatorPage: $existingHistory');
+      logger.d('История сохранена из FuelCalculatorPage: ${existingHistory.length} записей');
     } catch (e) {
       logger.e('Ошибка сохранения истории в FuelCalculatorPage: $e');
       if (mounted) {

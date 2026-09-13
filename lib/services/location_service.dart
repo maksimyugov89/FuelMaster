@@ -26,7 +26,7 @@ class LocationService {
         if (placemarks.isNotEmpty) {
           final city = placemarks.first.locality;
           if (city != null && city.isNotEmpty) {
-            logger.d('Определен город: $city');
+            logger.d('Геолокация: город определён');
             return city;
           }
         }
