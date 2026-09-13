@@ -663,10 +663,15 @@ class DatabaseHelper {
           }
         }
 
+        // B-1 аудита: раньше локальные авто, отсутствующие в облаке, здесь
+        // удалялись из БД. Сбой сети или частичное чтение стирали машины
+        // вместе с историей. В первом релизе исправления ничего не удаляем
+        // автоматически: только журналируем и отдаём запись наверх
+        // (мягкое удаление с tombstone — отдельная задача).
         for (var localCar in localCars) {
           if (!remoteCars.any((rc) => rc.id == localCar.id)) {
-            await db.delete('cars', where: 'id = ?', whereArgs: [localCar.id]);
-            logger.d('Deleted local car not in Firestore: id=${localCar.id}');
+            logger.w('Локальное авто id=${localCar.id} отсутствует в облаке — оставлено локально (B-1)');
+            await _syncCarToFirestore(uid, localCar);
           }
         }
 

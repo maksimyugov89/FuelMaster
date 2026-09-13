@@ -20,25 +20,52 @@ class CarProvider with ChangeNotifier {
     }
   }
 
+  /// Не чаще одного полного синка авто за это время (B-2 аудита).
+  static const Duration _minSyncInterval = Duration(minutes: 10);
+  DateTime? _lastSyncAt;
+
   Future<void> loadCars() async {
     if (_isLoading) return;
     _isLoading = true;
     notifyListeners();
     try {
       _cars = await _dbHelper.getCars();
-      if (Firebase.apps.isNotEmpty) {
-        final user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          await _dbHelper.syncCarsWithFirestore(user.uid);
-          _cars = await _dbHelper.getCars();
-        }
-      }
+      // B-2 аудита: раньше здесь на КАЖДОЕ действие (add/update/delete →
+      // loadCars) выполнялся полный сетевой проход. Теперь синк дебаунсится
+      // по времени, а сами изменения уходят в облако сразу — их пишет
+      // _syncCarToFirestoreIfAuthenticated из insert/update/deleteCar.
+      await syncWithFirestore();
       logger.d('Loaded ${_cars.length} cars in CarProvider');
     } catch (e) {
       logger.e('Error loading cars in CarProvider: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  /// Полная синхронизация авто с Firestore (B-2).
+  ///
+  /// Вызывается по явным событиям: загрузка списка, вход в аккаунт,
+  /// pull-to-refresh. Повторные вызовы чаще [_minSyncInterval] игнорируются.
+  Future<void> syncWithFirestore({bool force = false}) async {
+    if (Firebase.apps.isEmpty) return;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final now = DateTime.now();
+    final last = _lastSyncAt;
+    if (!force && last != null && now.difference(last) < _minSyncInterval) {
+      logger.d('Синк авто пропущен: прошло меньше ${_minSyncInterval.inMinutes} мин');
+      return;
+    }
+    _lastSyncAt = now;
+    try {
+      await _dbHelper.syncCarsWithFirestore(user.uid);
+      _cars = await _dbHelper.getCars();
+      notifyListeners();
+    } catch (e) {
+      logger.e('Ошибка синхронизации авто с Firestore: $e');
     }
   }
 

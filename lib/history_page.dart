@@ -220,17 +220,39 @@ class _HistoryPageState extends State<HistoryPage> {
       return;
     }
 
+    await _deleteStaleExports();
+
     final directory = await getTemporaryDirectory();
-    final file = File('${directory.path}/fuel_history.txt');
-    String content = recordsToExport.map((record) => service.formatHistoryRecord(record).join('\n')).join('\n\n');
+    // B-7 аудита: файл удалялся в finally сразу после shareXFiles, а принимающее
+    // приложение читает его уже после возврата из шита — экспорт приходил пустым.
+    // Теперь имя уникально, а чистим только старые файлы.
+    final file = File('${directory.path}/fuel_history_${DateTime.now().millisecondsSinceEpoch}.txt');
+    final String content = recordsToExport
+        .map((record) => service.formatHistoryRecord(record).join('\n'))
+        .join('\n\n');
     await file.writeAsString(content);
 
     try {
       await Share.shareXFiles([XFile(file.path)], subject: l10n.fuel_history_message);
     } catch (e) {
       logger.e('Ошибка при экспорте: $e');
-    } finally {
-      await file.delete();
+    }
+  }
+
+  /// Убирает прошлые экспорты истории (старше 10 минут), чтобы temp не рос.
+  Future<void> _deleteStaleExports() async {
+    try {
+      final directory = await getTemporaryDirectory();
+      final now = DateTime.now();
+      await for (final entity in directory.list()) {
+        final name = entity.path.split(Platform.pathSeparator).last;
+        if (entity is! File) continue;
+        if (!name.startsWith('fuel_history_') || !name.endsWith('.txt')) continue;
+        if (now.difference(entity.statSync().modified).inMinutes < 10) continue;
+        await entity.delete();
+      }
+    } catch (e) {
+      logger.w('Не удалось удалить старые экспорты: $e');
     }
   }
 
