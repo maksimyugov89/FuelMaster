@@ -116,7 +116,7 @@ EXTRA_BRANDS = {
     '飞凡': 'Rising Auto', '智己': 'IM Motors', '睿蓝': 'Livan',
     '欧萌达': 'Omoda', '杰酷': 'Jaecoo', '星途': 'Exeed', '捷途': 'Jetour',
     '坦克': 'Tank', '欧拉': 'Ora', '魏牌': 'WEY', '哈弗': 'Haval',
-    '银河': 'Geely', '睿行': 'Changan', '跨越': 'Changan',
+    '银河': 'Geely',
 }
 
 OUT_COLUMNS = [
