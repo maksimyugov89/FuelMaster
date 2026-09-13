@@ -909,4 +909,130 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get map => 'Map';
+
+  @override
+  String get analytics_title => 'Fuel analytics';
+
+  @override
+  String get analytics_period => 'Period';
+
+  @override
+  String get analytics_period_30 => '30 days';
+
+  @override
+  String get analytics_period_90 => '90 days';
+
+  @override
+  String get analytics_period_365 => 'Year';
+
+  @override
+  String get analytics_all_cars => 'All cars';
+
+  @override
+  String get analytics_car => 'Car';
+
+  @override
+  String get analytics_avg_consumption => 'Average consumption';
+
+  @override
+  String get analytics_norm => 'Norm';
+
+  @override
+  String get analytics_deviation => 'Deviation from norm';
+
+  @override
+  String get analytics_above_norm => 'above norm';
+
+  @override
+  String get analytics_below_norm => 'below norm';
+
+  @override
+  String get analytics_on_norm => 'at the norm';
+
+  @override
+  String get analytics_distance => 'Distance';
+
+  @override
+  String get analytics_fuel_used => 'Fuel used';
+
+  @override
+  String get analytics_cost => 'Fuel cost';
+
+  @override
+  String get analytics_cost_per_km => 'Cost per kilometer';
+
+  @override
+  String get analytics_price_per_liter => 'Price per liter';
+
+  @override
+  String get analytics_price_hint => 'For example, 250';
+
+  @override
+  String get analytics_currency => '₸';
+
+  @override
+  String get analytics_forecast => 'Monthly forecast';
+
+  @override
+  String get analytics_forecast_distance => 'Distance forecast';
+
+  @override
+  String get analytics_forecast_fuel => 'Fuel forecast';
+
+  @override
+  String get analytics_forecast_cost => 'Cost forecast';
+
+  @override
+  String get analytics_daily_distance => 'Distance per day';
+
+  @override
+  String get analytics_avg_refuel => 'Average refuel';
+
+  @override
+  String get analytics_trend => 'Consumption trend';
+
+  @override
+  String get analytics_trend_rising => 'rising';
+
+  @override
+  String get analytics_trend_falling => 'falling';
+
+  @override
+  String get analytics_trend_stable => 'stable';
+
+  @override
+  String get analytics_trend_per_month => 'l/100 km per month';
+
+  @override
+  String get analytics_comparison => 'Compared to previous period';
+
+  @override
+  String get analytics_comparison_empty =>
+      'No records in the previous period to compare with';
+
+  @override
+  String get analytics_no_period_data =>
+      'No records in this period. Pick a longer period or add a refuel.';
+
+  @override
+  String get analytics_no_data =>
+      'Not enough data yet: records with distance and fuel are required';
+
+  @override
+  String get analytics_entries => 'Records';
+
+  @override
+  String get analytics_city_share => 'City share';
+
+  @override
+  String get analytics_share_report => 'Share report';
+
+  @override
+  String get analytics_report_title => 'Fuel consumption report';
+
+  @override
+  String get analytics_summary => 'Period summary';
+
+  @override
+  String get analytics_period_label => 'Period';
 }

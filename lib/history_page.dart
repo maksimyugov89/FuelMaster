@@ -14,6 +14,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:collection/collection.dart';
 import 'package:fuelmaster/utils/history_display_service.dart';
+import 'package:fuelmaster/analytics_page.dart';
 import 'package:fuelmaster/widgets/gradient_button.dart';
 import 'package:fuelmaster/widgets/gradient_text.dart';
 import 'package:fuelmaster/theme.dart';
@@ -171,6 +172,21 @@ class _HistoryPageState extends State<HistoryPage> {
         logger.e('Ошибка при удалении записи: $e');
       }
     }
+  }
+
+  /// D-2: экран аналитики расхода открывается из истории — исходные записи
+  /// лежат здесь же, отдельный раздел в нижнем меню не нужен.
+  void _openAnalytics() {
+    if (!mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AnalyticsPage(
+          history: _history,
+          cars: widget.cars,
+        ),
+      ),
+    );
   }
 
   Future<void> _clearHistory() async {
@@ -528,6 +544,11 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
                 ),
                 actions: [
+                  IconButton(
+                    icon: const Icon(Icons.insights),
+                    onPressed: _openAnalytics,
+                    tooltip: l10n.analytics_title,
+                  ),
                   IconButton(
                     icon: Icon(Icons.delete_sweep, color: theme.colorScheme.error),
                     onPressed: _clearHistory,

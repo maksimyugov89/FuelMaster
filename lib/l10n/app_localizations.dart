@@ -1843,6 +1843,252 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Map'**
   String get map;
+
+  /// No description provided for @analytics_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel analytics'**
+  String get analytics_title;
+
+  /// No description provided for @analytics_period.
+  ///
+  /// In en, this message translates to:
+  /// **'Period'**
+  String get analytics_period;
+
+  /// No description provided for @analytics_period_30.
+  ///
+  /// In en, this message translates to:
+  /// **'30 days'**
+  String get analytics_period_30;
+
+  /// No description provided for @analytics_period_90.
+  ///
+  /// In en, this message translates to:
+  /// **'90 days'**
+  String get analytics_period_90;
+
+  /// No description provided for @analytics_period_365.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get analytics_period_365;
+
+  /// No description provided for @analytics_all_cars.
+  ///
+  /// In en, this message translates to:
+  /// **'All cars'**
+  String get analytics_all_cars;
+
+  /// No description provided for @analytics_car.
+  ///
+  /// In en, this message translates to:
+  /// **'Car'**
+  String get analytics_car;
+
+  /// No description provided for @analytics_avg_consumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Average consumption'**
+  String get analytics_avg_consumption;
+
+  /// No description provided for @analytics_norm.
+  ///
+  /// In en, this message translates to:
+  /// **'Norm'**
+  String get analytics_norm;
+
+  /// No description provided for @analytics_deviation.
+  ///
+  /// In en, this message translates to:
+  /// **'Deviation from norm'**
+  String get analytics_deviation;
+
+  /// No description provided for @analytics_above_norm.
+  ///
+  /// In en, this message translates to:
+  /// **'above norm'**
+  String get analytics_above_norm;
+
+  /// No description provided for @analytics_below_norm.
+  ///
+  /// In en, this message translates to:
+  /// **'below norm'**
+  String get analytics_below_norm;
+
+  /// No description provided for @analytics_on_norm.
+  ///
+  /// In en, this message translates to:
+  /// **'at the norm'**
+  String get analytics_on_norm;
+
+  /// No description provided for @analytics_distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get analytics_distance;
+
+  /// No description provided for @analytics_fuel_used.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel used'**
+  String get analytics_fuel_used;
+
+  /// No description provided for @analytics_cost.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel cost'**
+  String get analytics_cost;
+
+  /// No description provided for @analytics_cost_per_km.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost per kilometer'**
+  String get analytics_cost_per_km;
+
+  /// No description provided for @analytics_price_per_liter.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per liter'**
+  String get analytics_price_per_liter;
+
+  /// No description provided for @analytics_price_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example, 250'**
+  String get analytics_price_hint;
+
+  /// No description provided for @analytics_currency.
+  ///
+  /// In en, this message translates to:
+  /// **'₸'**
+  String get analytics_currency;
+
+  /// No description provided for @analytics_forecast.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly forecast'**
+  String get analytics_forecast;
+
+  /// No description provided for @analytics_forecast_distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance forecast'**
+  String get analytics_forecast_distance;
+
+  /// No description provided for @analytics_forecast_fuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel forecast'**
+  String get analytics_forecast_fuel;
+
+  /// No description provided for @analytics_forecast_cost.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost forecast'**
+  String get analytics_forecast_cost;
+
+  /// No description provided for @analytics_daily_distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance per day'**
+  String get analytics_daily_distance;
+
+  /// No description provided for @analytics_avg_refuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Average refuel'**
+  String get analytics_avg_refuel;
+
+  /// No description provided for @analytics_trend.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption trend'**
+  String get analytics_trend;
+
+  /// No description provided for @analytics_trend_rising.
+  ///
+  /// In en, this message translates to:
+  /// **'rising'**
+  String get analytics_trend_rising;
+
+  /// No description provided for @analytics_trend_falling.
+  ///
+  /// In en, this message translates to:
+  /// **'falling'**
+  String get analytics_trend_falling;
+
+  /// No description provided for @analytics_trend_stable.
+  ///
+  /// In en, this message translates to:
+  /// **'stable'**
+  String get analytics_trend_stable;
+
+  /// No description provided for @analytics_trend_per_month.
+  ///
+  /// In en, this message translates to:
+  /// **'l/100 km per month'**
+  String get analytics_trend_per_month;
+
+  /// No description provided for @analytics_comparison.
+  ///
+  /// In en, this message translates to:
+  /// **'Compared to previous period'**
+  String get analytics_comparison;
+
+  /// No description provided for @analytics_comparison_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No records in the previous period to compare with'**
+  String get analytics_comparison_empty;
+
+  /// No description provided for @analytics_no_period_data.
+  ///
+  /// In en, this message translates to:
+  /// **'No records in this period. Pick a longer period or add a refuel.'**
+  String get analytics_no_period_data;
+
+  /// No description provided for @analytics_no_data.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough data yet: records with distance and fuel are required'**
+  String get analytics_no_data;
+
+  /// No description provided for @analytics_entries.
+  ///
+  /// In en, this message translates to:
+  /// **'Records'**
+  String get analytics_entries;
+
+  /// No description provided for @analytics_city_share.
+  ///
+  /// In en, this message translates to:
+  /// **'City share'**
+  String get analytics_city_share;
+
+  /// No description provided for @analytics_share_report.
+  ///
+  /// In en, this message translates to:
+  /// **'Share report'**
+  String get analytics_share_report;
+
+  /// No description provided for @analytics_report_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel consumption report'**
+  String get analytics_report_title;
+
+  /// No description provided for @analytics_summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Period summary'**
+  String get analytics_summary;
+
+  /// No description provided for @analytics_period_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Period'**
+  String get analytics_period_label;
 }
 
 class _AppLocalizationsDelegate

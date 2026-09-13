@@ -913,4 +913,130 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get map => 'Карта';
+
+  @override
+  String get analytics_title => 'Аналитика расхода';
+
+  @override
+  String get analytics_period => 'Период';
+
+  @override
+  String get analytics_period_30 => '30 дней';
+
+  @override
+  String get analytics_period_90 => '90 дней';
+
+  @override
+  String get analytics_period_365 => 'Год';
+
+  @override
+  String get analytics_all_cars => 'Все автомобили';
+
+  @override
+  String get analytics_car => 'Автомобиль';
+
+  @override
+  String get analytics_avg_consumption => 'Средний расход';
+
+  @override
+  String get analytics_norm => 'Норма';
+
+  @override
+  String get analytics_deviation => 'Отклонение от нормы';
+
+  @override
+  String get analytics_above_norm => 'выше нормы';
+
+  @override
+  String get analytics_below_norm => 'ниже нормы';
+
+  @override
+  String get analytics_on_norm => 'на уровне нормы';
+
+  @override
+  String get analytics_distance => 'Пробег';
+
+  @override
+  String get analytics_fuel_used => 'Израсходовано';
+
+  @override
+  String get analytics_cost => 'Стоимость топлива';
+
+  @override
+  String get analytics_cost_per_km => 'Стоимость километра';
+
+  @override
+  String get analytics_price_per_liter => 'Цена литра';
+
+  @override
+  String get analytics_price_hint => 'Например, 250';
+
+  @override
+  String get analytics_currency => '₸';
+
+  @override
+  String get analytics_forecast => 'Прогноз на месяц';
+
+  @override
+  String get analytics_forecast_distance => 'Прогноз пробега';
+
+  @override
+  String get analytics_forecast_fuel => 'Прогноз расхода топлива';
+
+  @override
+  String get analytics_forecast_cost => 'Прогноз затрат';
+
+  @override
+  String get analytics_daily_distance => 'Пробег в день';
+
+  @override
+  String get analytics_avg_refuel => 'Средняя заправка';
+
+  @override
+  String get analytics_trend => 'Тренд расхода';
+
+  @override
+  String get analytics_trend_rising => 'растёт';
+
+  @override
+  String get analytics_trend_falling => 'падает';
+
+  @override
+  String get analytics_trend_stable => 'стабильно';
+
+  @override
+  String get analytics_trend_per_month => 'л/100 км в месяц';
+
+  @override
+  String get analytics_comparison => 'Сравнение с прошлым периодом';
+
+  @override
+  String get analytics_comparison_empty =>
+      'За прошлый период записей нет — сравнивать не с чем';
+
+  @override
+  String get analytics_no_period_data =>
+      'За этот период записей нет. Выберите период побольше или добавьте заправку.';
+
+  @override
+  String get analytics_no_data =>
+      'Пока мало данных: нужны записи с пробегом и расходом';
+
+  @override
+  String get analytics_entries => 'Записей';
+
+  @override
+  String get analytics_city_share => 'Доля города';
+
+  @override
+  String get analytics_share_report => 'Поделиться отчётом';
+
+  @override
+  String get analytics_report_title => 'Отчёт по расходу топлива';
+
+  @override
+  String get analytics_summary => 'Показатели за период';
+
+  @override
+  String get analytics_period_label => 'Период';
 }
