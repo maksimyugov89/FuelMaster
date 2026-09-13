@@ -1,13 +1,12 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fuelmaster/utils/env_config.dart';
 import 'package:http/http.dart' as http;
-import 'package:logger/logger.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
 
 class WeatherService {
-  static final String _apiKey = dotenv.env['WEATHER_API_KEY'] ?? '';
+  static final String _apiKey = EnvConfig.get('WEATHER_API_KEY');
   static const String _apiUrl = 'https://api.weatherapi.com/v1/current.json';
   final http.Client _client;
 

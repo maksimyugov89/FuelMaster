@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fuelmaster/utils/env_config.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
-import 'package:logger/logger.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:lottie/lottie.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -52,7 +51,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void initState() {
     super.initState();
     _initializeAppCheck();
-    final apiKey = dotenv.env['GEOAPIFY_API_KEY'];
+    final apiKey = EnvConfig.getOptional('GEOAPIFY_API_KEY');
     _isApiKeyMissing = apiKey == null || apiKey.isEmpty;
     if (_isApiKeyMissing) {
       logger.e('Geoapify API key is missing or empty in RegistrationPage');
@@ -168,7 +167,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       }
 
       Position position = await Geolocator.getCurrentPosition();
-      final apiKey = dotenv.env['GEOAPIFY_API_KEY'];
+      final apiKey = EnvConfig.getOptional('GEOAPIFY_API_KEY');
       if (apiKey == null || apiKey.isEmpty) {
         return _setDefaultCity(AppLocalizations.of(context)!.api_key_invalid);
       }
@@ -254,7 +253,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     });
 
     try {
-      final apiKey = dotenv.env['GEOAPIFY_API_KEY'];
+      final apiKey = EnvConfig.getOptional('GEOAPIFY_API_KEY');
       final response = await http.get(Uri.parse(
           'https://api.geoapify.com/v1/geocode/autocomplete?text=$query&type=city&limit=5&apiKey=$apiKey'));
       final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -436,7 +435,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             labelText: l10n.city,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.2)),
+              borderSide: BorderSide(color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -472,7 +471,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             constraints: const BoxConstraints(maxHeight: 200),
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
-              border: Border.all(color: theme.colorScheme.onSurface.withOpacity(0.2)),
+              border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
               borderRadius: BorderRadius.circular(12),
             ),
             child: ListView.builder(
@@ -487,6 +486,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   title: Text(
                     countryName.isNotEmpty ? '$cityName, $countryName' : cityName,
                     style: theme.textTheme.bodyMedium,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   onTap: () {
                     if (mounted) {
@@ -522,7 +522,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark; // Проверяем тему
 
-    // --- ШАГ 1: Выносим всё содержимое страницы в отдельный виджет ---
     final pageContent = FutureBuilder<String?>(
       future: _locationFuture,
       builder: (context, snapshot) {
@@ -534,7 +533,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             padding: const EdgeInsets.all(16.0),
             child: Card(
               elevation: 4.0,
-              shadowColor: theme.colorScheme.primary.withOpacity(0.2),
+              shadowColor: theme.colorScheme.primary.withValues(alpha: 0.2),
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -599,7 +598,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
       },
     );
     
-    // --- ШАГ 2: Собираем финальный экран с фоном ---
     return Scaffold(
       backgroundColor: Colors.transparent, // <--- ИЗМЕНЕНИЕ
       appBar: AppBar(

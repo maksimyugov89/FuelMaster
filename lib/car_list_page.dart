@@ -146,12 +146,15 @@ class _CarListPageState extends State<CarListPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('$label:', style: TextStyle(color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7))),
+          Flexible(
+            child: Text('$label:', style: TextStyle(color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7)), overflow: TextOverflow.ellipsis),
+          ),
           Flexible(
             child: Text(
               value,
               style: const TextStyle(fontWeight: FontWeight.bold),
               textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -167,11 +170,11 @@ class _CarListPageState extends State<CarListPage> {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       elevation: 4.0,
-      shadowColor: theme.colorScheme.primary.withOpacity(0.1),
+      shadowColor: theme.colorScheme.primary.withValues(alpha: 0.1),
       child: ExpansionTile(
         title: _formatCarDisplayName(car),
         leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
           child: Text(
             car.brand.isNotEmpty ? car.brand[0] : '?',
             style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
@@ -223,7 +226,6 @@ class _CarListPageState extends State<CarListPage> {
     // Обновляем список при каждой перерисовке
     _filterCars();
 
-    // --- ШАГ 1: Выносим всё содержимое страницы в отдельный виджет ---
     final pageContent = Column(
       children: [
         Padding(
@@ -258,7 +260,6 @@ class _CarListPageState extends State<CarListPage> {
       ],
     );
 
-    // --- ШАГ 2: Собираем финальный экран с фоном ---
     return Scaffold(
       backgroundColor: Colors.transparent, // <--- ИЗМЕНЕНИЕ
       appBar: AppBar(

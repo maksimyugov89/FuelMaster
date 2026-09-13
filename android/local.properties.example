@@ -1,0 +1,7 @@
+# Скопируйте в local.properties (файл уже в .gitignore).
+# Ключи Yandex — из кабинетов Yandex Maps / Yandex Mobile Ads.
+
+sdk.dir=C\:\\path\\to\\Android\\sdk
+
+yandex.maps.apikey=your_yandex_mapkit_api_key
+yandex.mobile.ads.app.id=your_yandex_mobile_ads_app_id

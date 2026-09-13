@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
-import 'package:logger/logger.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
@@ -141,14 +140,13 @@ class _SettingsPageState extends State<SettingsPage> {
     final currentLanguage = appSettings.locale.languageCode;
     final isSignedIn = FirebaseAuth.instance.currentUser != null;
 
-    // --- ШАГ 1: Выносим всё содержимое страницы в отдельный виджет ---
     final pageContent = ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
         // --- 2. Карточка "Внешний вид" ---
         Card(
           elevation: 4.0,
-          shadowColor: theme.colorScheme.primary.withOpacity(0.2),
+          shadowColor: theme.colorScheme.primary.withValues(alpha: 0.2),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -158,6 +156,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   l10n.theme,
                   gradient: primaryActionGradient,
                   style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 16),
                 _buildStyledDropdown(
@@ -176,6 +175,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   l10n.language,
                   gradient: primaryActionGradient,
                   style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 16),
                 _buildStyledDropdown(
@@ -197,7 +197,7 @@ class _SettingsPageState extends State<SettingsPage> {
         // --- 3. Карточка "Премиум" ---
         Card(
           elevation: 4.0,
-          shadowColor: theme.colorScheme.primary.withOpacity(0.2),
+          shadowColor: theme.colorScheme.primary.withValues(alpha: 0.2),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -207,6 +207,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   l10n.premium_subscription,
                   gradient: accentGradient,
                   style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 16),
                 appSettings.isPremium
@@ -216,6 +217,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           style: TextStyle(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       )
                     : GradientButton(
@@ -245,7 +247,6 @@ class _SettingsPageState extends State<SettingsPage> {
       ],
     );
 
-    // --- ШАГ 2: Собираем финальный экран с фоном ---
     return Scaffold(
       backgroundColor: Colors.transparent, // <--- ИЗМЕНЕНИЕ
       appBar: AppBar(

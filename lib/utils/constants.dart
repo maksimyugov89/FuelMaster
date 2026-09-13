@@ -5,6 +5,7 @@ class AppConstants {
   static const String isRegisteredKey = 'is_registered';
   static const String isPremiumKey = 'isPremium';
   static const String hasMigratedKey = 'has_migrated';
+  static const String historyPrefsMigratedKey = 'history_prefs_migrated';
   static const String themeModeKey = 'theme_mode';
   static const String userEmailKey = 'user_email';
   static const String userCityKey = 'user_city';

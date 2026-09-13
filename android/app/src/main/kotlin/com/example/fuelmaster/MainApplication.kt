@@ -1,20 +1,37 @@
 package com.example.fuelmaster
 
 import android.app.Application
-import com.yandex.mapkit.MapKitFactory
+import android.content.pm.PackageManager
 import android.util.Log
+import com.yandex.mapkit.MapKitFactory
 
 class MainApplication : Application() {
-    private val TAG = "MainApplication"
+    private val tag = "MainApplication"
 
     override fun onCreate() {
         super.onCreate()
         try {
-            MapKitFactory.setApiKey("YANDEX_MAPS_API_KEY_REMOVED") // Ваш сгенерированный API ключ
-            MapKitFactory.setLocale("ru_RU") // Ваш предпочтительный язык. Необязательно, по умолчанию используется системный язык
-            Log.d(TAG, "Yandex MapKit API key and locale set successfully in MainApplication.")
+            val apiKey = readMetaDataString("com.yandex.maps.apikey")
+            if (!apiKey.isNullOrBlank()) {
+                MapKitFactory.setApiKey(apiKey)
+                MapKitFactory.setLocale("ru_RU")
+                Log.d(tag, "Yandex MapKit initialized from manifest meta-data.")
+            } else {
+                Log.w(tag, "Yandex MapKit API key is missing. Set yandex.maps.apikey in android/local.properties")
+            }
         } catch (e: Exception) {
-            Log.e(TAG, "Error setting MapKit API key or locale in MainApplication.", e)
+            Log.e(tag, "Error initializing Yandex MapKit.", e)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun readMetaDataString(key: String): String? {
+        return try {
+            val appInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+            appInfo.metaData?.getString(key)
+        } catch (e: Exception) {
+            Log.e(tag, "Failed to read meta-data key: $key", e)
+            null
         }
     }
 }

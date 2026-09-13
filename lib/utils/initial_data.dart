@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:fuelmaster/utils/database_helper.dart';
-import 'package:logger/logger.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:sqflite/sqflite.dart';

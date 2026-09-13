@@ -12,6 +12,12 @@
 .swiftpm/
 migrate_working_dir/
 .env
+env.defines.json
+
+# Android signing secrets (never commit)
+android/keystore.properties
+**/*.jks
+**/*.keystore
 
 # IntelliJ related
 *.iml

@@ -33,32 +33,25 @@ class MainMenuPage extends StatefulWidget {
   _MainMenuPageState createState() => _MainMenuPageState();
 }
 
-// --- ШАГ 1: ДОБАВЛЯЕМ WidgetsBindingObserver ---
-// Это позволит нашему виджету отслеживать состояние приложения (свернуто/развернуто)
 class _MainMenuPageState extends State<MainMenuPage> with WidgetsBindingObserver {
   CarData? _selectedCar;
   final ListEquality _listEquality = ListEquality();
   
-  // --- ШАГ 2: ДОБАВЛЯЕМ КЛЮЧ ДЛЯ ВИДЖЕТА ПОГОДЫ ---
-  // Изменение этого ключа заставит виджет погоды полностью перестроиться и запросить новые данные
   Key _weatherWidgetKey = UniqueKey();
 
   @override
   void initState() {
     super.initState();
-    // --- ШАГ 3: ПОДПИСЫВАЕМСЯ НА СОБЫТИЯ ЖИЗНЕННОГО ЦИКЛА ---
     WidgetsBinding.instance.addObserver(this);
     _initialize();
   }
   
   @override
   void dispose() {
-    // --- ШАГ 4: ОТПИСЫВАЕМСЯ ОТ СОБЫТИЙ ПРИ УНИЧТОЖЕНИИ ВИДЖЕТА ---
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
-  // --- ШАГ 5: РЕАГИРУЕМ НА ИЗМЕНЕНИЕ СОСТОЯНИЯ ПРИЛОЖЕНИЯ ---
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -69,7 +62,6 @@ class _MainMenuPageState extends State<MainMenuPage> with WidgetsBindingObserver
     }
   }
 
-  // --- ШАГ 6: НОВЫЙ МЕТОД ДЛЯ ПРОВЕРКИ И ОБНОВЛЕНИЯ ГОРОДА ---
   Future<void> _updateLocationAndWeatherIfNeeded() async {
     try {
       final locationService = LocationService();
@@ -232,7 +224,7 @@ void _refreshCarListAndSetSelection() {
 
     return Card(
       elevation: 4.0,
-      shadowColor: theme.colorScheme.primary.withOpacity(0.2),
+      shadowColor: theme.colorScheme.primary.withValues(alpha: 0.2),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -242,6 +234,7 @@ void _refreshCarListAndSetSelection() {
               l10n.your_cars,
               style: theme.textTheme.titleLarge,
               textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<CarData>(
@@ -279,7 +272,7 @@ void _refreshCarListAndSetSelection() {
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         color: theme.brightness == Brightness.dark 
-                            ? Colors.white.withOpacity(0.9)
+                            ? Colors.white.withValues(alpha: 0.9)
                             : Colors.transparent,
                         shape: BoxShape.circle,
                       ),
@@ -375,7 +368,6 @@ void _refreshCarListAndSetSelection() {
             Positioned(
               bottom: 8,
               right: 16,
-              // --- ШАГ 7: ПЕРЕДАЕМ КЛЮЧ В ВИДЖЕТ ПОГОДЫ ---
               child: WeatherDisplayWidget(key: _weatherWidgetKey),
             ),
           ],

@@ -104,6 +104,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       fontSize: 16,
                       fontFamily: 'Roboto',
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

@@ -40,11 +40,10 @@ final ThemeData lightTheme = ThemeData(
     secondary: Color(0xFF007BFF),
     tertiary: Color(0xFF1D2939),
     surface: Colors.white,
-    background: Color(0xFFF5F7FA),
+    surfaceContainerLowest: Color(0xFFF5F7FA),
     error: Color(0xFFD32F2F),
     onPrimary: Colors.white,
     onSecondary: Colors.white,
-    onBackground: Color(0xFF1D2939),
     onSurface: Color(0xFF1D2939),
     onError: Colors.white,
   ),
@@ -79,15 +78,15 @@ final ThemeData lightTheme = ThemeData(
     hintStyle: TextStyle(color: Colors.grey.shade400),
   ),
   switchTheme: SwitchThemeData(
-    thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
-      if (states.contains(MaterialState.selected)) {
+    thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+      if (states.contains(WidgetState.selected)) {
         return const Color(0xFF007BFF);
       }
       return Colors.grey.shade400;
     }),
-    trackColor: MaterialStateProperty.resolveWith<Color>((states) {
-      if (states.contains(MaterialState.selected)) {
-        return const Color(0xFF007BFF).withOpacity(0.5);
+    trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+      if (states.contains(WidgetState.selected)) {
+        return const Color(0xFF007BFF).withValues(alpha: 0.5);
       }
       return Colors.grey.shade200;
     }),
@@ -109,11 +108,10 @@ final ThemeData darkTheme = ThemeData(
     secondary: Color(0xFFFFD200),
     tertiary: Color(0xFFE9ECEF),
     surface: Color(0xFF1D2939),
-    background: Color(0xFF101828),
+    surfaceContainerLowest: Color(0xFF101828),
     error: Color(0xFFE57373),
     onPrimary: Colors.black,
     onSecondary: Colors.black,
-    onBackground: Color(0xFFE9ECEF),
     onSurface: Color(0xFFE9ECEF),
     onError: Colors.black,
   ),
@@ -157,17 +155,17 @@ final ThemeData darkTheme = ThemeData(
         RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
   ),
   switchTheme: SwitchThemeData(
-    thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
-      if (states.contains(MaterialState.selected)) {
+    thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+      if (states.contains(WidgetState.selected)) {
         return const Color(0xFFF7971E);
       }
       return Colors.grey.shade600;
     }),
-    trackColor: MaterialStateProperty.resolveWith<Color>((states) {
-      if (states.contains(MaterialState.selected)) {
-        return const Color(0xFFF7971E).withOpacity(0.5);
+    trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+      if (states.contains(WidgetState.selected)) {
+        return const Color(0xFFF7971E).withValues(alpha: 0.5);
       }
-      return Colors.white.withOpacity(0.1);
+      return Colors.white.withValues(alpha: 0.1);
     }),
   ),
   appBarTheme: const AppBarTheme(

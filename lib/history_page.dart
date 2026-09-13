@@ -25,6 +25,7 @@ import 'package:fuelmaster/widgets/gradient_button.dart';
 import 'package:fuelmaster/widgets/gradient_text.dart';
 import 'package:fuelmaster/theme.dart';
 import 'package:fuelmaster/widgets/gradient_background.dart';
+import 'package:fuelmaster/widgets/history_fuel_chart.dart';
 import 'package:fuelmaster/widgets/license_plate_widget.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:fuelmaster/utils/constants.dart';
@@ -132,16 +133,6 @@ class _HistoryPageState extends State<HistoryPage> {
       }
     } catch (e) {
       logger.e('Ошибка загрузки истории в HistoryPage: $e');
-    }
-  }
-
-  Future<void> saveData(HistoryDisplayService service) async {
-    if (!mounted) return;
-    try {
-      final filteredHistory = service.getFilteredHistory();
-      await HistoryManager.saveHistory(filteredHistory);
-    } catch (e) {
-      logger.e('Ошибка сохранения истории в HistoryPage: $e');
     }
   }
 
@@ -284,14 +275,14 @@ class _HistoryPageState extends State<HistoryPage> {
       key: cardKey,
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       elevation: 4.0,
-      shadowColor: theme.colorScheme.primary.withOpacity(0.1),
+      shadowColor: theme.colorScheme.primary.withValues(alpha: 0.1),
       child: ExpansionTile(
         controller: tileController,
         title: isExpanded 
           ? _buildExpandedTitle(car, record, theme) 
           : _buildCollapsedTitle(car, theme),
         leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
           child: car != null && AppConstants.brandIcons.containsKey(car.brand)
             ? Container(
                 width: 32,  // Уменьшенный размер для leading (чтобы поместился в CircleAvatar)
@@ -299,7 +290,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: theme.brightness == Brightness.dark 
-                    ? Colors.white.withOpacity(0.9)  // Белый фон для тёмной темы
+                    ? Colors.white.withValues(alpha: 0.9)  // Белый фон для тёмной темы
                     : Colors.transparent,
                   shape: BoxShape.circle,
                 ),
@@ -417,8 +408,10 @@ class _HistoryPageState extends State<HistoryPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('${parts[0]}:', style: TextStyle(color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7))),
-                    Flexible(child: Text(parts.length > 1 ? parts[1] : '', style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.end)),
+                    Flexible(
+                      child: Text('${parts[0]}:', style: TextStyle(color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7)), overflow: TextOverflow.ellipsis),
+                    ),
+                    Flexible(child: Text(parts.length > 1 ? parts[1] : '', style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.end, overflow: TextOverflow.ellipsis)),
                   ],
                 ),
               );
@@ -454,7 +447,7 @@ class _HistoryPageState extends State<HistoryPage> {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       elevation: 4.0,
-      shadowColor: Colors.black.withOpacity(0.1),
+      shadowColor: Colors.black.withValues(alpha: 0.1),
       child: Container(
         alignment: Alignment.center,
         height: 270,
@@ -476,7 +469,6 @@ class _HistoryPageState extends State<HistoryPage> {
       endDate: _endDate,
       l10n: l10n,
     );
-    final List<Map<String, dynamic>> chartData = historyDisplayService.getChartData();
     final List<Map<String, dynamic>> filteredHistory = historyDisplayService.getFilteredHistory();
 
     for (var record in filteredHistory) {
@@ -515,7 +507,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                   child: Card(
                     elevation: 4.0,
-                    shadowColor: theme.colorScheme.primary.withOpacity(0.2),
+                    shadowColor: theme.colorScheme.primary.withValues(alpha: 0.2),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -601,83 +593,9 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
                 ),
               ),
-              if (chartData.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                    child: Card(
-                      elevation: 4.0,
-                      shadowColor: theme.colorScheme.primary.withOpacity(0.2),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            GradientText(
-                              l10n.fuel_usage_chart,
-                              gradient: primaryActionGradient,
-                              style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 24),
-                            SizedBox(
-                              height: 130,
-                              child: LineChart(
-                                LineChartData(
-                                  gridData: FlGridData(show: true),
-                                  titlesData: FlTitlesData(
-                                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                    leftTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles: true,
-                                        reservedSize: 40,
-                                        getTitlesWidget: (value, meta) => Text(value.toStringAsFixed(1), style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12)),
-                                      ),
-                                    ),
-                                    bottomTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles: true,
-                                        reservedSize: 40,
-                                        interval: 24 * 3600 * 1000 * 7,
-                                        getTitlesWidget: (value, meta) {
-                                          final date = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                                          final dateText = DateFormat('dd.MM').format(date);
-                                          return Transform.rotate(
-                                            angle: -45 * (3.1415926535 / 180),
-                                            child: Text(dateText, style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12)),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  borderData: FlBorderData(show: true),
-                                  lineBarsData: [
-                                    LineChartBarData(
-                                      spots: historyDisplayService.getChartSpots(),
-                                      isCurved: true,
-                                      color: theme.colorScheme.primary,
-                                      barWidth: 3,
-                                      dotData: const FlDotData(show: true),
-                                      belowBarData: BarAreaData(show: true, color: theme.colorScheme.primary.withOpacity(0.2)),
-                                    ),
-                                  ],
-                                  minY: 0,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              else
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(l10n.no_chart_data, style: theme.textTheme.bodyMedium, textAlign: TextAlign.center),
-                  ),
-                ),
+              SliverToBoxAdapter(
+                child: HistoryFuelChart(displayService: historyDisplayService),
+              ),
               if (filteredHistory.isEmpty)
                 SliverToBoxAdapter(
                   child: Center(
@@ -715,4 +633,3 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 }
-

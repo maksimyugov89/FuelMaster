@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
 import 'package:geolocator/geolocator.dart';
@@ -12,7 +13,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final Completer<YandexMapController> _controller = Completer();
-  final List<MapObject> _mapObjects = [];
+  List<MapObject> _mapObjects = [];
 
   bool _isMeasuring = false;
   final List<Point> _measuredPoints = [];
@@ -70,9 +71,8 @@ class _MapPageState extends State<MapPage> {
 
   // --- Поиск АЗС ---
   Future<void> _searchGasStations() async {
-    _clearMapObjects();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Идет поиск АЗС в радиусе 50 км...')),
+      const SnackBar(content: Text('Идет поиск АЗС в радиусе ~50 км...')),
     );
 
     try {
@@ -80,29 +80,37 @@ class _MapPageState extends State<MapPage> {
       final searchCenter =
           Point(latitude: position.latitude, longitude: position.longitude);
 
+      const latDelta = 0.45;
+      final lonDelta = 0.45 / cos(searchCenter.latitude * pi / 180);
+
       final (_, resultFuture) = await YandexSearch.searchByText(
         searchText: 'АЗС',
         geometry: Geometry.fromBoundingBox(
           BoundingBox(
-            southWest: Point(latitude: searchCenter.latitude - 0.5, longitude: searchCenter.longitude - 0.5),
-            northEast: Point(latitude: searchCenter.latitude + 0.5, longitude: searchCenter.longitude + 0.5),
+            southWest: Point(latitude: searchCenter.latitude - latDelta, longitude: searchCenter.longitude - lonDelta),
+            northEast: Point(latitude: searchCenter.latitude + latDelta, longitude: searchCenter.longitude + lonDelta),
           ),
         ),
-        searchOptions: const SearchOptions(),
-        
-                
+        searchOptions: const SearchOptions(
+          resultPageSize: 50,
+          searchType: SearchType.biz,
+        ),
       );
 
       final result = await resultFuture;
-      final List<MapObject> gasStationPlacemarks = [];
+      
+      // Вот переменная, которую нужно было объявить
+      final List<MapObject> newPlacemarks = []; 
 
       if (result.items != null && result.items!.isNotEmpty) {
+        debugPrint("✅ Найдено ${result.items!.length} АЗС.");
         for (var item in result.items!) {
           final point = item.geometry.first.point;
           if (point != null) {
-            gasStationPlacemarks.add(
+            // Здесь мы добавляем метки в наш новый список
+            newPlacemarks.add(
               PlacemarkMapObject(
-                mapId: MapObjectId('gas_station_${item.name}'),
+                mapId: MapObjectId('gas_station_${item.name}_${point.latitude}_${point.longitude}'),
                 point: point,
                 icon: PlacemarkIcon.single(
                   PlacemarkIconStyle(
@@ -110,12 +118,13 @@ class _MapPageState extends State<MapPage> {
                     scale: 0.7,
                   ),
                 ),
-                // Можно убрать текст, если PlacemarkText не поддерживается в твоей версии
                 text: PlacemarkText(
                   text: item.name,
                   style: const PlacemarkTextStyle(
                     size: 10,
                     placement: TextStylePlacement.bottom,
+                    color: Colors.black,
+                    outlineColor: Colors.white,
                   ),
                 ),
               ),
@@ -130,13 +139,18 @@ class _MapPageState extends State<MapPage> {
       }
 
       setState(() {
-        _mapObjects.addAll(gasStationPlacemarks);
+        // И здесь мы присваиваем этот новый список
+        _mapObjects = newPlacemarks;
       });
+
     } catch (e) {
       debugPrint("Ошибка поиска: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка поиска: $e')),
+        const SnackBar(content: Text('Произошла ошибка при поиске. Попробуйте снова.')),
       );
+      setState(() {
+        _mapObjects = [];
+      });
     }
   }
 

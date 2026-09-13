@@ -13,8 +13,12 @@ class GradientBackground extends StatelessWidget {
 
     // 2. Задаем цвета в зависимости от темы
     final baseColor = isDark ? const Color(0xFF101828) : const Color(0xFFF5F7FA);
-    final blobColor1 = isDark ? Colors.deepPurple.withOpacity(0.3) : Colors.green.withOpacity(0.2);
-    final blobColor2 = isDark ? Colors.indigo.withOpacity(0.4) : Colors.blue.withOpacity(0.2);
+    final blobColor1 = isDark
+        ? Colors.deepPurple.withValues(alpha: 0.3)
+        : Colors.green.withValues(alpha: 0.2);
+    final blobColor2 = isDark
+        ? Colors.indigo.withValues(alpha: 0.4)
+        : Colors.blue.withValues(alpha: 0.2);
 
     return Container(
       color: baseColor, // Используем базовый цвет для текущей темы

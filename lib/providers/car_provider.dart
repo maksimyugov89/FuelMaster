@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
 import 'package:fuelmaster/utils/logger.dart';
@@ -12,8 +13,11 @@ class CarProvider with ChangeNotifier {
   List<CarData> get cars => _cars;
   bool get isLoading => _isLoading;
 
-  CarProvider({DatabaseHelper? dbHelper}) : _dbHelper = dbHelper ?? DatabaseHelper.instance {
-    loadCars();
+  CarProvider({DatabaseHelper? dbHelper, bool autoLoad = true})
+      : _dbHelper = dbHelper ?? DatabaseHelper.instance {
+    if (autoLoad) {
+      loadCars();
+    }
   }
 
   Future<void> loadCars() async {
@@ -21,11 +25,13 @@ class CarProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      _cars = await _dbHelper.getCars(); // Используем getCars() для всех автомобилей
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await _dbHelper.syncCarsWithFirestore(user.uid);
-        _cars = await _dbHelper.getCars(); // Refresh after sync
+      _cars = await _dbHelper.getCars();
+      if (Firebase.apps.isNotEmpty) {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          await _dbHelper.syncCarsWithFirestore(user.uid);
+          _cars = await _dbHelper.getCars();
+        }
       }
       logger.d('Loaded ${_cars.length} cars in CarProvider');
     } catch (e) {

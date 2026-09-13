@@ -17,7 +17,6 @@ class OnboardingPage extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark; // Проверяем тему
     final l10n = AppLocalizations.of(context)!;
 
-    // --- ШАГ 1: Выносим всё содержимое страницы в отдельный виджет ---
     final pageContent = SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -80,7 +79,6 @@ class OnboardingPage extends StatelessWidget {
       ),
     );
 
-    // --- ШАГ 2: Собираем финальный экран с фоном ---
     return Scaffold(
       // Убираем старый фон, который был в Container
       body: GradientBackground(child: pageContent), // Для светлой - применяем наш новый фон
@@ -92,8 +90,8 @@ class OnboardingPage extends StatelessWidget {
     final theme = Theme.of(context);
     return Card(
       elevation: 4.0,
-      shadowColor: theme.colorScheme.primary.withOpacity(0.1),
-      color: theme.cardTheme.color?.withOpacity(0.85),
+      shadowColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+      color: theme.cardTheme.color?.withValues(alpha: 0.85),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -102,7 +100,7 @@ class OnboardingPage extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
               child: Icon(icon, size: 28, color: theme.colorScheme.primary),
             ),
             const SizedBox(width: 16),
@@ -113,11 +111,13 @@ class OnboardingPage extends StatelessWidget {
                   Text(
                     title,
                     style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7)),
+                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7)),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

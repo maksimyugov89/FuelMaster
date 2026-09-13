@@ -26,14 +26,21 @@ class AppSettingsProvider with ChangeNotifier {
     _isRegistered = _prefs.getBool(AppConstants.isRegisteredKey) ?? false;
     _onboardingCompleted = _prefs.getBool(AppConstants.onboardingCompletedKey) ?? false;
     _themeMode = _prefs.getString(AppConstants.themeModeKey) ?? 'auto';
-    _updateDarkModeBasedOnThemeMode();
+    _updateDarkModeBasedOnThemeMode(initialDarkMode: initialDarkMode);
   }
 
-  void _updateDarkModeBasedOnThemeMode() {
+  void _updateDarkModeBasedOnThemeMode({bool? initialDarkMode}) {
     if (_themeMode == 'auto') {
-      _isDarkMode = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+      _isDarkMode =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+    } else if (_themeMode == 'dark') {
+      _isDarkMode = true;
+    } else if (_themeMode == 'light') {
+      _isDarkMode = false;
+    } else if (initialDarkMode != null) {
+      _isDarkMode = initialDarkMode;
     } else {
-      _isDarkMode = _themeMode == 'dark';
+      _isDarkMode = false;
     }
   }
 

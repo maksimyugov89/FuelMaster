@@ -4,8 +4,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:logger/logger.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:meta/meta.dart';
@@ -446,10 +446,7 @@ class DatabaseHelper {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
       logger.d('Inserted car with ID: $insertedId, data: ${carToInsert.toJson()}');
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await _syncCarToFirestore(user.uid, carToInsert.copyWith(id: insertedId));
-      }
+      await _syncCarToFirestoreIfAuthenticated(carToInsert.copyWith(id: insertedId));
     } catch (e) {
       logger.e('Error inserting car: $e');
       rethrow;
@@ -505,10 +502,7 @@ class DatabaseHelper {
         whereArgs: [car.id],
       );
       logger.d('Updated car: ${carWithTimestamp.toJson()}');
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await _syncCarToFirestore(user.uid, carWithTimestamp);
-      }
+      await _syncCarToFirestoreIfAuthenticated(carWithTimestamp);
     } catch (e) {
       logger.e('Error updating car: $e');
       rethrow;
@@ -529,10 +523,7 @@ class DatabaseHelper {
         whereArgs: [id],
       );
       logger.d('Deleted car with id: $id');
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await _deleteCarFromFirestore(user.uid, id);
-      }
+      await _deleteCarFromFirestoreIfAuthenticated(id);
     } catch (e) {
       logger.e('Error deleting car: $e');
       rethrow;
@@ -666,6 +657,30 @@ class DatabaseHelper {
         if (retries == 0) throw e;
         await Future.delayed(const Duration(seconds: 5));
       }
+    }
+  }
+
+  Future<void> _syncCarToFirestoreIfAuthenticated(CarData car) async {
+    if (Firebase.apps.isEmpty) return;
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await _syncCarToFirestore(user.uid, car);
+      }
+    } catch (e) {
+      logger.w('Пропуск синхронизации авто с Firestore: $e');
+    }
+  }
+
+  Future<void> _deleteCarFromFirestoreIfAuthenticated(int id) async {
+    if (Firebase.apps.isEmpty) return;
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await _deleteCarFromFirestore(user.uid, id);
+      }
+    } catch (e) {
+      logger.w('Пропуск удаления авто из Firestore: $e');
     }
   }
 

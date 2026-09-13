@@ -7,7 +7,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
-import 'package:logger/logger.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/utils.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
@@ -19,14 +18,13 @@ import 'package:csv/csv.dart';
 import 'package:fuelmaster/utils/deepseek_service.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:fuelmaster/widgets.dart';
 import 'package:fuelmaster/utils/fuel_calculation_service.dart';
 import 'package:fuelmaster/utils/weather_service.dart';
-import 'package:fuelmaster/widgets/gradient_button.dart';
-import 'package:fuelmaster/theme.dart';
-import 'package:fuelmaster/widgets/gradient_text.dart';
 import 'package:fuelmaster/widgets/gradient_background.dart';
-import 'package:fuelmaster/widgets/license_plate_widget.dart';
+import 'package:fuelmaster/widgets/fuel_calculator_car_header.dart';
+import 'package:fuelmaster/widgets/fuel_calculator_conditions.dart';
+import 'package:fuelmaster/widgets/fuel_calculator_input_section.dart';
+import 'package:fuelmaster/widgets/fuel_calculator_actions_section.dart';
 
 class FuelCalculatorPage extends StatefulWidget {
   final CarData car;
@@ -615,122 +613,33 @@ if (correctionFactor != null && correctionFactor != 0.0) {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final bool isBus = widget.car.vehicleType == 'Bus';
 
-    // --- ШАГ 1: Выносим всё содержимое страницы в отдельный виджет ---
-    // Это нужно, чтобы мы могли поместить его внутрь нашего нового фона.
     final pageContent = SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-             Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // <-- Эта строка выравнивает все по левому краю
-          children: [
-            // 1. Марка
-            Text(
-              '${l10n.brand}: ${widget.car.brand}',
-              style: theme.textTheme.headlineSmall?.copyWith(fontFamily: 'Roboto', fontWeight: FontWeight.bold),
-            ),
-            
-            // 2. Гос. номер (виджет)
-            // Условие: показываем только если номер существует
-            if (widget.car.licensePlate != null && widget.car.licensePlate!.isNotEmpty)
-              Padding(
-                // Добавляем отступы сверху и снизу для красоты
-                padding: const EdgeInsets.symmetric(vertical: 8.0), 
-                child: LicensePlateWidget(
-                  plateNumber: widget.car.licensePlate!,
-                  scale: 0.7, // Можно подобрать масштаб, чтобы выглядело гармонично
-                ),
-              ),
-
-            // 3. Модель
-            Text(
-              '${l10n.model}: ${RegExp(r'[^\d\s]+').allMatches(widget.car.model).isNotEmpty ? RegExp(r'[^\d\s]+').allMatches(widget.car.model).map((match) => match.group(0)).join(' ') : widget.car.model}',
-              style: theme.textTheme.headlineSmall?.copyWith(fontFamily: 'Roboto', fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-          Text(
-            '${l10n.base_city_norm}: ${widget.car.baseCityNorm.toStringAsFixed(2)} ${l10n.liters_per_100km}',
-            style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
-          ),
-          Text(
-            '${l10n.base_highway_norm}: ${widget.car.baseHighwayNorm.toStringAsFixed(2)} ${l10n.liters_per_100km}',
-            style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
-          ),
-          Text(
-            '${l10n.base_combined_norm}: ${((widget.car.baseCityNorm + widget.car.baseHighwayNorm) / 2).toStringAsFixed(2)} ${l10n.liters_per_100km}',
-            style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14), // <--- Убрали fontWeight: FontWeight.bold
-          ),
+          FuelCalculatorCarHeader(car: widget.car),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: CustomTextField(
-                  controller: initialMileageController,
-                  focusNode: initialMileageFocus,
-                  labelKey: 'initial_mileage',
-                  isNumber: true,
-                  icon: Icons.speed,
-                  onTap: () => FocusScope.of(context).requestFocus(initialMileageFocus),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: CustomTextField(
-                  controller: finalMileageController,
-                  focusNode: finalMileageFocus,
-                  labelKey: 'final_mileage',
-                  isNumber: true,
-                  icon: Icons.speed,
-                  onTap: () => FocusScope.of(context).requestFocus(finalMileageFocus),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: CustomTextField(
-                  controller: initialFuelController,
-                  focusNode: initialFuelFocus,
-                  labelKey: 'initial_fuel',
-                  isNumber: true,
-                  icon: Icons.local_gas_station,
-                  onTap: () => FocusScope.of(context).requestFocus(initialFuelFocus),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: CustomTextField(
-                  controller: refuelController,
-                  focusNode: refuelFocus,
-                  labelKey: 'refuel',
-                  isNumber: true,
-                  icon: Icons.local_gas_station,
-                  onTap: () => FocusScope.of(context).requestFocus(refuelFocus),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          CustomTextField(
-            controller: highwayKmController,
-            focusNode: highwayKmFocus,
-            labelKey: 'highway_distance',
-            isNumber: true,
-            icon: Icons.directions_car,
-            onTap: () => FocusScope.of(context).unfocus(),
-          ),
-          const SizedBox(height: 16),
-          SwitchListTile(
-            title: Text(l10n.autoCorrectionFactor),
-            value: _useAutoCorrectionFactor,
-            onChanged: (value) {
+          FuelCalculatorInputSection(
+            car: widget.car,
+            totalMileage: totalMileage,
+            useAutoCorrectionFactor: _useAutoCorrectionFactor,
+            initialMileageController: initialMileageController,
+            finalMileageController: finalMileageController,
+            initialFuelController: initialFuelController,
+            refuelController: refuelController,
+            highwayKmController: highwayKmController,
+            correctionFactorController: correctionFactorController,
+            heaterOperatingTimeController: heaterOperatingTimeController,
+            initialMileageFocus: initialMileageFocus,
+            finalMileageFocus: finalMileageFocus,
+            initialFuelFocus: initialFuelFocus,
+            refuelFocus: refuelFocus,
+            highwayKmFocus: highwayKmFocus,
+            correctionFactorFocus: correctionFactorFocus,
+            heaterOperatingTimeFocus: heaterOperatingTimeFocus,
+            onAutoCorrectionChanged: (value) {
               setState(() {
                 _useAutoCorrectionFactor = value;
                 if (value) {
@@ -738,116 +647,31 @@ if (correctionFactor != null && correctionFactor != 0.0) {
                 }
               });
             },
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: CustomTextField(
-                  controller: correctionFactorController,
-                  focusNode: correctionFactorFocus,
-                  labelKey: 'correction_factor',
-                  isNumber: true,
-                  icon: Icons.percent,
-                  readOnly: _useAutoCorrectionFactor,
-                  onTap: () => FocusScope.of(context).unfocus(),
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.help_outline, color: theme.iconTheme.color),
-                onPressed: () => _showHelpDialog(
-                  l10n.correction_factor,
-                  l10n.correction_factor_tooltip,
-                ),
-                tooltip: l10n.correction_factor,
-              ),
-            ],
-          ),
-          if (isBus) ...[
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomTextField(
-                    controller: heaterOperatingTimeController,
-                    focusNode: heaterOperatingTimeFocus,
-                    labelKey: 'heater_operating_time',
-                    isNumber: true,
-                    icon: Icons.access_time,
-                    onTap: () => FocusScope.of(context).unfocus(),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.help_outline, color: theme.iconTheme.color),
-                  onPressed: () => _showHelpDialog(
-                    l10n.heater_operating_time,
-                    l10n.heater_operating_time_tooltip,
-                  ),
-                  tooltip: l10n.heater_operating_time,
-                ),
-              ],
-            ),
-          ],
-          const SizedBox(height: 20),
-          Text(
-            l10n.total_mileage,
-            style: theme.textTheme.headlineSmall?.copyWith(fontFamily: 'Roboto', fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '$totalMileage ${l10n.kilometers}',
-            style: theme.textTheme.headlineSmall?.copyWith(fontFamily: 'Roboto', fontWeight: FontWeight.bold),
+            onShowHelp: _showHelpDialog,
           ),
           const SizedBox(height: 20),
-          GradientText(
-            l10n.adjustments,
-            gradient: primaryActionGradient,
-            style: theme.textTheme.headlineMedium?.copyWith(fontFamily: 'Roboto'),
-          ),
-          SwitchListTile(
-            title: Text(
-              l10n.winter,
-              style: theme.textTheme.bodyMedium,
-            ),
-            value: isWinter,
-            onChanged: (value) {
-              setState(() => isWinter = value);
-            },
-          ),
-          SwitchListTile(
-            title: Text(
-              l10n.ac,
-              style: theme.textTheme.bodyMedium,
-            ),
-            value: isAC,
-            onChanged: (value) {
-              setState(() => isAC = value);
-            },
-          ),
-          SwitchListTile(
-            title: Text(
-              l10n.mountain,
-              style: theme.textTheme.bodyMedium,
-            ),
-            value: isMountain,
-            onChanged: (value) {
-              setState(() => isMountain = value);
-            },
+          FuelCalculatorConditions(
+            isWinter: isWinter,
+            isAC: isAC,
+            isMountain: isMountain,
+            onWinterChanged: (value) => setState(() => isWinter = value),
+            onACChanged: (value) => setState(() => isAC = value),
+            onMountainChanged: (value) => setState(() => isMountain = value),
           ),
           const SizedBox(height: 20),
-          GradientButton(
-            text: l10n.calculate,
-            gradient: primaryActionGradient,
-            iconData: Icons.calculate,
-            onPressed: () async {
+          FuelCalculatorActionsSection(
+            result: result,
+            onCalculate: () async {
               if (_useAutoCorrectionFactor) {
                 setState(() => _isLoading = true);
                 try {
                   const String userCity = 'Almaty';
                   final weatherService = WeatherService();
-                  final weatherMultiplier = await weatherService.getWeatherMultiplier(userCity);
+                  final weatherMultiplier =
+                      await weatherService.getWeatherMultiplier(userCity);
                   final calculatedFactor = (weatherMultiplier - 1) * 100;
-                  correctionFactorController.text = calculatedFactor.toStringAsFixed(2);
+                  correctionFactorController.text =
+                      calculatedFactor.toStringAsFixed(2);
                 } catch (e) {
                   logger.e('Ошибка получения погоды: $e');
                   if (mounted) {
@@ -873,79 +697,42 @@ if (correctionFactor != null && correctionFactor != 0.0) {
                 AdManager.showInterstitialAd();
               }
             },
+            onSaveAndBack: () async {
+              if (!mounted) return;
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) =>
+                    const Center(child: CircularProgressIndicator()),
+              );
+              try {
+                await _saveHistory();
+                logger.d(
+                    'Возврат с FuelCalculatorPage с сохранением истории: $localHistory');
+                if (mounted) Navigator.pop(context);
+                if (mounted) {
+                  Navigator.pop(context, {
+                    'cars': List<CarData>.from(widget.cars),
+                    'history':
+                        List<Map<String, dynamic>>.from(localHistory),
+                  });
+                }
+              } catch (e) {
+                logger.e('Ошибка при сохранении и возврате: $e');
+                if (mounted) Navigator.pop(context);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.error)),
+                  );
+                }
+              }
+            },
+            onContinue: _handleContinueCalculation,
           ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: GradientButton(
-                  text: l10n.save_and_back,
-                  gradient: primaryActionGradient,
-                  iconData: Icons.save,
-                  onPressed: () async {
-                    if (mounted) {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (context) => const Center(child: CircularProgressIndicator()),
-                      );
-                      try {
-                        await _saveHistory();
-                        logger.d('Возврат с FuelCalculatorPage с сохранением истории: $localHistory');
-                        if (mounted) Navigator.pop(context); // close dialog
-                        if (mounted) {
-                          Navigator.pop(context, {
-                            'cars': List<CarData>.from(widget.cars),
-                            'history': List<Map<String, dynamic>>.from(localHistory),
-                          });
-                        }
-                      } catch (e) {
-                        logger.e('Ошибка при сохранении и возврате: $e');
-                        if (mounted) Navigator.pop(context); // close dialog
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.error)),
-                          );
-                        }
-                      }
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: GradientButton(
-                  text: l10n.continue_calculations,
-                  gradient: secondaryActionGradient,
-                  iconData: Icons.replay,
-                  onPressed: _handleContinueCalculation,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Text(
-            l10n.current_calculations,
-            style: theme.textTheme.headlineMedium?.copyWith(fontFamily: 'Roboto'),
-          ),
-          const SizedBox(height: 8),
-          if (result.isNotEmpty)
-            Text(
-              result,
-              style: theme.textTheme.bodyMedium,
-            )
-          else
-            Center(
-              child: Text(
-                l10n.no_calculations,
-                style: theme.textTheme.bodyMedium,
-              ),
-            ),
         ],
       ),
     );
 
-    // --- ШАГ 2: Собираем финальный экран с фоном ---
     return Scaffold(
       backgroundColor: Colors.transparent, // <--- ИЗМЕНЕНИЕ
       appBar: AppBar(

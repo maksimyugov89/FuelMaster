@@ -1,9 +1,4 @@
 import java.util.Properties
-import java.io.File
-
-val properties = Properties().apply {
-    load(File("keystore.properties").inputStream())
-}
 
 plugins {
     id("com.android.application")
@@ -13,6 +8,20 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(localPropertiesFile.inputStream())
+    }
+}
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
+}
+
+val yandexMapsApiKey: String = localProperties.getProperty("yandex.maps.apikey", "")
 android {
     namespace = "com.example.fuelmaster"
     compileSdk = 36
@@ -20,7 +29,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-
         isCoreLibraryDesugaringEnabled = true
     }
 
@@ -35,14 +43,18 @@ android {
         versionCode = 1
         versionName = "1.0.0"
         multiDexEnabled = true
+
+        manifestPlaceholders["YANDEX_MAPS_API_KEY"] = yandexMapsApiKey
     }
 
     signingConfigs {
-        create("release") {
-            keyAlias = properties["keyAlias"] as String
-            keyPassword = properties["keyPassword"] as String
-            storeFile = file(properties["storeFile"] as String)
-            storePassword = properties["storePassword"] as String
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = rootProject.file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            }
         }
     }
 
@@ -54,7 +66,9 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
+            if (keystorePropertiesFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fuelmaster/utils/env_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ class DeepSeekService {
   factory DeepSeekService() => _instance;
   DeepSeekService._internal();
 
-  final String _apiKey = dotenv.env['DEEPSEEK_API_KEY'] ?? '';
+  final String _apiKey = EnvConfig.get('DEEPSEEK_API_KEY');
 
   Future<String?> getCachedAdvice(String carModel) async {
     final prefs = await SharedPreferences.getInstance();

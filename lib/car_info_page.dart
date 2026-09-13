@@ -13,8 +13,9 @@ import 'package:fuelmaster/widgets/gradient_button.dart';
 import 'package:fuelmaster/widgets/gradient_text.dart';
 import 'package:fuelmaster/theme.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:fuelmaster/widgets/license_plate_widget.dart';
 import 'package:fuelmaster/utils/constants.dart';
+import 'package:fuelmaster/utils/debouncer.dart';
+import 'package:fuelmaster/widgets/car_info_form_cards.dart';
 import 'package:fuelmaster/widgets/gradient_background.dart';
 
 class CarInfoPage extends StatefulWidget {
@@ -64,17 +65,13 @@ class _CarInfoPageState extends State<CarInfoPage> {
   final FocusNode passengerCapacityFocus = FocusNode();
   final Debouncer debouncer = Debouncer(duration: const Duration(milliseconds: 300));
   final licensePlateMask = MaskTextInputFormatter(
-      mask: 'A ### AA ###', // A - Буква, # - Цифра
+      mask: 'A ### AA ###', // A - Буквы, # - Цифр
       filter: {
         "#": RegExp(r'[0-9]'),
         "A": RegExp(r'[АВЕКМНОРСТУХABEKMHOPCTYX]', caseSensitive: false)
       },
       type: MaskAutoCompletionType.lazy);
   bool _isLoading = false;
-
-  static const List<String> vehicleTypes = [
-    'Passenger Car', 'Bus', 'Truck', 'Tractor', 'Dump Truck', 'Van', 'Special Equipment'
-  ];
 
   @override
   void initState() {
@@ -85,7 +82,7 @@ class _CarInfoPageState extends State<CarInfoPage> {
     _loadInitialDataForPage();
     _addListenersToControllers();
 
-    // --- ИСПРАВЛЕНИЕ: Слушатель для авто-конвертации теперь находится ВНУТРИ initState ---
+    // --- ИСПРАВЛЕН: Слушатель для авто-конвертации теперь находится ВНУТРИ initState ---
     licensePlateController.addListener(_convertLicensePlateLayout);
   }
 
@@ -300,7 +297,7 @@ class _CarInfoPageState extends State<CarInfoPage> {
             height: 40,
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withOpacity(0.9) : Colors.transparent,
+              color: isDark ? Colors.white.withValues(alpha: 0.9) : Colors.transparent,
               shape: BoxShape.circle,
             ),
             child: iconWidget,
@@ -638,207 +635,42 @@ class _CarInfoPageState extends State<CarInfoPage> {
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 24),
-                Card(
-                  elevation: 4.0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(l10n.car_form_step1_title,
-                            style: theme.textTheme.titleLarge),
-                        const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                          value: vehicleType,
-                          decoration: InputDecoration(
-                            labelText: l10n.vehicle_type,
-                            prefixIcon: Icon(Icons.commute,
-                                color: theme.colorScheme.primary),
-                          ),
-                          items: vehicleTypes.map((type) {
-                            return DropdownMenuItem(
-                              value: type,
-                              child: Text(
-                                type == 'Passenger Car'
-                                    ? l10n.passenger_car
-                                    : type == 'Bus'
-                                        ? l10n.bus
-                                        : type == 'Truck'
-                                            ? l10n.truck
-                                            : type == 'Tractor'
-                                                ? l10n.tractor
-                                                : type == 'Dump Truck'
-                                                    ? l10n.dump_truck
-                                                    : type == 'Van'
-                                                        ? l10n.van
-                                                        : l10n.special_equipment,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: _onVehicleTypeChanged,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: licensePlateController,
-                          focusNode: licensePlateFocus,
-                          inputFormatters: [licensePlateMask],
-                          keyboardType: TextInputType.visiblePassword,
-                          textCapitalization: TextCapitalization.characters,
-                          autocorrect: false,
-                          decoration: InputDecoration(
-                            labelText: l10n.license_plate,
-                            prefixIcon: Icon(Icons.confirmation_number,
-                                color: theme.colorScheme.primary),
-                            hintText: 'А 123 ВС 78',
-                          ),
-                        ),
-                        Visibility(
-                          visible: licensePlateController.text.isNotEmpty,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 16.0),
-                            child: Center(
-                              child: LicensePlateWidget(
-                                plateNumber: licensePlateController.text,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                CarInfoStep1Card(
+                  vehicleType: vehicleType,
+                  licensePlateController: licensePlateController,
+                  licensePlateFocus: licensePlateFocus,
+                  licensePlateMask: licensePlateMask,
+                  onVehicleTypeChanged: _onVehicleTypeChanged,
                 ),
                 const SizedBox(height: 24),
-                Card(
-                  elevation: 4.0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(l10n.car_form_step2_title,
-                            style: theme.textTheme.titleLarge),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: brandController,
-                          focusNode: brandFocus,
-                          labelKey: 'brand',
-                          icon: Icons.directions_car,
-                          readOnly: true,
-                          onTap: _showBrandDropdown,
-                        ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: modelController,
-                          focusNode: modelFocus,
-                          labelKey: 'model',
-                          icon: Icons.directions_car,
-                          enabled: brandController.text.isNotEmpty,
-                          readOnly: true,
-                          onTap: _showModelDropdown,
-                        ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: modificationController,
-                          focusNode: modificationFocus,
-                          labelKey: 'modification',
-                          icon: Icons.car_repair,
-                          enabled: modelController.text.isNotEmpty,
-                          readOnly: true,
-                          onTap: _showModificationDropdown,
-                        ),
-                      ],
-                    ),
-                  ),
+                CarInfoStep2Card(
+                  brandController: brandController,
+                  modelController: modelController,
+                  modificationController: modificationController,
+                  brandFocus: brandFocus,
+                  modelFocus: modelFocus,
+                  modificationFocus: modificationFocus,
+                  onBrandTap: _showBrandDropdown,
+                  onModelTap: _showModelDropdown,
+                  onModificationTap: _showModificationDropdown,
                 ),
                 const SizedBox(height: 24),
-                Card(
-                  elevation: 4.0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(l10n.car_form_step3_title,
-                            style: theme.textTheme.titleLarge),
-                        const SizedBox(height: 16),
-                        DropdownButtonFormField<String>(
-                          value: fuelType,
-                          decoration: InputDecoration(
-                            labelText: l10n.fuel_type,
-                            prefixIcon: Icon(Icons.local_gas_station,
-                                color: theme.colorScheme.primary),
-                          ),
-                          items: [
-                            'Б', 'Д', 'СУГ', 'КПГ', 'Электро', 'Газодизель'
-                          ].map((type) {
-                            return DropdownMenuItem(
-                              value: type,
-                              child: Text(
-                                type == 'Б'
-                                    ? l10n.petrol
-                                    : type == 'Д'
-                                        ? l10n.diesel
-                                        : type == 'СУГ'
-                                            ? l10n.lpg
-                                            : type == 'КПГ'
-                                                ? l10n.cng
-                                                : type == 'Электро'
-                                                    ? l10n.electric
-                                                    : l10n.gas_diesel,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            if (mounted) setState(() => fuelType = value);
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: baseCityNormController,
-                          focusNode: baseCityNormFocus,
-                          labelKey: 'base_city_norm',
-                          isNumber: true,
-                          icon: Icons.location_city,
-                        ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: baseHighwayNormController,
-                          focusNode: baseHighwayNormFocus,
-                          labelKey: 'base_highway_norm',
-                          isNumber: true,
-                          icon: Icons.add_road,
-                        ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: baseCombinedNormController,
-                          focusNode: baseCombinedNormFocus,
-                          labelKey: 'base_combined_norm',
-                          isNumber: true,
-                          icon: Icons.blender,
-                        ),
-                        if (vehicleType == 'Bus') ...[
-                          const SizedBox(height: 16),
-                          CustomTextField(
-                            controller: heaterFuelConsumptionController,
-                            focusNode: heaterFuelConsumptionFocus,
-                            labelKey: 'heater_fuel_consumption',
-                            isNumber: true,
-                            icon: Icons.thermostat,
-                          ),
-                          const SizedBox(height: 16),
-                          CustomTextField(
-                            controller: passengerCapacityController,
-                            focusNode: passengerCapacityFocus,
-                            labelKey: 'passenger_capacity',
-                            isNumber: true,
-                            icon: Icons.people,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
+                CarInfoStep3Card(
+                  vehicleType: vehicleType,
+                  fuelType: fuelType,
+                  baseCityNormController: baseCityNormController,
+                  baseHighwayNormController: baseHighwayNormController,
+                  baseCombinedNormController: baseCombinedNormController,
+                  heaterFuelConsumptionController: heaterFuelConsumptionController,
+                  passengerCapacityController: passengerCapacityController,
+                  baseCityNormFocus: baseCityNormFocus,
+                  baseHighwayNormFocus: baseHighwayNormFocus,
+                  baseCombinedNormFocus: baseCombinedNormFocus,
+                  heaterFuelConsumptionFocus: heaterFuelConsumptionFocus,
+                  passengerCapacityFocus: passengerCapacityFocus,
+                  onFuelTypeChanged: (value) {
+                    if (mounted) setState(() => fuelType = value);
+                  },
                 ),
                 const SizedBox(height: 32),
                 GradientButton(
@@ -881,22 +713,6 @@ class _CarInfoPageState extends State<CarInfoPage> {
       ),
       body: GradientBackground(child: pageContent),
     );
-  }
-}
-
-class Debouncer {
-  final Duration duration;
-  Timer? _timer;
-
-  Debouncer({required this.duration});
-
-  void run(VoidCallback action) {
-    _timer?.cancel();
-    _timer = Timer(duration, action);
-  }
-
-  void dispose() {
-    _timer?.cancel();
   }
 }
 

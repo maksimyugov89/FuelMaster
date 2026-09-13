@@ -1,28 +1,16 @@
 import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fuelmaster/firebase_options.dart';
 import 'package:fuelmaster/utils/ad_manager.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
+import 'package:fuelmaster/utils/history_manager.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/constants.dart';
 import 'package:fuelmaster/services/location_service.dart'; // <-- ИМПОРТ СЕРВИСА
 
 class AppInitializer {
   static Future<Map<String, dynamic>> initialize() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await dotenv.load(fileName: ".env");
-
-    try {
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-      logger.d('Firebase успешно инициализирован');
-    } catch (e) {
-      logger.e('Ошибка инициализации Firebase: $e');
-    }
-
     try {
       await AdManager.initialize();
       logger.d('AdManager успешно инициализирован');
@@ -71,7 +59,8 @@ class AppInitializer {
     final InAppPurchase iap = InAppPurchase.instance;
     final isIapAvailable = await iap.isAvailable();
     if (!isIapAvailable) {
-      logger.w('InAppPurchase недоступен');
+      logger.w('InAppPurchase недоступен — покупки внутри приложения отключены');
+      await prefs.setBool(AppConstants.isPremiumKey, false);
     }
 
     final hasMigrated = prefs.getBool(AppConstants.hasMigratedKey) ?? false;
@@ -79,9 +68,20 @@ class AppInitializer {
       try {
         await DatabaseHelper.instance.migrateFromSharedPreferences();
         await prefs.setBool(AppConstants.hasMigratedKey, true);
-        logger.d('Миграция данных успешно выполнена');
+        logger.d('Миграция автомобилей из SharedPreferences выполнена');
       } catch (e) {
-        logger.e('Ошибка миграции данных: $e');
+        logger.e('Ошибка миграции автомобилей: $e');
+      }
+    }
+
+    final historyMigrated = prefs.getBool(AppConstants.historyPrefsMigratedKey) ?? false;
+    if (!historyMigrated) {
+      try {
+        await HistoryManager.migrateFromSharedPreferences();
+        await prefs.setBool(AppConstants.historyPrefsMigratedKey, true);
+        logger.d('Миграция истории из SharedPreferences выполнена');
+      } catch (e) {
+        logger.e('Ошибка миграции истории: $e');
       }
     }
 

@@ -6,11 +6,15 @@ class GradientText extends StatelessWidget {
     super.key,
     required this.gradient,
     this.style,
+    this.textAlign,
+    this.overflow,
   });
 
   final String text;
   final TextStyle? style;
   final Gradient gradient;
+  final TextAlign? textAlign;
+  final TextOverflow? overflow;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +23,7 @@ class GradientText extends StatelessWidget {
       shaderCallback: (bounds) => gradient.createShader(
         Rect.fromLTWH(0, 0, bounds.width, bounds.height),
       ),
-      child: Text(text, style: style),
+      child: Text(text, style: style, textAlign: textAlign, overflow: overflow),
     );
   }
 }

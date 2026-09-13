@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:logger/logger.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:fuelmaster/utils/logger.dart';

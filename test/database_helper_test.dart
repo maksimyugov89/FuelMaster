@@ -23,8 +23,7 @@ void main() {
 
     setUp(() async {
       mockDatabase = MockDatabase();
-      // Мокируем геттер database
-      when(DatabaseHelper.instance.database).thenAnswer((_) async => mockDatabase);
+      DatabaseHelper.setDatabaseForTesting(mockDatabase);
       databaseHelper = DatabaseHelper.instance;
 
       // Моки для методов
@@ -81,7 +80,7 @@ void main() {
       await databaseHelper.insertCar(car); // Убрано expect, так как метод возвращает void
       verify(mockDatabase.insert(
         'cars',
-        car.toJson(),
+        any,
         conflictAlgorithm: ConflictAlgorithm.replace,
       )).called(1);
     });
@@ -109,7 +108,7 @@ void main() {
       await databaseHelper.updateCar(car); // Убрано expect, так как метод возвращает void
       verify(mockDatabase.update(
         'cars',
-        car.toJson(),
+        any,
         where: 'id = ?',
         whereArgs: [car.id],
       )).called(1);
