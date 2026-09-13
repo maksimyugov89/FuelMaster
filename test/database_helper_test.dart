@@ -3,7 +3,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
-import 'package:fuelmaster/utils/models/car_data.dart';
 import 'database_helper_test.mocks.dart';
 
 // Генерация моков с помощью mockito
@@ -67,22 +66,9 @@ void main() {
               ]);
     });
 
-    test('Insert car', () async {
-      final car = CarData(
-        brand: 'Toyota',
-        model: 'Camry XV70',
-        baseCityNorm: 8.4,
-        baseHighwayNorm: 5.7,
-        vehicleType: 'Passenger Car',
-      );
-
-      await databaseHelper.insertCar(car); // Убрано expect, так как метод возвращает void
-      verify(mockDatabase.insert(
-        'cars',
-        any,
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      )).called(1);
-    });
+    // CRUD-пути insert/update/delete с версии 13 работают через транзакцию
+    // (запись + очередь синка) и проверяются на настоящей SQLite —
+    // см. test/sync_outbox_integration_test.dart.
 
     test('Get cars', () async {
       final cars = await databaseHelper.getUserCars();
@@ -92,40 +78,6 @@ void main() {
       expect(cars.first.baseCityNorm, 8.4);
       expect(cars.first.baseHighwayNorm, 5.7);
       verify(mockDatabase.query('cars', where: 'is_preset = ?', whereArgs: [0])).called(1);
-    });
-
-    test('Update car', () async {
-      final car = CarData(
-        id: 1,
-        brand: 'Toyota',
-        model: 'Camry XV70',
-        baseCityNorm: 8.5,
-        baseHighwayNorm: 5.8,
-        vehicleType: 'Passenger Car',
-      );
-
-      await databaseHelper.updateCar(car); // Убрано expect, так как метод возвращает void
-      verify(mockDatabase.update(
-        'cars',
-        any,
-        where: 'id = ?',
-        whereArgs: [car.id],
-      )).called(1);
-    });
-
-    test('Delete car', () async {
-      const id = 1;
-      await databaseHelper.deleteCar(id); // Убрано expect, так как метод возвращает void
-      verify(mockDatabase.delete(
-        'cars',
-        where: 'id = ?',
-        whereArgs: [id],
-      )).called(1);
-      verify(mockDatabase.delete(
-        'fuel_logs',
-        where: 'car_id = ?',
-        whereArgs: [id],
-      )).called(1);
     });
 
     test('Машины без номера не схлопываются в одну запись (B-1)', () async {

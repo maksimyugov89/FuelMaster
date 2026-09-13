@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/services/premium_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:fuelmaster/services/sync_outbox.dart';
+import 'package:fuelmaster/utils/uuid_v4.dart';
 
 /// Управление историей расчётов. Единственный источник правды — SQLite.
 class HistoryManager {
@@ -38,6 +41,9 @@ class HistoryManager {
     };
     return {
       if (recordWithTimestamp['id'] != null) 'id': recordWithTimestamp['id'],
+      // D-4: ключ синхронизации. Строки без него (созданные до версии 13)
+      // получают uuid здесь же — в той же транзакции, что и запись.
+      'uuid': ensureUuid(recordWithTimestamp['uuid'] as String?),
       'car_id': recordWithTimestamp['car_id'] ?? 0,
       'date': recordWithTimestamp['date'],
       'license_plate': recordWithTimestamp['license_plate'],
@@ -99,19 +105,33 @@ class HistoryManager {
       }
 
       final db = await DatabaseHelper.instance.database;
-      final id = await db.insert(
-        'fuel_logs',
-        _fuelLogRow(entry),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+      final Map<String, Object?> row = _fuelLogRow(entry);
 
-      final saved = {...entry, 'id': id};
+      // Запись и постановка в очередь — одной транзакцией (D-4): запись не
+      // считается сохранённой, пока операция не попала в журнал синхронизации.
+      final int id = await db.transaction<int>((txn) async {
+        final int insertedId = await txn.insert(
+          'fuel_logs',
+          row,
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+        await SyncOutbox.enqueue(
+          entity: SyncOutbox.entityHistory,
+          entityUuid: row['uuid']! as String,
+          entityId: insertedId,
+          op: SyncOutbox.opUpsert,
+          // payload — строка таблицы: только примитивы, поэтому jsonEncode
+          // гарантированно не упадёт (в отличие от исходного map с вложенностями).
+          payload: Map<String, dynamic>.from(row),
+          executor: txn,
+        );
+        return insertedId;
+      });
+
+      final saved = {...entry, 'id': id, 'uuid': row['uuid']};
       logger.d('Запись истории сохранена в SQLite');
 
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null && await _isPremiumUser()) {
-        await _syncHistoryRecordToFirestore(user.uid, saved);
-      }
+      await _syncHistoryRecordToCloud(saved);
     } catch (e) {
       logger.e('Ошибка сохранения записи истории: $e');
       rethrow;
@@ -142,29 +162,37 @@ class HistoryManager {
     try {
       final db = await DatabaseHelper.instance.database;
       final existing = await loadHistoryFromDatabase();
-      final batch = db.batch();
       var inserted = 0;
 
-      for (final record in history) {
-        if (_isDuplicateRecord(record, existing)) continue;
-        batch.insert(
-          'fuel_logs',
-          _fuelLogRow(record),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-        inserted++;
-      }
+      // Транзакция вместо batch (D-4): вместе с каждой записью в журнал синка
+      // попадает операция. Пакетный insert этого не позволял.
+      await db.transaction<void>((txn) async {
+        for (final record in history) {
+          if (_isDuplicateRecord(record, existing)) continue;
+          final Map<String, Object?> row = _fuelLogRow(record);
+          final int id = await txn.insert(
+            'fuel_logs',
+            row,
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+          await SyncOutbox.enqueue(
+            entity: SyncOutbox.entityHistory,
+            entityUuid: row['uuid']! as String,
+            entityId: id,
+            op: SyncOutbox.opUpsert,
+            payload: Map<String, dynamic>.from(row),
+            executor: txn,
+          );
+          inserted++;
+        }
+      });
 
       if (inserted > 0) {
-        await batch.commit(noResult: true);
         logger.d('Сохранено записей истории в SQLite: $inserted');
       }
 
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null && await _isPremiumUser()) {
-        for (final record in history) {
-          await _syncHistoryRecordToFirestore(user.uid, record);
-        }
+      for (final record in history) {
+        await _syncHistoryRecordToCloud(record);
       }
     } catch (e) {
       logger.e('Ошибка пакетного сохранения истории: $e');
@@ -191,6 +219,7 @@ class HistoryManager {
 
     return {
       'id': map['id'] as int,
+      'uuid': map['uuid'] as String?,
       'date': map['date'] as String,
       'car_id': map['car_id'] as int,
       'license_plate': map['license_plate'] as String?,
@@ -290,20 +319,63 @@ class HistoryManager {
     }
   }
 
+  /// Отправка записи в облако — необязательный шаг (D-4).
+  ///
+  /// Локальная запись уже сделана и операция лежит в очереди синка, поэтому
+  /// отсутствие Firebase (тесты, офлайн) или ошибка сети не должны ломать
+  /// сохранение: очередь отправит запись позже.
+  static Future<void> _syncHistoryRecordToCloud(Map<String, dynamic> record) async {
+    if (Firebase.apps.isEmpty) return;
+    try {
+      final User? user = FirebaseAuth.instance.currentUser;
+      if (user == null || !await _isPremiumUser()) return;
+      await _syncHistoryRecordToFirestore(user.uid, record);
+    } catch (e) {
+      logger.w('Пропуск синхронизации записи истории: $e');
+    }
+  }
+
+  static Future<void> _deleteHistoryRecordFromCloud(int id) async {
+    if (Firebase.apps.isEmpty) return;
+    try {
+      final User? user = FirebaseAuth.instance.currentUser;
+      if (user == null || !await _isPremiumUser()) return;
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('history')
+          .doc(id.toString())
+          .delete();
+    } catch (e) {
+      logger.w('Пропуск удаления записи истории в облаке: $e');
+    }
+  }
+
   static Future<void> deleteHistoryRecord(int id) async {
     try {
       final db = await DatabaseHelper.instance.database;
-      await db.delete('fuel_logs', where: 'id = ?', whereArgs: [id]);
+      final List<Map<String, Object?>> found = await db.query(
+        'fuel_logs',
+        columns: <String>['uuid'],
+        where: 'id = ?',
+        whereArgs: <Object?>[id],
+      );
+      final String? uuid = found.isEmpty ? null : found.first['uuid'] as String?;
 
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null && await _isPremiumUser()) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('history')
-            .doc(id.toString())
-            .delete();
-      }
+      await db.transaction<void>((txn) async {
+        await txn.delete('fuel_logs', where: 'id = ?', whereArgs: [id]);
+        if (uuid != null && uuid.isNotEmpty) {
+          await SyncOutbox.enqueue(
+            entity: SyncOutbox.entityHistory,
+            entityUuid: uuid,
+            entityId: id,
+            op: SyncOutbox.opDelete,
+            executor: txn,
+          );
+        }
+      });
+
+      await _deleteHistoryRecordFromCloud(id);
     } catch (e) {
       logger.e('Ошибка удаления записи истории: $e');
       rethrow;

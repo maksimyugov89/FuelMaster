@@ -7,15 +7,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fuelmaster/services/premium_service.dart';
+import 'package:fuelmaster/services/sync_outbox.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
+import 'package:fuelmaster/utils/uuid_v4.dart';
 import 'package:meta/meta.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
-  // ✨ FIX: Увеличена версия БД для добавления колонки total_mileage
-  static const int _dbVersion = 12; 
+  /// 13 (D-4): uuid у cars/fuel_logs и таблица очереди sync_outbox.
+  static const int _dbVersion = 13;
+
+  /// Для тестов: создать полную схему текущей версии в переданной БД
+  /// (см. `test/sync_outbox_integration_test.dart`).
+  @visibleForTesting
+  static Future<void> createSchemaForTesting(Database db, int version) =>
+      instance._createDB(db, version);
 
   @visibleForTesting
   static void setDatabaseForTesting(Database db) {
@@ -75,6 +83,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE cars (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uuid TEXT,
         brand TEXT NOT NULL,
         model TEXT NOT NULL,
         license_plate TEXT,
@@ -108,6 +117,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE fuel_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uuid TEXT,
         date TEXT NOT NULL,
         car_id INTEGER NOT NULL,
         license_plate TEXT,
@@ -142,6 +152,7 @@ class DatabaseHelper {
     ''');
 
     await _createWeatherCoefficientsTable(db);
+    await _createSyncOutboxTable(db);
 
     logger.d('Database created with version $version');
   }
@@ -205,6 +216,15 @@ class DatabaseHelper {
 
     if (oldVersion < 12) {
       await _createWeatherCoefficientsTable(db);
+    }
+
+    // D-4: глобальные ключи и очередь операций. Существующим записям uuid
+    // выдается один раз здесь, дальше он живёт вместе с записью.
+    if (oldVersion < 13) {
+      await _addColumnIfMissing(db, 'cars', 'uuid', 'TEXT');
+      await _addColumnIfMissing(db, 'fuel_logs', 'uuid', 'TEXT');
+      await _createSyncOutboxTable(db);
+      await _backfillEntityUuids(db);
     }
 
     logger.d('Database upgraded from version $oldVersion to $newVersion');
@@ -480,12 +500,33 @@ class DatabaseHelper {
     final db = await database;
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
-      final carToInsert = car.copyWith(lastModified: now, isPreset: car.isPreset ?? 0);
-      final insertedId = await db.insert(
-        'cars',
-        carToInsert.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
+      final carToInsert = car.copyWith(
+        lastModified: now,
+        isPreset: car.isPreset ?? 0,
+        uuid: ensureUuid(car.uuid),
       );
+      final Map<String, dynamic> row = carToInsert.toJson();
+
+      // Запись и постановка в очередь синка — одной транзакцией (D-4):
+      // иначе сбой между ними оставит машину локально, но не отправит её.
+      final int insertedId = await db.transaction<int>((txn) async {
+        final int id = await txn.insert(
+          'cars',
+          row,
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+        await SyncOutbox.enqueue(
+          entity: SyncOutbox.entityCar,
+          entityUuid: carToInsert.uuid!,
+          entityId: id,
+          op: SyncOutbox.opUpsert,
+          payload: row,
+          executor: txn,
+          now: now,
+        );
+        return id;
+      });
+
       logger.d('Inserted car with ID: $insertedId');
       await _syncCarToFirestoreIfAuthenticated(carToInsert.copyWith(id: insertedId));
     } catch (e) {
@@ -541,13 +582,30 @@ class DatabaseHelper {
     final db = await database;
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
-      final carWithTimestamp = car.copyWith(lastModified: now);
-      await db.update(
-        'cars',
-        carWithTimestamp.toJson(),
-        where: 'id = ?',
-        whereArgs: [car.id],
+      final carWithTimestamp = car.copyWith(
+        lastModified: now,
+        uuid: ensureUuid(car.uuid),
       );
+      final Map<String, dynamic> row = carWithTimestamp.toJson();
+
+      await db.transaction<void>((txn) async {
+        await txn.update(
+          'cars',
+          row,
+          where: 'id = ?',
+          whereArgs: [car.id],
+        );
+        await SyncOutbox.enqueue(
+          entity: SyncOutbox.entityCar,
+          entityUuid: carWithTimestamp.uuid!,
+          entityId: car.id,
+          op: SyncOutbox.opUpsert,
+          payload: row,
+          executor: txn,
+          now: now,
+        );
+      });
+
       logger.d('Updated car id=${carWithTimestamp.id}');
       await _syncCarToFirestoreIfAuthenticated(carWithTimestamp);
     } catch (e) {
@@ -559,16 +617,38 @@ class DatabaseHelper {
   Future<void> deleteCar(int id) async {
     final db = await database;
     try {
-      await db.delete(
+      // uuid нужен до удаления строки: по нему сервер узнает, что удалять.
+      final List<Map<String, Object?>> found = await db.query(
         'cars',
+        columns: <String>['uuid'],
         where: 'id = ?',
-        whereArgs: [id],
+        whereArgs: <Object?>[id],
       );
-      await db.delete(
-        'fuel_logs',
-        where: 'car_id = ?',
-        whereArgs: [id],
-      );
+      final String? uuid =
+          found.isEmpty ? null : found.first['uuid'] as String?;
+
+      await db.transaction<void>((txn) async {
+        await txn.delete(
+          'cars',
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+        await txn.delete(
+          'fuel_logs',
+          where: 'car_id = ?',
+          whereArgs: [id],
+        );
+        if (uuid != null && uuid.isNotEmpty) {
+          await SyncOutbox.enqueue(
+            entity: SyncOutbox.entityCar,
+            entityUuid: uuid,
+            entityId: id,
+            op: SyncOutbox.opDelete,
+            executor: txn,
+          );
+        }
+      });
+
       logger.d('Deleted car with id: $id');
       await _deleteCarFromFirestoreIfAuthenticated(id);
     } catch (e) {
@@ -754,6 +834,57 @@ class DatabaseHelper {
     } catch (e) {
       logger.e('Error deleting car from Firestore: $e');
       throw Exception('Failed to delete car: $e');
+    }
+  }
+
+  /// D-4: таблица очереди операций для синхронизации.
+  Future<void> _createSyncOutboxTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS ${SyncOutbox.table} (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        entity TEXT NOT NULL,
+        entity_uuid TEXT NOT NULL,
+        entity_id INTEGER,
+        op TEXT NOT NULL,
+        payload TEXT,
+        created_at INTEGER NOT NULL,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        next_attempt_at INTEGER NOT NULL DEFAULT 0,
+        last_error TEXT
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_sync_outbox_next_attempt '
+      'ON ${SyncOutbox.table}(next_attempt_at)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_cars_uuid ON cars(uuid)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_fuel_logs_uuid ON fuel_logs(uuid)',
+    );
+  }
+
+  /// D-4: выдаёт uuid записям, созданным до версии 13. Дальше ключ не меняется.
+  Future<void> _backfillEntityUuids(Database db) async {
+    for (final String table in <String>['cars', 'fuel_logs']) {
+      final List<Map<String, Object?>> rows = await db.query(
+        table,
+        columns: <String>['id'],
+        where: 'uuid IS NULL OR uuid = ?',
+        whereArgs: <Object?>[''],
+      );
+      for (final Map<String, Object?> row in rows) {
+        await db.update(
+          table,
+          <String, Object?>{'uuid': generateUuidV4()},
+          where: 'id = ?',
+          whereArgs: <Object?>[row['id']],
+        );
+      }
+      if (rows.isNotEmpty) {
+        logger.i('Проставлены uuid для $table: ${rows.length}');
+      }
     }
   }
 

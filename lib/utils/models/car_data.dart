@@ -1,6 +1,11 @@
 
 class CarData {
   final int? id;
+
+  /// D-4: глобальный ключ синхронизации. Локальный `id` уникален только внутри
+  /// устройства — именно из-за этого две машины на разных телефонах могли
+  /// перезаписать друг друга в Firestore.
+  final String? uuid;
   final String brand;
   final String model;
   final String? licensePlate;
@@ -31,6 +36,7 @@ class CarData {
 
   CarData({
     this.id,
+    this.uuid,
     required this.brand,
     required this.model,
     this.licensePlate,
@@ -62,6 +68,7 @@ class CarData {
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'uuid': uuid,
         'brand': brand,
         'model': model,
         'license_plate': licensePlate,
@@ -93,6 +100,7 @@ class CarData {
 
   factory CarData.fromJson(Map<String, dynamic> json) => CarData(
         id: json['id'] is int ? json['id'] as int? : int.tryParse(json['id']?.toString() ?? ''),
+        uuid: json['uuid'] as String?,
         brand: json['brand'] as String? ?? '',
         model: json['model'] as String? ?? '',
         licensePlate: json['license_plate'] as String?,
@@ -124,6 +132,7 @@ class CarData {
 
   CarData copyWith({
     int? id,
+    String? uuid,
     String? brand,
     String? model,
     String? licensePlate,
@@ -154,6 +163,7 @@ class CarData {
   }) {
     return CarData(
       id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
       brand: brand ?? this.brand,
       model: model ?? this.model,
       licensePlate: licensePlate ?? this.licensePlate,
@@ -184,15 +194,22 @@ class CarData {
     );
   }
 
+  /// Сравнение по глобальному ключу, если он есть: две разные машины одной
+  /// модели раньше считались «одной и той же» (brand+model+modification), из-за
+  /// чего терялись записи. Для строк без uuid сохранено прежнее поведение.
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CarData &&
-          runtimeType == other.runtimeType &&
-          brand == other.brand &&
-          model == other.model &&
-          modification == other.modification;
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! CarData || runtimeType != other.runtimeType) return false;
+    if (uuid != null && other.uuid != null) return uuid == other.uuid;
+    if (id != null && other.id != null) return id == other.id;
+    return brand == other.brand &&
+        model == other.model &&
+        modification == other.modification;
+  }
 
   @override
-  int get hashCode => brand.hashCode ^ model.hashCode ^ (modification?.hashCode ?? 0);
+  int get hashCode => uuid?.hashCode ??
+      (id?.hashCode ??
+          brand.hashCode ^ model.hashCode ^ (modification?.hashCode ?? 0));
 }
