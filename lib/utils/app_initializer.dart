@@ -23,18 +23,27 @@ class AppInitializer {
 
     // --- НАЧАЛО ИЗМЕНЕНИЙ: ОПРЕДЕЛЕНИЕ ГОРОДА ---
     // Проверяем, был ли город сохранен ранее
-    if (prefs.getString(AppConstants.userCityKey) == null) {
+    // B-6 аудита: геолокация запускалась на самом старте, до онбординга —
+    // у нового пользователя диалог разрешения висел поверх сплэша, а при отказе
+    // город не определялся вовсе. Спрашиваем геопозицию только у уже
+    // зарегистрированных (у новых это делает экран регистрации), а сам запрос
+    // ограничен по времени, чтобы не блокировать запуск приложения.
+    final isRegistered = prefs.getBool(AppConstants.isRegisteredKey) ?? false;
+    if (isRegistered && prefs.getString(AppConstants.userCityKey) == null) {
       logger.d('Город пользователя не найден, попытка определения...');
-      // Если нет, вызываем наш новый сервис
       final locationService = LocationService();
-      final city = await locationService.getCurrentCity();
+      final city = await locationService.getCurrentCity().timeout(
+            const Duration(seconds: 15),
+            onTimeout: () => null,
+          );
       if (city != null) {
-        // Если город успешно определен, сохраняем его
         await prefs.setString(AppConstants.userCityKey, city);
         logger.d('Город ($city) успешно сохранен в SharedPreferences.');
       } else {
         logger.w('Не удалось определить и сохранить город пользователя.');
       }
+    } else if (!isRegistered) {
+      logger.d('Геолокация на старте пропущена: пользователь ещё не зарегистрирован (B-6)');
     } else {
       logger.d('Используется ранее сохраненный город: ${prefs.getString(AppConstants.userCityKey)}');
     }
