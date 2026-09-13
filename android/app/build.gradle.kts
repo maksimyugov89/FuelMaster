@@ -37,15 +37,9 @@ android {
     }
 
     defaultConfig {
-        // applicationId — постоянный идентификатор приложения в Google Play,
-        // после публикации он НЕ меняется. Сменён 13.09.2026 с шаблонного
-        // com.example.fuelmaster (Play такое не принимает) на com.fuelmaster.app
-        // — как у FitnesBuster (com.fitnesbuster.app).
-        // Старый id остаётся зарегистрированным в Firebase: у друзей уже стоят
-        // сборки с ним, и они продолжат работать (тот же проект, та же база).
-        // ВАЖНО при смене: новый Android-апп в Firebase (google-services.json),
-        // ограничения ключа Yandex Maps (package + SHA-1), App Check, тестеры в Play.
-        applicationId = "com.fuelmaster.app"
+        // Сохраняем идентификатор опубликованной версии RuStore, чтобы новая
+        // версия устанавливалась как обновление существующего FuelMaster.
+        applicationId = "com.example.fuelmaster"
         minSdk = 26
         targetSdk = 36
         // Единственный источник версии — pubspec.yaml (`version: 1.0.1+7`).
