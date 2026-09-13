@@ -167,4 +167,25 @@ void main() {
     expect(after.first['cnt'], before.first['cnt'],
         reason: 'каталог не должен дублироваться');
   });
+
+  // Регрессия: разбор полагался на перевод строки по умолчанию ('\r\n'), и
+  // каталог с одиночными '\n' превращался в одну строку — импорт давал ноль
+  // строк без единой ошибки в логе.
+  test('разбор каталога не зависит от перевода строки', () async {
+    const header = 'brand,model,baseCityNorm,baseHighwayNorm,vehicleType';
+    const first = 'TestBrandLf,TestModelLf,8.5,6.1,Passenger Car';
+    const second = 'TestBrandCrlf,TestModelCrlf,9.1,6.6,Truck';
+
+    for (final nl in <String>['\n', '\r\n']) {
+      final testCsv = [header, first, second].join(nl) + nl;
+      final ok = await InitialData.reimportPresetData(csvString: testCsv);
+      expect(ok, isTrue, reason: 'перевод строки ${nl.codeUnits}');
+
+      final db = await DatabaseHelper.instance.database;
+      final rows = await db.rawQuery(
+          'SELECT COUNT(*) AS cnt FROM cars WHERE is_preset = 1');
+      expect(rows.first['cnt'], 2,
+          reason: 'перевод строки ${nl.codeUnits}: обе строки должны попасть в базу');
+    }
+  });
 }

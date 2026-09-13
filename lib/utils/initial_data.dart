@@ -11,7 +11,7 @@ class InitialData {
   /// Менять ВМЕСТЕ с правкой самого CSV. На старте приложение сравнивает её с
   /// отметкой в prefs и переливает каталог, если версия выросла: иначе новые
   /// марки и модели увидит только тот, кто ставит приложение с нуля.
-  static const int presetDataVersion = 2;
+  static const int presetDataVersion = 3;
 
   /// Защита от параллельного переимпорта (сплэш + возврат в приложение).
   static bool _reimportInProgress = false;
@@ -80,11 +80,24 @@ class InitialData {
   }
 
   static Future<void> _addCarsFromCsv(String csvString, DatabaseExecutor db) async {
-    final List<List<dynamic>> rows =
-        const CsvToListConverter(shouldParseNumbers: false).convert(csvString);
+    // Перевод строки определяется по файлу. Раньше полагались на значение по
+    // умолчанию ('\r\n'): файл с одиночными '\n' разбирался как ОДНА строка, и
+    // каталог молча заливался пустым (строк с нужным числом полей не находилось).
+    final String eol = csvString.contains('\r\n') ? '\r\n' : '\n';
+    final List<List<dynamic>> rows = CsvToListConverter(
+      shouldParseNumbers: false,
+      eol: eol,
+    ).convert(csvString);
     final List<CarData> predefinedCars = [];
     if (rows.isEmpty || rows.first.isEmpty) {
       logger.e('CSV file is empty or invalid');
+      return;
+    }
+    if (rows.length == 1) {
+      // Так выглядит файл, у которого переводы строк не совпали с ожидаемыми:
+      // весь каталог превращается в одну строку, и импорт молча даёт ноль.
+      logger.e('В каталоге только шапка — проверьте переводы строк в '
+          'assets/cars.csv (было разобрано ${rows.first.length} полей)');
       return;
     }
 
@@ -139,8 +152,9 @@ class InitialData {
           vehicleType = rowData[vehicleTypeIndex].trim();
         }
 
-        // Логируем, какой тип мы определили для строки
-        logger.i('Row $i: Parsed vehicleType: "$vehicleType"');
+        // Построчный лог убран: каталог содержит десятки тысяч строк, и запись
+        // двух сообщений на каждую из них заметно тормозила импорт на старте.
+        // Итог по количеству разобранных строк пишется один раз, после цикла.
 
         final brand = (brandIndex != -1 &&
                 rowData.length > brandIndex &&
@@ -159,9 +173,7 @@ class InitialData {
           continue;
         }
 
-        // Логируем, какую машину мы обрабатываем
-        logger.i(
-            'Row $i: Processing "$brand $model" as vehicle type "$vehicleType"');
+        // (построчный лог убран: см. комментарий выше)
 
         final modification = (modificationIndex != -1 &&
                 rowData.length > modificationIndex &&
@@ -317,7 +329,8 @@ class InitialData {
       );
     }
     await batch.commit(noResult: true);
-    logger.d('Batch inserted ${predefinedCars.length} cars into the database');
+    logger.d('Каталог: разобрано ${predefinedCars.length} строк '
+        'из ${rows.length - 1}');
   }
 }
 

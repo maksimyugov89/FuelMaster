@@ -53,3 +53,9 @@ app.*.map.json
 
 # Сессия Kotlin-плагина Gradle
 android/.kotlin/
+
+# Сырые выгрузки реестра МИИТ КНР и производный каталог (большие, воспроизводимы)
+data/miit/
+data/catalog_miit.csv
+data/cars_base_*.csv
+data/cars_prev.csv
