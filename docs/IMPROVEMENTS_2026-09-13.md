@@ -14,7 +14,8 @@
 | D-2 | аналитика расхода: сервис, экран, отчёты, 24 новых теста | `ca1f92a` |
 
 Проверки на момент отчёта: `flutter analyze` — **0 замечаний**, `flutter test` — **48/48**,
-`flutter build apk --release` — **успешно** (R8 + сжатие ресурсов + загрузка mapping-файла Crashlytics).
+`flutter build apk --release` — **успешно** (R8 + сжатие ресурсов + загрузка mapping-файла Crashlytics);
+`package: name='com.fuelmaster.app' versionCode='7' versionName='1.0.1'` — подтверждено `aapt dump badging`.
 
 ---
 
@@ -93,6 +94,8 @@ Google-Services 4.4.1 and above`. В `android/settings.gradle.kts` стояла 
 - `.github/workflows/ci.yml`: на каждый push в `main` и на PR — `flutter pub get`,
   `flutter analyze --fatal-infos`, `flutter test`. Flutter зафиксирован на 3.38.5
   (версия релизной сборки), включён кэш pub.
+- Отдельная job `build-debug` собирает debug APK: анализ и тесты не видят поломок
+  Gradle/Kotlin/SDK, а именно такая поломка вскрылась в этом заходе (см. блокер №3 ниже).
 - Не сделано осознанно: `dart format` в CI. Сейчас **44 файла** не соответствуют
   `dart format`; массовый переформат смешался бы с текущими правками, поэтому его
   стоит делать отдельным коммитом «только форматирование».
@@ -117,6 +120,15 @@ Google-Services 4.4.1 and above`. В `android/settings.gradle.kts` стояла 
 (раньше они оставались только в logcat на устройстве), Analytics — активность и долю premium.
 
 ---
+
+**Блокер №3 (после подключения Firebase-пакетов):** release-сборка упала на
+`:firebase_auth:compileReleaseKotlin` — «Module was compiled with an incompatible version
+of Kotlin. The binary version of its metadata is 2.3.0, expected version is 2.1.0».
+`firebase_crashlytics`/`firebase_analytics` подтянули свежие Firebase-модули
+(`firebase-auth:24.2.0`), которые собраны Kotlin 2.3.0, а в `android/settings.gradle.kts`
+стоял плагин Kotlin **2.1.0**. Плагин поднят до **2.3.21** (совместим с Gradle 8.9 и
+AGP 8.7.3). Это ровно тот класс поломки, который CI обязан ловить — поэтому в CI добавлена
+сборка debug APK.
 
 ## 6. D-2 — аналитика расхода
 

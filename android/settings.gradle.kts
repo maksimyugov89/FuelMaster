@@ -25,7 +25,10 @@ plugins {
     // Держать синхронно с android/build.gradle.kts (buildscript classpath).
     id("com.google.gms.google-services") version("4.4.3") apply false
     // END: FlutterFire Configuration
-    id("org.jetbrains.kotlin.android") version "2.1.0" apply false
+    // Kotlin 2.1.0 не читает метаданные 2.3.0, которыми собраны свежие
+    // Firebase-модули (firebase-auth 24.2.0) — release-сборка падала на
+    // :firebase_auth:compileReleaseKotlin с "incompatible version of Kotlin".
+    id("org.jetbrains.kotlin.android") version "2.3.21" apply false
 }
 
 include(":app")

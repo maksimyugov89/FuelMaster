@@ -34,3 +34,20 @@ jobs:
 
       - name: Тесты
         run: flutter test --reporter expanded
+
+  # Анализ и тесты не видят поломок Gradle/Kotlin/SDK — например, несовместимой
+  # версии Kotlin-плагина после обновления Firebase-пакетов. Поэтому собираем APK.
+  build-debug:
+    name: Сборка debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.38.5
+          channel: stable
+          cache: true
+      - name: Зависимости
+        run: flutter pub get
+      - name: Сборка
+        run: flutter build apk --debug
