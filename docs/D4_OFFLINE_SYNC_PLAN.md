@@ -16,22 +16,22 @@
 | `saveHistoryEntry`/`saveHistoryToDatabase`/`deleteHistoryRecord` так же; облачный синк истории не валит локальное сохранение | `lib/utils/history_manager.dart` (`_syncHistoryRecordToCloud`, `_deleteHistoryRecordFromCloud`) | там же |
 | Формат проверки uuid (`isUuidV4`) | `lib/utils/uuid_v4.dart` | — |
 
-Проверки фазы 1: `flutter analyze` — 0 замечаний, `flutter test` — 55/55
+Проверки фазы 1: `flutter analyze` — 0 замечаний, `flutter test` — 55/55 (после фазы 2 — 65/65)
 (три мок-теста CRUD заменены интеграционными на реальной SQLite).
 
-## Что НЕ сделано (это фазы 2–4)
+## Фаза 2 — закрыта (коммиты `93eb4f5`, `2ce22e8`)
 
-### Фаза 2 — воркер синхронизации (следующий шаг)
+| Элемент | Где |
+|---|---|
+| Воркер `drain()`: `pending()` → отправка → `markDone`/`markFailed`, единичный прогон | `lib/services/sync_worker.dart` |
+| Запуск: вход в аккаунт, возврат из фона, таймер 5 мин, сразу после правки | `lib/main.dart`, `lib/providers/car_provider.dart`, `lib/utils/history_manager.dart` |
+| Сеть выведена из UI: пути записи только пишут в БД и очередь | `database_helper.dart`, `history_manager.dart` |
+| Ключ документа — `uuid`; чтение и по `uuid`, и по старому `id`; чужие локальные id не переносятся | `syncCarsWithFirestore`, `_performFirestoreSync` |
+| Индикатор «Ждёт отправки: N» и кнопка «Отправить сейчас» в настройках | `settings_page.dart` |
+| Снят премиум-гейт с синхронизации (монетизация отложена, F-1) | `database_helper.dart`, `history_manager.dart` |
+| Тесты воркера с подменённым отправителем | `test/sync_worker_test.dart` (5) |
 
-1. `lib/services/sync_worker.dart`: `drain()` — взять `pending()`, отправить в
-   Firestore, успех → `markDone`, ошибка → `markFailed` (backoff уже есть).
-2. Запуск: при старте приложения, при возврате из фона (`AppLifecycleState.resumed`)
-   и по таймеру (5 мин). Никаких вызовов сети из UI — убрать `_syncCarToFirestoreIfAuthenticated`
-   из `car_provider.dart:106,137` и Firestore-вызовы из `history_page.dart:117`.
-3. Документ в Firestore ключуется `uuid` (сейчас — `id.toString()`), поэтому
-   старые документы нужно читать и по `id`, и по `uuid` (переходный период минимум
-   один релиз). Дельта: `payload` из очереди содержит снимок строки БД.
-4. Индикатор: `SyncOutbox.countPending()` — «ждёт отправки: N» в настройках.
+## Что НЕ сделано (это фазы 3–4)
 
 ### Фаза 3 — слияние (LWW + надгробия)
 
