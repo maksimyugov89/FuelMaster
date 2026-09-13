@@ -1394,6 +1394,24 @@ abstract class AppLocalizations {
   /// **'This feature is available only for premium users'**
   String get premium_feature;
 
+  /// Title of the dialog shown for functions deferred to later versions
+  ///
+  /// In en, this message translates to:
+  /// **'Coming in a future update'**
+  String get coming_soon_title;
+
+  /// Explains that AI advice is deferred to a future version
+  ///
+  /// In en, this message translates to:
+  /// **'AI fuel-saving advice will appear in one of the next app updates. For now, fuel consumption calculation and analytics are available.'**
+  String get coming_soon_ai_advice;
+
+  /// Explains that the subscription is deferred to a future version
+  ///
+  /// In en, this message translates to:
+  /// **'The subscription will appear in future versions of the app.'**
+  String get coming_soon_premium;
+
   /// Button text for sharing content, such as AI fuel efficiency advice
   ///
   /// In en, this message translates to:

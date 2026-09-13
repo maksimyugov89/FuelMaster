@@ -444,6 +444,18 @@
   "@premium_feature": {
     "description": "Message shown when a premium feature is accessed by a non-premium user"
   },
+  "coming_soon_title": "Coming in a future update",
+  "@coming_soon_title": {
+    "description": "Title of the dialog shown for functions deferred to later versions"
+  },
+  "coming_soon_ai_advice": "AI fuel-saving advice will appear in one of the next app updates. For now, fuel consumption calculation and analytics are available.",
+  "@coming_soon_ai_advice": {
+    "description": "Explains that AI advice is deferred to a future version"
+  },
+  "coming_soon_premium": "The subscription will appear in future versions of the app.",
+  "@coming_soon_premium": {
+    "description": "Explains that the subscription is deferred to a future version"
+  },
   "share": "Share",
   "@share": {
     "description": "Button text for sharing content, such as AI fuel efficiency advice"

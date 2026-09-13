@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fuelmaster/services/premium_service.dart';
+import 'package:fuelmaster/utils/feature_flags.dart';
 import 'package:fuelmaster/l10n/app_localizations.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:fuelmaster/services/account_service.dart';
@@ -248,22 +249,30 @@ class _SettingsPageState extends State<SettingsPage> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 16),
-                appSettings.isPremium
-                    ? Center(
-                        child: Text(
-                          l10n.premium_active,
-                          style: TextStyle(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      )
-                    : GradientButton(
-                        text: l10n.buy,
-                        gradient: primaryActionGradient,
-                        iconData: Icons.star,
-                        onPressed: () => _purchasePremium(context),
-                      ),
+                // F-1: подписка отложена до отдельного релиза (FeatureFlags.premium).
+                if (!FeatureFlags.premium)
+                  Text(
+                    l10n.coming_soon_premium,
+                    style: theme.textTheme.bodyMedium,
+                    overflow: TextOverflow.ellipsis,
+                  )
+                else if (appSettings.isPremium)
+                  Center(
+                    child: Text(
+                      l10n.premium_active,
+                      style: TextStyle(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )
+                else
+                  GradientButton(
+                    text: l10n.buy,
+                    gradient: primaryActionGradient,
+                    iconData: Icons.star,
+                    onPressed: () => _purchasePremium(context),
+                  ),
               ],
             ),
           ),

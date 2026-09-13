@@ -32,6 +32,7 @@ import 'package:fuelmaster/services/premium_service.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:fuelmaster/services/map_page.dart';
 import 'package:fuelmaster/services/account_service.dart';
+import 'package:fuelmaster/utils/feature_flags.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -129,7 +130,9 @@ Future<void> _activateDiagnostics() async {
 /// Премиум-статус как свойство пользователя в Analytics — основа воронки
 /// монетизации (D-6). Без ПДн: только признак подписки.
 Future<void> _reportPremiumState() async {
-  if (!kReleaseMode) return;
+  // F-1: монетизация отложена — пользовательское свойство не отправляем,
+  // пока подписка выключена флагом сборки.
+  if (!kReleaseMode || !FeatureFlags.premium) return;
   try {
     await FirebaseAnalytics.instance.setUserProperty(
       name: 'premium',

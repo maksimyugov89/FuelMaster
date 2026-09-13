@@ -10,6 +10,7 @@ import 'package:fuelmaster/utils/utils.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:fuelmaster/utils/history_manager.dart';
 import 'package:fuelmaster/utils/ad_manager.dart';
+import 'package:fuelmaster/utils/feature_flags.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
 import 'package:fuelmaster/utils/deepseek_service.dart';
@@ -143,8 +144,8 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // ✅ теперь баннер безопасно показывается здесь
-    if (!_isPremium && !_bannerShown) {
+    // F-1: баннер запрашиваем только когда реклама включена флагом сборки.
+    if (FeatureFlags.ads && !_isPremium && !_bannerShown) {
       final screenWidth = MediaQuery.of(context).size.width.toInt();
       AdManager.showBannerAd(
         context: context,
@@ -162,7 +163,7 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
   /// Грузим, пока пользователь считает расход: к моменту показа объявление уже
   /// готово, а `showInterstitialAd` вызывается только по загруженному.
   Future<void> _preloadInterstitial() async {
-    if (_isPremium) return;
+    if (!FeatureFlags.ads || _isPremium) return;
     await AdManager.loadInterstitialAd(adUnitId: AdUnitIds.interstitial);
   }
 
@@ -223,6 +224,24 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
 
   Future<void> _showFuelAdvice() async {
     final l10n = AppLocalizations.of(context)!;
+    // F-1: AI-советы отложены. Кнопка остаётся на месте и честно сообщает,
+    // что функция появится позже, — вместо платного запроса к AI-сервису.
+    if (!FeatureFlags.aiAdvice) {
+      await showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.coming_soon_title),
+          content: Text(l10n.coming_soon_ai_advice),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.ok),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
     // B-13: await вынесен из условия, чтобы проверка mounted стояла между
     // асинхронным шагом и обращением к контексту.
     final bool dailyLimitReached =
@@ -696,7 +715,7 @@ if (correctionFactor != null && correctionFactor != 0.0) {
                 isAC: isAC,
                 isMountain: isMountain,
               );
-              if (!_isPremium) {
+              if (FeatureFlags.ads && !_isPremium) {
                 await AdManager.showInterstitialAd();
                 // Следующий показ возможен только после новой загрузки.
                 await _preloadInterstitial();

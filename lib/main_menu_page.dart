@@ -11,6 +11,7 @@ import 'car_info_page.dart';
 import 'car_list_page.dart';
 import 'package:fuelmaster/providers/car_provider.dart';
 import 'package:fuelmaster/utils/ad_manager.dart';
+import 'package:fuelmaster/utils/feature_flags.dart';
 import 'package:fuelmaster/providers/app_settings_provider.dart';
 import 'package:fuelmaster/providers/history_provider.dart';
 import 'package:fuelmaster/widgets/gradient_button.dart';
@@ -341,7 +342,8 @@ void _refreshCarListAndSetSelection() {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildMyCarsCard(context),
-                if (!appSettings.isPremium) ...[
+                // F-1: реклама выключена до отдельного релиза (FeatureFlags.ads).
+                if (FeatureFlags.ads && !appSettings.isPremium) ...[
                   const SizedBox(height: 24),
                   AdManager.buildNativeAdView(adUnitId: AdUnitIds.nativeAd),
                 ],

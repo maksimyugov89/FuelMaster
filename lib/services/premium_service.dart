@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:fuelmaster/services/entitlement_client.dart';
 import 'package:fuelmaster/utils/constants.dart';
+import 'package:fuelmaster/utils/feature_flags.dart';
 import 'package:fuelmaster/utils/logger.dart';
 
 /// Единственный источник правды о премиум-статусе.
@@ -49,6 +50,16 @@ class PremiumService extends ChangeNotifier {
       _isPremium = prefs.getBool(AppConstants.isPremiumKey) ?? false;
     } catch (e) {
       logger.e('PremiumService: не удалось прочитать статус из prefs: $e');
+    }
+
+    // F-1: монетизация отложена. Статус из prefs читаем (пригодится будущим
+    // версиям), но Billing не поднимаем и на сервер не ходим: пока покупать
+    // нечего, а подключение к магазину — лишняя точка отказа на старте,
+    // особенно на устройствах без Google Play.
+    if (!FeatureFlags.premium) {
+      logger.d('PremiumService: подписка выключена флагом сборки');
+      notifyListeners();
+      return;
     }
 
     try {

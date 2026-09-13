@@ -676,6 +676,17 @@ class AppLocalizationsRu extends AppLocalizations {
       'Эта функция доступна только для премиум-пользователей';
 
   @override
+  String get coming_soon_title => 'Будет доступно в новых версиях';
+
+  @override
+  String get coming_soon_ai_advice =>
+      'AI-советы по экономии топлива появятся в одном из следующих обновлений. Пока доступны расчёт расхода и аналитика.';
+
+  @override
+  String get coming_soon_premium =>
+      'Подписка появится в будущих версиях приложения.';
+
+  @override
   String get share => 'Поделиться';
 
   @override

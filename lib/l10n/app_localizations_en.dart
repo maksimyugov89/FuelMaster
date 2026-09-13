@@ -672,6 +672,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'This feature is available only for premium users';
 
   @override
+  String get coming_soon_title => 'Coming in a future update';
+
+  @override
+  String get coming_soon_ai_advice =>
+      'AI fuel-saving advice will appear in one of the next app updates. For now, fuel consumption calculation and analytics are available.';
+
+  @override
+  String get coming_soon_premium =>
+      'The subscription will appear in future versions of the app.';
+
+  @override
   String get share => 'Share';
 
   @override

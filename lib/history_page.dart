@@ -9,6 +9,7 @@ import 'package:fuelmaster/utils/history_manager.dart';
 import 'package:fuelmaster/utils/logger.dart';
 import 'package:intl/intl.dart';
 import 'package:fuelmaster/utils/ad_manager.dart';
+import 'package:fuelmaster/utils/feature_flags.dart';
 import 'package:fuelmaster/utils/database_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -121,7 +122,9 @@ class _HistoryPageState extends State<HistoryPage> {
     try {
       final loadedHistory = await HistoryManager.loadHistoryFromDatabase();
       final user = FirebaseAuth.instance.currentUser;
-      if (user != null && _isPremium) {
+      // F-1: синхронизация истории больше не premium-функция — монетизация
+      // отложена, а резервная копия истории нужна всем пользователям.
+      if (user != null) {
         await HistoryManager.syncHistoryWithFirestore(user.uid);
         final syncedHistory = await HistoryManager.loadHistoryFromDatabase();
         if (mounted && !_listEquality.equals(_history, syncedHistory)) {
@@ -212,7 +215,7 @@ class _HistoryPageState extends State<HistoryPage> {
         await db.delete('fuel_logs');
         setState(() => _history.clear());
         final user = FirebaseAuth.instance.currentUser;
-        if (user != null && _isPremium) {
+        if (user != null) {
           final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).collection('history').get();
           for (var doc in snapshot.docs) {
             doc.reference.delete();
@@ -665,9 +668,12 @@ class _HistoryPageState extends State<HistoryPage> {
                 )
               else
                 SliverList.builder(
-                  itemCount: _isPremium ? filteredHistory.length : filteredHistory.length * 2,
+                  // F-1: врезки рекламы только при включённой рекламе.
+                  itemCount: (FeatureFlags.ads && !_isPremium)
+                      ? filteredHistory.length * 2
+                      : filteredHistory.length,
                   itemBuilder: (context, index) {
-                    if (!_isPremium) {
+                    if (FeatureFlags.ads && !_isPremium) {
                       if (index.isEven) {
                         return _buildAdCard();
                       }
