@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fuelmaster/utils/env_config.dart';
@@ -33,16 +35,21 @@ import 'package:fuelmaster/services/account_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // C-7: перехватчики ставятся до Firebase.initializeApp, чтобы падения на
+  // старте (включая инициализацию Firebase) тоже попали в отчёт Crashlytics.
+  _installErrorHandlers();
   await EnvConfig.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await _activateDiagnostics();
   await _activateAppCheck();
 
   final initialData = await AppInitializer.initialize();
   // Премиум-статус: prefs + восстановление покупок в магазине при старте
   // (после AppInitializer, чтобы не мешать миграциям prefs).
   await PremiumService.instance.init();
+  await _reportPremiumState();
   // B-10 аудита: аккаунт мог создаться без профиля в Firestore — восстанавливаем.
   final User? restoredUser = FirebaseAuth.instance.currentUser;
   if (restoredUser != null) {
@@ -75,12 +82,61 @@ Future<void> main() async {
 Future<void> _activateAppCheck() async {
   try {
     await FirebaseAppCheck.instance.activate(
-      androidProvider: kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
-      appleProvider: kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
+      providerAndroid:
+          kDebugMode ? const AndroidDebugProvider() : const AndroidPlayIntegrityProvider(),
+      providerApple: kDebugMode ? const AppleDebugProvider() : const AppleDeviceCheckProvider(),
     );
     logger.d('App Check активирован (${kDebugMode ? 'debug' : 'release'})');
   } catch (e) {
     logger.e('Не удалось активировать App Check: $e');
+  }
+}
+
+/// C-7: ошибки, которые раньше оставались только в логах устройства.
+///
+/// В debug-сборке записи не отправляются: панель Crashlytics нужна для того,
+/// что происходит у друзей в релизе, а не для наших итераций.
+void _installErrorHandlers() {
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    if (kReleaseMode) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    }
+  };
+
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    logger.e('Необработанная ошибка: $error');
+    if (kReleaseMode) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    }
+    return true;
+  };
+}
+
+/// Включает Crashlytics и Analytics (C-7).
+///
+/// Сбор идёт только в release: в debug он засоряет панель тестовыми падениями.
+Future<void> _activateDiagnostics() async {
+  try {
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(kReleaseMode);
+    await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(kReleaseMode);
+    logger.d('Диагностика: сбор ${kReleaseMode ? 'включён' : 'выключен (debug)'}');
+  } catch (e) {
+    logger.e('Не удалось настроить Crashlytics/Analytics: $e');
+  }
+}
+
+/// Премиум-статус как свойство пользователя в Analytics — основа воронки
+/// монетизации (D-6). Без ПДн: только признак подписки.
+Future<void> _reportPremiumState() async {
+  if (!kReleaseMode) return;
+  try {
+    await FirebaseAnalytics.instance.setUserProperty(
+      name: 'premium',
+      value: PremiumService.instance.isPremium ? 'true' : 'false',
+    );
+  } catch (e) {
+    logger.e('Не удалось записать свойство premium в Analytics: $e');
   }
 }
 
