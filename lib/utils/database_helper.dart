@@ -21,6 +21,16 @@ class DatabaseHelper {
     _database = db;
   }
 
+  /// Для тестов: прогон миграций на открытой БД
+  /// (см. `test/database_migration_test.dart`, регрессия A-4).
+  @visibleForTesting
+  static Future<void> runMigrationsForTesting(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) =>
+      instance._upgradeSafely(db, oldVersion, newVersion);
+
   DatabaseHelper._init();
 
   Future<Database> get database async {
@@ -37,7 +47,7 @@ class DatabaseHelper {
       path,
       version: _dbVersion,
       onCreate: _createDB,
-      onUpgrade: _upgradeDB,
+      onUpgrade: _upgradeSafely,
     );
   }
 
@@ -118,99 +128,48 @@ class DatabaseHelper {
 
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      try {
-        await db.execute('ALTER TABLE fuel_logs ADD COLUMN license_plate TEXT');
-        logger.d('Added license_plate column to fuel_logs table');
-      } catch (e) {
-        logger.e('Error adding license_plate column: $e');
-        rethrow;
-      }
+      await _addColumnIfMissing(db, 'fuel_logs', 'license_plate', 'TEXT');
     }
     if (oldVersion < 3) {
-      try {
-        await db.execute('ALTER TABLE cars ADD COLUMN year_from TEXT');
-        await db.execute('ALTER TABLE cars ADD COLUMN year_to TEXT');
-        logger.d('Added year_from and year_to columns to cars table');
-      } catch (e) {
-        logger.e('Error adding year_from and year_to columns: $e');
-        rethrow;
-      }
+      await _addColumnIfMissing(db, 'cars', 'year_from', 'TEXT');
+      await _addColumnIfMissing(db, 'cars', 'year_to', 'TEXT');
     }
     if (oldVersion < 4) {
-      try {
-        await db.execute('ALTER TABLE cars ADD COLUMN power_kw REAL');
-        await db.execute('ALTER TABLE cars ADD COLUMN passenger_capacity INTEGER');
-        await db.execute('ALTER TABLE cars ADD COLUMN heater_fuel_consumption REAL');
-        await db.execute('ALTER TABLE cars ADD COLUMN fuel_consumption_per_ton_km REAL');
-        await db.execute('ALTER TABLE cars ADD COLUMN trailer_weight REAL');
-        await db.execute('ALTER TABLE cars ADD COLUMN fuel_consumption_per_load REAL');
-        await db.execute('ALTER TABLE cars ADD COLUMN load_capacity REAL');
-        await db.execute('ALTER TABLE cars ADD COLUMN battery_capacity_kwh REAL');
-        logger.d('Added new columns for vehicle types to cars table');
-      } catch (e) {
-        logger.e('Error adding new columns for vehicle types: $e');
-        rethrow;
-      }
+      await _addColumnIfMissing(db, 'cars', 'power_kw', 'REAL');
+      await _addColumnIfMissing(db, 'cars', 'passenger_capacity', 'INTEGER');
+      await _addColumnIfMissing(db, 'cars', 'heater_fuel_consumption', 'REAL');
+      await _addColumnIfMissing(
+          db, 'cars', 'fuel_consumption_per_ton_km', 'REAL');
+      await _addColumnIfMissing(db, 'cars', 'trailer_weight', 'REAL');
+      await _addColumnIfMissing(
+          db, 'cars', 'fuel_consumption_per_load', 'REAL');
+      await _addColumnIfMissing(db, 'cars', 'load_capacity', 'REAL');
+      await _addColumnIfMissing(db, 'cars', 'battery_capacity_kwh', 'REAL');
     }
     if (oldVersion < 5) {
-      try {
-        await db.execute('ALTER TABLE fuel_logs ADD COLUMN correction_factor REAL');
-        await db.execute('ALTER TABLE fuel_logs ADD COLUMN heater_operating_time REAL');
-        logger.d('Added correction_factor and heater_operating_time columns to fuel_logs table');
-      } catch (e) {
-        logger.e('Error adding correction_factor and heater_operating_time columns: $e');
-        rethrow;
-      }
+      await _addColumnIfMissing(db, 'fuel_logs', 'correction_factor', 'REAL');
+      await _addColumnIfMissing(
+          db, 'fuel_logs', 'heater_operating_time', 'REAL');
     }
     if (oldVersion < 6) {
-      try {
-        await db.execute('ALTER TABLE cars ADD COLUMN last_modified INTEGER');
-        await db.execute('ALTER TABLE fuel_logs ADD COLUMN last_modified INTEGER');
-        logger.d('Added last_modified columns to cars and fuel_logs tables');
-      } catch (e) {
-        logger.e('Error adding last_modified columns: $e');
-        rethrow;
-      }
+      await _addColumnIfMissing(db, 'cars', 'last_modified', 'INTEGER');
+      await _addColumnIfMissing(db, 'fuel_logs', 'last_modified', 'INTEGER');
     }
     if (oldVersion < 7) {
-      try {
-        await db.execute('ALTER TABLE fuel_logs ADD COLUMN weather_multiplier REAL');
-        logger.d('Added weather_multiplier column to fuel_logs table (upgrade <7)');
-      } catch (e) {
-        logger.e('Error adding weather_multiplier column (<7): $e');
-        rethrow;
-      }
+      await _addColumnIfMissing(db, 'fuel_logs', 'weather_multiplier', 'REAL');
     }
-    if (oldVersion < 8) {
-      try {
-        await db.execute('ALTER TABLE fuel_logs ADD COLUMN weather_multiplier REAL');
-        logger.d('Added weather_multiplier column to fuel_logs table (upgrade <8)');
-      } catch (e) {
-        logger.e('Error adding weather_multiplier column (<8): $e');
-        rethrow;
-      }
-    }
+    // Версия 8: раньше здесь повторно добавлялась та же колонка
+    // weather_multiplier, что на апгрейде 6→8 давало "duplicate column name",
+    // rethrow и нерабочее приложение (БД не открывалась). Отметка версии
+    // оставлена намеренно, действий не требует.
     if (oldVersion < 9) {
-      try {
-        await db.execute('ALTER TABLE fuel_logs ADD COLUMN base_city_norm REAL');
-        await db.execute('ALTER TABLE fuel_logs ADD COLUMN base_highway_norm REAL');
-        logger.d('Added base_city_norm and base_highway_norm columns to fuel_logs table');
-      } catch (e) {
-        logger.e('Error adding base_city_norm and base_highway_norm columns: $e');
-        rethrow;
-      }
+      await _addColumnIfMissing(db, 'fuel_logs', 'base_city_norm', 'REAL');
+      await _addColumnIfMissing(db, 'fuel_logs', 'base_highway_norm', 'REAL');
     }
     if (oldVersion < 10) {
-      try {
-        await db.execute('ALTER TABLE fuel_logs ADD COLUMN total_mileage REAL');
-        logger.d('Added total_mileage column to fuel_logs table');
-      } catch (e) {
-        logger.e('Error adding total_mileage column: $e');
-        rethrow;
-      }
+      await _addColumnIfMissing(db, 'fuel_logs', 'total_mileage', 'REAL');
     }
-    if (oldVersion < 11) {
-    try {
+    if (oldVersion < 11 && !await _tableExists(db, 'locations')) {
       await db.execute('''
         CREATE TABLE locations (
           city TEXT PRIMARY KEY,
@@ -222,23 +181,85 @@ class DatabaseHelper {
         )
       ''');
       logger.d('Created locations table for existing users');
-    } catch (e) {
-      logger.e('Error creating locations table: $e');
-      rethrow;
     }
-  }
 
     if (oldVersion < 12) {
-    try {
       await _createWeatherCoefficientsTable(db);
-    } catch (e) {
-      logger.e('Error creating weather_coefficients table: $e');
-      rethrow;
     }
+
+    logger.d('Database upgraded from version $oldVersion to $newVersion');
   }
 
-  logger.d('Database upgraded from version $oldVersion to $newVersion');
-}
+  /// Открывает БД даже при сбое миграции: ошибка логируется, приложение
+  /// продолжает работать, а не падает на старте (см. A-4 в аудите).
+  Future<void> _upgradeSafely(Database db, int oldVersion, int newVersion) async {
+    try {
+      await _upgradeDB(db, oldVersion, newVersion);
+    } catch (e, stackTrace) {
+      logger.e('Ошибка миграции БД $oldVersion→$newVersion: $e\n$stackTrace');
+    }
+    await _logMissingColumns(db);
+  }
+
+  /// Добавляет колонку только если её нет: повторный ALTER TABLE в SQLite
+  /// падает с "duplicate column name" и раньше ломал открытие БД.
+  Future<void> _addColumnIfMissing(
+    Database db,
+    String table,
+    String column,
+    String type,
+  ) async {
+    final columns = await db.rawQuery('PRAGMA table_info($table)');
+    final exists = columns.any((row) => row['name'] == column);
+    if (exists) {
+      logger.d('Колонка $table.$column уже есть — пропускаю');
+      return;
+    }
+    await db.execute('ALTER TABLE $table ADD COLUMN $column $type');
+    logger.d('Добавлена колонка $table.$column');
+  }
+
+  Future<bool> _tableExists(Database db, String table) async {
+    final result = await db.rawQuery(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
+      [table],
+    );
+    return result.isNotEmpty;
+  }
+
+  /// Диагностика: пишет в лог колонки, которых не хватает после миграции.
+  Future<void> _logMissingColumns(Database db) async {
+    const expected = <String, List<String>>{
+      'cars': ['last_modified', 'vehicle_type', 'battery_capacity_kwh'],
+      'fuel_logs': [
+        'last_modified',
+        'weather_multiplier',
+        'base_city_norm',
+        'base_highway_norm',
+        'total_mileage',
+        'correction_factor',
+      ],
+      'locations': ['city', 'weather_data'],
+      'weather_coefficients': ['condition_type', 'multiplier'],
+    };
+
+    try {
+      for (final entry in expected.entries) {
+        if (!await _tableExists(db, entry.key)) {
+          logger.e('После миграции нет таблицы ${entry.key}');
+          continue;
+        }
+        final columns = await db.rawQuery('PRAGMA table_info(${entry.key})');
+        final names = columns.map((row) => row['name']).toSet();
+        final missing = entry.value.where((c) => !names.contains(c)).toList();
+        if (missing.isNotEmpty) {
+          logger.e('После миграции нет колонок ${entry.key}: $missing');
+        }
+      }
+    } catch (e) {
+      logger.e('Не удалось проверить схему БД: $e');
+    }
+  }
 
   Future<List<String>> getAllPresetBrands() async {
     final db = await database;
@@ -707,9 +728,9 @@ class DatabaseHelper {
   }
 
   Future<void> _createWeatherCoefficientsTable(Database db) async {
-  // 1. Создаем саму таблицу
+  // 1. Создаем саму таблицу (IF NOT EXISTS: миграция может вызываться повторно)
   await db.execute('''
-    CREATE TABLE weather_coefficients (
+    CREATE TABLE IF NOT EXISTS weather_coefficients (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       condition_type TEXT NOT NULL,
       range_min REAL NOT NULL,
@@ -718,7 +739,17 @@ class DatabaseHelper {
     )
   ''');
 
-  // 2. Готовим список коэффициентов для наполнения
+  // 2. Наполняем только пустую таблицу — иначе строки бы дублировались
+  final existing = await db.rawQuery(
+    'SELECT COUNT(*) AS cnt FROM weather_coefficients',
+  );
+  final rowCount = (existing.first['cnt'] as int?) ?? 0;
+  if (rowCount > 0) {
+    logger.d('weather_coefficients уже заполнена ($rowCount строк) — пропускаю');
+    return;
+  }
+
+  // 3. Готовим список коэффициентов для наполнения
   final List<Map<String, dynamic>> coefficients = [
     // --- Температура (в градусах Цельсия) ---
     // Сильный мороз
@@ -749,13 +780,13 @@ class DatabaseHelper {
     {'condition_type': 'WIND', 'range_min': 40, 'range_max': null, 'multiplier': 1.08},
   ];
 
-  // 3. Вставляем все коэффициенты в таблицу
+  // 4. Вставляем все коэффициенты в таблицу
   final batch = db.batch();
   for (var coeff in coefficients) {
     batch.insert('weather_coefficients', coeff);
   }
   await batch.commit(noResult: true);
 
-  logger.d('Created and populated weather_coefficients table');
+  logger.d('weather_coefficients: добавлено ${coefficients.length} коэффициентов');
 }
 }

@@ -10,12 +10,12 @@ import 'database_helper_test.mocks.dart';
 // Генерация моков с помощью mockito
 @GenerateMocks([Database])
 void main() {
-  // Инициализация sqflite_common_ffi для тестирования
-  if (identical(1, 1.0)) {
-    // Для настольных платформ
+  setUpAll(() {
+    // Настоящий SQLite для desktop-тестов (раньше условие identical(1, 1.0)
+    // было всегда ложным, поэтому инициализация ffi не выполнялась вовсе).
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
-  }
+  });
 
   group('DatabaseHelper Tests', () {
     late DatabaseHelper databaseHelper;
