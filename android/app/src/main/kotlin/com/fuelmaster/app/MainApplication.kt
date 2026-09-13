@@ -1,4 +1,4 @@
-package com.example.fuelmaster
+package com.fuelmaster.app
 
 import android.app.Application
 import android.content.pm.PackageManager

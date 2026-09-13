@@ -1,4 +1,4 @@
-package com.example.fuelmaster
+package com.fuelmaster.app
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -17,13 +17,13 @@ import com.yandex.mobile.ads.common.*
 import android.util.Log
 import android.view.View
 import android.view.LayoutInflater
-import com.example.fuelmaster.R
+import com.fuelmaster.app.R
 import com.yandex.mapkit.MapKitFactory
 import com.unact.yandexmapkit.YandexMapkitPlugin
 
 class MainActivity : FlutterFragmentActivity() {
     private val TAG = "MainActivity"
-    private val CHANNEL = "com.example.fuelmaster/yandex_ads"
+    private val CHANNEL = "com.fuelmaster.app/yandex_ads"
     private var interstitialAd: InterstitialAd? = null
     private var interstitialAdLoader: InterstitialAdLoader? = null
 

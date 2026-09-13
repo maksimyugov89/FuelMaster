@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 class YandexAdsChannel {
   static const MethodChannel _channel =
-      MethodChannel("com.example.fuelmaster/yandex_ads");
+      MethodChannel("com.fuelmaster.app/yandex_ads");
 
   /// Инициализация SDK
   static Future<void> initialize() async {

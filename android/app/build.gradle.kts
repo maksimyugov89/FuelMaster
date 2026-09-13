@@ -23,7 +23,7 @@ if (keystorePropertiesFile.exists()) {
 
 val yandexMapsApiKey: String = localProperties.getProperty("yandex.maps.apikey", "")
 android {
-    namespace = "com.example.fuelmaster"
+    namespace = "com.fuelmaster.app"
     compileSdk = 36
 
     compileOptions {
@@ -37,13 +37,15 @@ android {
     }
 
     defaultConfig {
-        // ВНИМАНИЕ: applicationId до сих пор шаблонный (com.example.*).
-        // Google Play такой идентификатор не принимает, но смена applicationId
-        // — это НОВОЕ приложение для системы: обновление «поверх» у друзей
-        // станет невозможным (только удалить и поставить заново), плюс нужно
-        // обновить ограничения ключа Yandex Maps (package + SHA-1) и App Check.
-        // Менять осознанно и вместе с google-services.json и AndroidManifest.xml.
-        applicationId = "com.example.fuelmaster"
+        // applicationId — постоянный идентификатор приложения в Google Play,
+        // после публикации он НЕ меняется. Сменён 13.09.2026 с шаблонного
+        // com.example.fuelmaster (Play такое не принимает) на com.fuelmaster.app
+        // — как у FitnesBuster (com.fitnesbuster.app).
+        // Старый id остаётся зарегистрированным в Firebase: у друзей уже стоят
+        // сборки с ним, и они продолжат работать (тот же проект, та же база).
+        // ВАЖНО при смене: новый Android-апп в Firebase (google-services.json),
+        // ограничения ключа Yandex Maps (package + SHA-1), App Check, тестеры в Play.
+        applicationId = "com.fuelmaster.app"
         minSdk = 26
         targetSdk = 36
         // Единственный источник версии — pubspec.yaml (`version: 1.0.1+7`).
