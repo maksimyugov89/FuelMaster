@@ -27,12 +27,16 @@
 ## Безопасность секретов
 
 - **Не коммитьте** `.env`, `env.defines.json`, `android/keystore.properties`, `android/local.properties`, файлы `*.jks`.
-- Файл `.env` **не включается** в assets приложения (не попадает в APK).
+- Файл `.env` **не включается** в assets приложения и читается только в debug-сборках — в APK он не попадает.
 - Для запуска и сборки используйте `--dart-define-from-file=env.defines.json` (см. `env.defines.json.example`).
+- **AI-советы в release идут через собственный прокси** (`AI_PROXY_URL`, код и инструкция — `server/ai_proxy/`). Ключ провайдера в release-сборке не читается вообще: `EnvConfig` его не отдаёт, в APK его нет.
 - Ключ Yandex MapKit задаётся в `android/local.properties` → `yandex.maps.apikey` (см. `android/local.properties.example`).
 - Подпись release: `android/keystore.properties` (см. `android/keystore.properties.example`).
 
-**Если пароли keystore ранее попали в Git** — смените их и рассмотрите ротацию ключей API.
+**Ротация ключей (обязательно один раз):** ключи AI-провайдера, Geoapify и WeatherAPI
+ранее лежали в `.env` внутри APK, а ключ Yandex MapKit был зашит в `AndroidManifest.xml` —
+считайте их утёкшими и перевыпустите (старые отозвать). Пароли keystore, попавшие в Git,
+тоже нужно сменить.
 
 ## Скриншоты
 ![Screenshot_2025-09-04-02-30-09-10_00ed68a25f49ddc81dfbde00b62141e1](https://github.com/user-attachments/assets/2b646849-1ba2-4b50-b5be-7a50ef011d7e)

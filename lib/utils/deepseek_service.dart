@@ -1,23 +1,49 @@
+import 'dart:async';
 import 'dart:convert';
-import 'package:fuelmaster/utils/env_config.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
+
 import 'package:fuelmaster/l10n/app_localizations.dart';
+import 'package:fuelmaster/utils/env_config.dart';
 import 'package:fuelmaster/utils/logger.dart';
 
+/// Советы по экономии топлива от AI-провайдера.
+///
+/// В release-сборках запрос идёт ТОЛЬКО через собственный прокси
+/// (`AI_PROXY_URL`, см. `server/ai_proxy`): ключ провайдера в APK не попадает.
+/// Прямое обращение к OpenRouter остаётся для debug-сборок, когда прокси
+/// ещё не задан и в `.env` есть `DEEPSEEK_API_KEY`.
 class DeepSeekService {
   static final DeepSeekService _instance = DeepSeekService._internal();
   factory DeepSeekService() => _instance;
   DeepSeekService._internal();
 
-  final String _apiKey = EnvConfig.get('DEEPSEEK_API_KEY');
+  static const String _directModel = 'deepseek/deepseek-r1-0528:free';
+  static const Duration _requestTimeout = Duration(seconds: 60);
+
+  /// Прямой ключ провайдера (в release всегда пустой).
+  String get _directApiKey => EnvConfig.get('DEEPSEEK_API_KEY');
+
+  bool get _useProxy => EnvConfig.hasAiProxy;
+
+  Uri get _endpoint {
+    if (_useProxy) {
+      final base = EnvConfig.aiProxyUrl.replaceAll(RegExp(r'/+$'), '');
+      return Uri.parse('$base/v1/advice');
+    }
+    return Uri.parse('https://openrouter.ai/api/v1/chat/completions');
+  }
 
   Future<String?> getCachedAdvice(String carModel) async {
     final prefs = await SharedPreferences.getInstance();
     final cached = prefs.getString('deepseek_advice_$carModel');
     final timestamp = prefs.getInt('deepseek_advice_timestamp_$carModel') ?? 0;
-    if (cached != null && cached.isNotEmpty && DateTime.now().millisecondsSinceEpoch - timestamp < 7 * 24 * 60 * 60 * 1000) {
+    if (cached != null &&
+        cached.isNotEmpty &&
+        DateTime.now().millisecondsSinceEpoch - timestamp < 7 * 24 * 60 * 60 * 1000) {
       logger.d('Using cached advice for $carModel');
       return cached;
     }
@@ -28,19 +54,79 @@ class DeepSeekService {
     if (advice.isNotEmpty) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('deepseek_advice_$carModel', advice);
-      await prefs.setInt('deepseek_advice_timestamp_$carModel', DateTime.now().millisecondsSinceEpoch);
+      await prefs.setInt(
+          'deepseek_advice_timestamp_$carModel', DateTime.now().millisecondsSinceEpoch);
       logger.d('Cached advice for $carModel');
     }
   }
 
-  Future<String?> getFuelEfficiencyAdvice(String carModel, BuildContext context, Map<String, dynamic>? calculationRecord) async {
+  /// Заголовки запроса: к прокси — токен Firebase, напрямую — ключ провайдера.
+  Future<Map<String, String>> _headers() async {
+    const jsonHeaders = {'Content-Type': 'application/json'};
+
+    if (!_useProxy) {
+      return {...jsonHeaders, 'Authorization': 'Bearer $_directApiKey'};
+    }
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return jsonHeaders;
+
+    try {
+      final idToken = await user.getIdToken();
+      if (idToken == null) return jsonHeaders;
+      return {...jsonHeaders, 'Authorization': 'Bearer $idToken'};
+    } catch (e) {
+      logger.e('Не удалось получить Firebase ID token: $e');
+      return jsonHeaders;
+    }
+  }
+
+  /// Тело запроса: прокси получает только промпт и модель автомобиля,
+  /// прямой режим — полный OpenAI-совместимый payload.
+  String _body(String carModel, String prompt) {
+    if (_useProxy) {
+      return jsonEncode({'car_model': carModel, 'prompt': prompt});
+    }
+    return jsonEncode({
+      'model': _directModel,
+      'messages': [
+        {'role': 'user', 'content': prompt},
+      ],
+      'max_tokens': 1700,
+    });
+  }
+
+  String? _extractAdvice(String responseBody) {
+    final data = jsonDecode(responseBody);
+    if (data is! Map<String, dynamic>) return null;
+    if (_useProxy) {
+      final advice = data['advice'];
+      return advice is String && advice.isNotEmpty ? advice : null;
+    }
+    return data['choices']?[0]?['message']?['content'] as String?;
+  }
+
+  Future<String?> getFuelEfficiencyAdvice(
+      String carModel, BuildContext context, Map<String, dynamic>? calculationRecord) async {
     final l10n = AppLocalizations.of(context)!;
+
+    if (!_useProxy && _directApiKey.isEmpty) {
+      logger.e('AI недоступен: не задан AI_PROXY_URL и нет ключа провайдера');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.error)),
+        );
+      }
+      return null;
+    }
+
     int retryCount = 0;
     const maxRetries = 2;
 
     while (retryCount <= maxRetries) {
       try {
-        String prompt = 'Дайте детальные и специфические советы на русском языке по оптимизации расхода топлива для автомобиля $carModel с учетом опыта водителя со стажем более 5 лет. ';
+        String prompt =
+            'Дайте детальные и специфические советы на русском языке по оптимизации расхода топлива для автомобиля $carModel с учетом опыта водителя со стажем более 5 лет. ';
         if (calculationRecord != null) {
           prompt += 'Используйте следующие данные: '
               'общий пробег: ${calculationRecord['total_mileage']} км, '
@@ -58,43 +144,40 @@ class DeepSeekService {
           prompt += 'Предоставьте рекомендации, ориентированные на опытных водителей, без общих советов.';
         }
 
-        final response = await http.post(
-          Uri.parse('https://openrouter.ai/api/v1/chat/completions'),
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $_apiKey',
-          },
-          body: jsonEncode({
-            'model': 'deepseek/deepseek-r1-0528:free',
-            'messages': [
-              {'role': 'user', 'content': prompt},
-            ],
-            'max_tokens': 1700,
-          }),
-        );
+        final response = await http
+            .post(
+              _endpoint,
+              headers: await _headers(),
+              body: _body(carModel, prompt),
+            )
+            .timeout(_requestTimeout);
 
         if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final advice = data['choices']?[0]?['message']?['content'] as String?;
-          logger.d('DeepSeek API raw response: ${response.body}');
+          final advice = _extractAdvice(response.body);
           if (advice != null && advice.isNotEmpty) {
-            logger.d('DeepSeek API response: $advice');
             return advice;
-          } else {
-            logger.e('DeepSeek API returned null or empty response (attempt $retryCount)');
-            retryCount++;
-            if (retryCount <= maxRetries) await Future.delayed(const Duration(seconds: 2));
           }
+          logger.e('AI вернул пустой ответ (попытка $retryCount)');
+          retryCount++;
+          if (retryCount <= maxRetries) await Future.delayed(const Duration(seconds: 2));
         } else if (response.statusCode == 402) {
-          logger.e('DeepSeek API error: 402, ${l10n.insufficient_balance}');
+          logger.e('AI: 402, ${l10n.insufficient_balance}');
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(l10n.insufficient_balance)),
             );
           }
           return null;
+        } else if (response.statusCode == 401 || response.statusCode == 403) {
+          logger.e('AI: отказ авторизации (${response.statusCode})');
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.error)),
+            );
+          }
+          return null;
         } else {
-          logger.e('DeepSeek API error: ${response.statusCode}, ${response.body}');
+          logger.e('AI error: ${response.statusCode}');
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(l10n.error)),
@@ -102,12 +185,17 @@ class DeepSeekService {
           }
           return null;
         }
+      } on TimeoutException {
+        logger.e('AI: таймаут запроса (попытка $retryCount)');
+        retryCount++;
+        if (retryCount <= maxRetries) await Future.delayed(const Duration(seconds: 2));
       } catch (e) {
-        logger.e('DeepSeek API exception: $e (attempt $retryCount)');
+        logger.e('AI exception: ${e.runtimeType} (попытка $retryCount)');
         retryCount++;
         if (retryCount <= maxRetries) await Future.delayed(const Duration(seconds: 2));
       }
     }
+
     logger.e('Max retries reached for $carModel');
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

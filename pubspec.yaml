@@ -75,7 +75,6 @@ flutter:
     - assets/cars.csv
     - assets/car_brands/
     - assets/images/
-    - .env
   fonts:
     - family: Roboto
       fonts:
