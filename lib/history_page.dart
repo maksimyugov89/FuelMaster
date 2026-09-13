@@ -23,7 +23,7 @@ import 'package:fuelmaster/widgets/gradient_background.dart';
 import 'package:fuelmaster/widgets/history_fuel_chart.dart';
 import 'package:fuelmaster/widgets/license_plate_widget.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:fuelmaster/utils/constants.dart';
+import 'package:fuelmaster/widgets/brand_logo.dart';
 
 class HistoryPage extends StatefulWidget {
   final List<Map<String, dynamic>> history;
@@ -333,29 +333,9 @@ class _HistoryPageState extends State<HistoryPage> {
         title: isExpanded 
           ? _buildExpandedTitle(car, record, theme) 
           : _buildCollapsedTitle(car, theme),
-        leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-          child: car != null && AppConstants.brandIcons.containsKey(car.brand)
-            ? Container(
-                width: 32,  // Уменьшенный размер для leading (чтобы поместился в CircleAvatar)
-                height: 32,
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: theme.brightness == Brightness.dark 
-                    ? Colors.white.withValues(alpha: 0.9)  // Белый фон для тёмной темы
-                    : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-                child: Image.asset(
-                  AppConstants.brandIcons[car.brand]!,
-                  fit: BoxFit.contain,  // Чтобы логотип не обрезался
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(Icons.directions_car, color: theme.colorScheme.primary, size: 24);
-                  },
-                ),
-              )
-            : Icon(Icons.directions_car, color: theme.colorScheme.primary, size: 24),  // Fallback на стандартную иконку
-        ),
+        leading: car == null
+          ? Icon(Icons.directions_car, color: theme.colorScheme.primary, size: 24)
+          : BrandLogo(brand: car.brand, size: 36.0),
         trailing: isExpanded 
           ? const Icon(Icons.expand_less) 
           : const Icon(Icons.expand_more),

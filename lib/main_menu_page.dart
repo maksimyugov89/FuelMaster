@@ -18,6 +18,7 @@ import 'package:fuelmaster/widgets/gradient_button.dart';
 import 'package:fuelmaster/theme.dart';
 import 'package:fuelmaster/widgets/license_plate_widget.dart';
 import 'package:fuelmaster/utils/constants.dart';
+import 'package:fuelmaster/widgets/brand_logo.dart';
 import 'package:fuelmaster/widgets/gradient_background.dart';
 import 'package:fuelmaster/widgets/weather_display_widget.dart';
 import 'package:fuelmaster/services/location_service.dart';
@@ -267,25 +268,8 @@ void _refreshCarListAndSetSelection() {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  if (AppConstants.brandIcons.containsKey(_selectedCar!.brand))
-                    Container(
-                      width: 40,
-                      height: 40,
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: theme.brightness == Brightness.dark 
-                            ? Colors.white.withValues(alpha: 0.9)
-                            : Colors.transparent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Image.asset(
-                        AppConstants.brandIcons[_selectedCar!.brand]!,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(Icons.directions_car, size: 28);
-                        },
-                      ),
-                    ),
-                  
+                  BrandLogo(brand: _selectedCar!.brand, size: 40.0),
+
                   const SizedBox(width: 16),
                   LicensePlateWidget(
                     plateNumber: _selectedCar!.licensePlate!,

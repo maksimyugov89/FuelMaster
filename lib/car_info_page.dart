@@ -11,7 +11,7 @@ import 'package:fuelmaster/widgets/gradient_button.dart';
 import 'package:fuelmaster/widgets/gradient_text.dart';
 import 'package:fuelmaster/theme.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:fuelmaster/utils/constants.dart';
+import 'package:fuelmaster/widgets/brand_logo.dart';
 import 'package:fuelmaster/utils/debouncer.dart';
 import 'package:fuelmaster/widgets/car_info_form_cards.dart';
 import 'package:fuelmaster/widgets/gradient_background.dart';
@@ -283,23 +283,8 @@ class _CarInfoPageState extends State<CarInfoPage> {
       items: presetBrands,
       onItemSelected: _onBrandSelected,
       itemBuilder: (brand) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        final iconWidget = AppConstants.brandIcons.containsKey(brand)
-            ? Image.asset(AppConstants.brandIcons[brand]!, width: 28, height: 28,
-                errorBuilder: (_, __, ___) => Icon(Icons.directions_car, size: 28, color: Theme.of(context).colorScheme.primary))
-            : Icon(Icons.directions_car, size: 28, color: Theme.of(context).colorScheme.primary);
-
         return ListTile(
-          leading: Container(
-            width: 40,
-            height: 40,
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: isDark ? Colors.white.withValues(alpha: 0.9) : Colors.transparent,
-              shape: BoxShape.circle,
-            ),
-            child: iconWidget,
-          ),
+          leading: BrandLogo(brand: brand, size: 40.0),
           title: Text(brand, overflow: TextOverflow.ellipsis),
         );
       },
