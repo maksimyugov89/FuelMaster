@@ -11,12 +11,16 @@ class AppSettingsProvider with ChangeNotifier {
   late bool _isRegistered;
   late bool _onboardingCompleted;
   late String _themeMode;
+  bool _isEmailVerified = false;
 
   Locale get locale => _locale;
   bool get isDarkMode => _isDarkMode;
   // Единственный источник правды — PremiumService (prefs + магазин).
   bool get isPremium => PremiumService.instance.isPremium;
   bool get isRegistered => _isRegistered;
+  /// Подтверждён ли e-mail (F-2). Значение приходит из FirebaseAuth и в prefs
+  /// не сохраняется: это серверный факт, а не пользовательская настройка.
+  bool get isEmailVerified => _isEmailVerified;
   bool get onboardingCompleted => _onboardingCompleted;
   String get themeMode => _themeMode;
 
@@ -71,6 +75,12 @@ class AppSettingsProvider with ChangeNotifier {
     if (_isRegistered == isRegistered) return;
     _isRegistered = isRegistered;
     _prefs.setBool(AppConstants.isRegisteredKey, _isRegistered);
+    notifyListeners();
+  }
+
+  void setEmailVerified(bool verified) {
+    if (_isEmailVerified == verified) return;
+    _isEmailVerified = verified;
     notifyListeners();
   }
 

@@ -21,6 +21,7 @@ import 'package:fuelmaster/utils/constants.dart';
 import 'package:fuelmaster/widgets/gradient_background.dart';
 import 'package:fuelmaster/widgets/weather_display_widget.dart';
 import 'package:fuelmaster/services/location_service.dart';
+import 'package:fuelmaster/widgets/email_verification_banner.dart';
 
 class MainMenuPage extends StatefulWidget {
   final List<Map<String, dynamic>> history;
@@ -341,6 +342,12 @@ void _refreshCarListAndSetSelection() {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // F-2: напоминание подтвердить e-mail. Учёт топлива локальный,
+                // поэтому напоминание не блокирует работу приложения.
+                if (appSettings.isRegistered && !appSettings.isEmailVerified) ...[
+                  const EmailVerificationBanner(),
+                  const SizedBox(height: 16),
+                ],
                 _buildMyCarsCard(context),
                 // F-1: реклама выключена до отдельного релиза (FeatureFlags.ads).
                 if (FeatureFlags.ads && !appSettings.isPremium) ...[

@@ -683,6 +683,41 @@ class AppLocalizationsEn extends AppLocalizations {
       'The subscription will appear in future versions of the app.';
 
   @override
+  String get email_verify_banner_title => 'Confirm your e-mail';
+
+  @override
+  String email_verify_banner_text(String email) {
+    return 'A confirmation link was sent to $email. Check the Spam folder: confirmation is needed to restore access to your account.';
+  }
+
+  @override
+  String get email_verify_resend => 'Send the letter again';
+
+  @override
+  String get email_verify_check => 'I have confirmed';
+
+  @override
+  String email_verify_sent(String email) {
+    return 'Letter sent to $email';
+  }
+
+  @override
+  String get email_verify_ok => 'E-mail confirmed. Thank you!';
+
+  @override
+  String get email_verify_not_yet =>
+      'Not confirmed yet. Check your inbox and try again.';
+
+  @override
+  String email_verify_cooldown(int seconds) {
+    return 'You can resend in $seconds s';
+  }
+
+  @override
+  String get email_verify_error =>
+      'Could not send the letter. Please try again later.';
+
+  @override
   String get share => 'Share';
 
   @override

@@ -456,6 +456,57 @@
   "@coming_soon_premium": {
     "description": "Explains that the subscription is deferred to a future version"
   },
+  "email_verify_banner_title": "Confirm your e-mail",
+  "@email_verify_banner_title": {
+    "description": "Title of the reminder to confirm the e-mail address"
+  },
+  "email_verify_banner_text": "A confirmation link was sent to {email}. Check the Spam folder: confirmation is needed to restore access to your account.",
+  "@email_verify_banner_text": {
+    "description": "Explains where the confirmation letter went",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "email_verify_resend": "Send the letter again",
+  "@email_verify_resend": {
+    "description": "Button that re-sends the confirmation letter"
+  },
+  "email_verify_check": "I have confirmed",
+  "@email_verify_check": {
+    "description": "Button that re-checks the confirmation status on the server"
+  },
+  "email_verify_sent": "Letter sent to {email}",
+  "@email_verify_sent": {
+    "description": "Snackbar shown after the confirmation letter was sent",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "email_verify_ok": "E-mail confirmed. Thank you!",
+  "@email_verify_ok": {
+    "description": "Snackbar shown when the e-mail is confirmed"
+  },
+  "email_verify_not_yet": "Not confirmed yet. Check your inbox and try again.",
+  "@email_verify_not_yet": {
+    "description": "Snackbar shown when the confirmation is not found on the server yet"
+  },
+  "email_verify_cooldown": "You can resend in {seconds} s",
+  "@email_verify_cooldown": {
+    "description": "Countdown before the letter can be sent again",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "email_verify_error": "Could not send the letter. Please try again later.",
+  "@email_verify_error": {
+    "description": "Snackbar shown when sending the confirmation letter failed"
+  },
   "share": "Share",
   "@share": {
     "description": "Button text for sharing content, such as AI fuel efficiency advice"

@@ -15,6 +15,7 @@ import 'package:fuelmaster/widgets/gradient_button.dart';
 import 'package:fuelmaster/widgets/gradient_text.dart';
 import 'package:fuelmaster/theme.dart';
 import 'package:fuelmaster/widgets/gradient_background.dart';
+import 'package:fuelmaster/services/email_verification_service.dart';
 
 class RegistrationPage extends StatefulWidget {
   final VoidCallback onRegistered;
@@ -311,6 +312,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
+      // F-2: письмо подтверждения уходит сразу — иначе пользователь узнает о
+      // нём только из напоминания на главном экране.
+      final VerificationSendResult sendResult =
+          await EmailVerificationService.send(respectCooldown: false);
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('user_city', cityController.text);
       await prefs.setString('user_country', _countryCode ?? _mapLocaleToCountryCode(widget.locale.languageCode));
@@ -331,6 +337,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
       if (profileSaved) {
         _showSnackBar(l10n.registration_success);
+        if (sendResult == VerificationSendResult.sent) {
+          _showSnackBar(l10n.email_verify_sent(emailController.text.trim()));
+        }
       } else {
         // B-10 аудита: аккаунт в Auth уже создан. Если оставить пользователя на
         // форме регистрации, повторная попытка ответит «email already in use», а

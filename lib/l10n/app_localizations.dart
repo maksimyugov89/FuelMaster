@@ -1412,6 +1412,60 @@ abstract class AppLocalizations {
   /// **'The subscription will appear in future versions of the app.'**
   String get coming_soon_premium;
 
+  /// Title of the reminder to confirm the e-mail address
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your e-mail'**
+  String get email_verify_banner_title;
+
+  /// Explains where the confirmation letter went
+  ///
+  /// In en, this message translates to:
+  /// **'A confirmation link was sent to {email}. Check the Spam folder: confirmation is needed to restore access to your account.'**
+  String email_verify_banner_text(String email);
+
+  /// Button that re-sends the confirmation letter
+  ///
+  /// In en, this message translates to:
+  /// **'Send the letter again'**
+  String get email_verify_resend;
+
+  /// Button that re-checks the confirmation status on the server
+  ///
+  /// In en, this message translates to:
+  /// **'I have confirmed'**
+  String get email_verify_check;
+
+  /// Snackbar shown after the confirmation letter was sent
+  ///
+  /// In en, this message translates to:
+  /// **'Letter sent to {email}'**
+  String email_verify_sent(String email);
+
+  /// Snackbar shown when the e-mail is confirmed
+  ///
+  /// In en, this message translates to:
+  /// **'E-mail confirmed. Thank you!'**
+  String get email_verify_ok;
+
+  /// Snackbar shown when the confirmation is not found on the server yet
+  ///
+  /// In en, this message translates to:
+  /// **'Not confirmed yet. Check your inbox and try again.'**
+  String get email_verify_not_yet;
+
+  /// Countdown before the letter can be sent again
+  ///
+  /// In en, this message translates to:
+  /// **'You can resend in {seconds} s'**
+  String email_verify_cooldown(int seconds);
+
+  /// Snackbar shown when sending the confirmation letter failed
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send the letter. Please try again later.'**
+  String get email_verify_error;
+
   /// Button text for sharing content, such as AI fuel efficiency advice
   ///
   /// In en, this message translates to:

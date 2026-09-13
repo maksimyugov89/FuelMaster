@@ -687,6 +687,41 @@ class AppLocalizationsRu extends AppLocalizations {
       'Подписка появится в будущих версиях приложения.';
 
   @override
+  String get email_verify_banner_title => 'Подтвердите e-mail';
+
+  @override
+  String email_verify_banner_text(String email) {
+    return 'Письмо со ссылкой отправлено на $email. Проверьте папку «Спам»: подтверждение нужно, чтобы восстановить доступ к аккаунту.';
+  }
+
+  @override
+  String get email_verify_resend => 'Отправить письмо ещё раз';
+
+  @override
+  String get email_verify_check => 'Я подтвердил';
+
+  @override
+  String email_verify_sent(String email) {
+    return 'Письмо отправлено на $email';
+  }
+
+  @override
+  String get email_verify_ok => 'E-mail подтверждён. Спасибо!';
+
+  @override
+  String get email_verify_not_yet =>
+      'Подтверждение пока не найдено. Проверьте почту и попробуйте снова.';
+
+  @override
+  String email_verify_cooldown(int seconds) {
+    return 'Повторная отправка будет доступна через $seconds с';
+  }
+
+  @override
+  String get email_verify_error =>
+      'Не удалось отправить письмо. Попробуйте позже.';
+
+  @override
   String get share => 'Поделиться';
 
   @override

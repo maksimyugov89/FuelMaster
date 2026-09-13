@@ -32,6 +32,7 @@ import 'package:fuelmaster/services/premium_service.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:fuelmaster/services/map_page.dart';
 import 'package:fuelmaster/services/account_service.dart';
+import 'package:fuelmaster/services/email_verification_service.dart';
 import 'package:fuelmaster/utils/feature_flags.dart';
 
 Future<void> main() async {
@@ -152,7 +153,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   int _selectedIndex = 0;
   bool _isLoading = true;
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -194,22 +195,47 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    // F-2: статус подтверждения e-mail перепроверяем при возврате в приложение
+    // (пользователь уходит в почту и возвращается уже подтверждённым).
+    WidgetsBinding.instance.addObserver(this);
     // B-11 аудита: источник правды о сессии — FirebaseAuth, а не флаг в prefs.
     // Раньше выход на другом устройстве и отзыв токена не отражались: приложение
     // продолжало считать пользователя зарегистрированным.
     _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
       if (!mounted) return;
-      context.read<AppSettingsProvider>().setRegistered(user != null);
+      final settings = context.read<AppSettingsProvider>();
+      settings.setRegistered(user != null);
+      settings.setEmailVerified(user?.emailVerified ?? false);
       if (user != null) {
         AccountService.ensureUserProfile(user.uid);
+        if (!user.emailVerified) {
+          // F-2: одно письмо на установку — закрывает аккаунты, созданные до
+          // появления подтверждения. Дальше письмо уходит только по кнопке.
+          unawaited(EmailVerificationService.sendInitial());
+        }
       }
     });
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _authSubscription?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    unawaited(_refreshVerificationStatus());
+  }
+
+  /// Тихая проверка подтверждения при возврате в приложение (F-2).
+  Future<void> _refreshVerificationStatus() async {
+    if (!EmailVerificationService.needsVerification) return;
+    final bool verified = await EmailVerificationService.refresh();
+    if (!mounted || !verified) return;
+    context.read<AppSettingsProvider>().setEmailVerified(true);
   }
 
   Widget _buildBottomNavigationBar(BuildContext context) {

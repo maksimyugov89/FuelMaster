@@ -456,6 +456,57 @@
   "@coming_soon_premium": {
     "description": "Пояснение, что подписка отложена на будущую версию"
   },
+  "email_verify_banner_title": "Подтвердите e-mail",
+  "@email_verify_banner_title": {
+    "description": "Заголовок напоминания подтвердить адрес"
+  },
+  "email_verify_banner_text": "Письмо со ссылкой отправлено на {email}. Проверьте папку «Спам»: подтверждение нужно, чтобы восстановить доступ к аккаунту.",
+  "@email_verify_banner_text": {
+    "description": "Поясняет, куда ушло письмо подтверждения",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "email_verify_resend": "Отправить письмо ещё раз",
+  "@email_verify_resend": {
+    "description": "Кнопка повторной отправки письма"
+  },
+  "email_verify_check": "Я подтвердил",
+  "@email_verify_check": {
+    "description": "Кнопка повторной проверки статуса на сервере"
+  },
+  "email_verify_sent": "Письмо отправлено на {email}",
+  "@email_verify_sent": {
+    "description": "Сообщение после отправки письма",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "email_verify_ok": "E-mail подтверждён. Спасибо!",
+  "@email_verify_ok": {
+    "description": "Сообщение, когда адрес подтверждён"
+  },
+  "email_verify_not_yet": "Подтверждение пока не найдено. Проверьте почту и попробуйте снова.",
+  "@email_verify_not_yet": {
+    "description": "Сообщение, когда подтверждения на сервере ещё нет"
+  },
+  "email_verify_cooldown": "Повторная отправка будет доступна через {seconds} с",
+  "@email_verify_cooldown": {
+    "description": "Обратный отсчёт до следующей отправки",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "email_verify_error": "Не удалось отправить письмо. Попробуйте позже.",
+  "@email_verify_error": {
+    "description": "Сообщение об ошибке отправки письма"
+  },
   "share": "Поделиться",
   "@share": {
     "description": "Текст кнопки для шаринга контента, например, AI-советов по экономии топлива"
