@@ -228,12 +228,13 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
     if (cachedAdvice != null && cachedAdvice.isNotEmpty) {
       advice = cachedAdvice;
     } else {
-      Map<String, dynamic>? lastRecord = localHistory.isNotEmpty ? localHistory.first : null;
+      final Map<String, dynamic>? lastRecord =
+          localHistory.isNotEmpty ? localHistory.first : null;
+      // B-3 аудита: повторный вызов сервиса при пустом ответе множил платные
+      // запросы — у самого сервиса внутри уже есть ретраи, второй попытки нет.
       advice = await DeepSeekService().getFuelEfficiencyAdvice(carModel, context, lastRecord);
       if (advice != null && advice.isNotEmpty) {
         await DeepSeekService().cacheAdvice(carModel, advice);
-      } else {
-        advice = await DeepSeekService().getFuelEfficiencyAdvice(carModel, context, lastRecord);
       }
     }
     if (mounted) {

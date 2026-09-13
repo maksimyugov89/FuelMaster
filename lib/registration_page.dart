@@ -159,10 +159,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
         return _setDefaultCity(AppLocalizations.of(context)!.api_key_invalid);
       }
 
-      final response = await http.get(Uri.parse(
-          'https://api.geoapify.com/v1/geocode/reverse?lat=${position.latitude}&lon=${position.longitude}&apiKey=$apiKey'));
+      final response = await http
+          .get(Uri.parse(
+              'https://api.geoapify.com/v1/geocode/reverse?lat=${position.latitude}&lon=${position.longitude}&apiKey=$apiKey'))
+          .timeout(const Duration(seconds: 10));
       final data = jsonDecode(response.body) as Map<String, dynamic>;
-      logger.d('Geoapify response status: ${response.statusCode}, body: $data');
+      logger.d('Geoapify response status: ${response.statusCode}');
 
       if (response.statusCode == 200 && data['features'] != null && data['features'].isNotEmpty) {
         final feature = data['features'][0]['properties'];
@@ -241,10 +243,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     try {
       final apiKey = EnvConfig.getOptional('GEOAPIFY_API_KEY');
-      final response = await http.get(Uri.parse(
-          'https://api.geoapify.com/v1/geocode/autocomplete?text=$query&type=city&limit=5&apiKey=$apiKey'));
+      final response = await http
+          .get(Uri.parse(
+              'https://api.geoapify.com/v1/geocode/autocomplete?text=$query&type=city&limit=5&apiKey=$apiKey'))
+          .timeout(const Duration(seconds: 10));
       final data = jsonDecode(response.body) as Map<String, dynamic>;
-      logger.d('City suggestions response: ${response.statusCode}, body: $data');
+      logger.d('City suggestions response: ${response.statusCode}');
 
       if (response.statusCode == 200 && data['features'] != null) {
         final suggestions = (data['features'] as List<dynamic>).map((feature) {

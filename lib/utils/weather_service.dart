@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:fuelmaster/utils/env_config.dart';
 import 'package:http/http.dart' as http;
@@ -8,25 +9,34 @@ import 'package:fuelmaster/utils/database_helper.dart';
 class WeatherService {
   static final String _apiKey = EnvConfig.get('WEATHER_API_KEY');
   static const String _apiUrl = 'https://api.weatherapi.com/v1/current.json';
+
+  /// B-4 аудита: без таймаута «залипшее» соединение держало расчёт топлива
+  /// в вечном ожидании.
+  static const Duration _timeout = Duration(seconds: 10);
+
   final http.Client _client;
 
   WeatherService({http.Client? client}) : _client = client ?? http.Client();
 
   Future<Map<String, dynamic>?> getWeatherData(String city) async {
     try {
-      final response = await _client.get(
-        Uri.parse('$_apiUrl?key=$_apiKey&q=$city&aqi=no'),
-        headers: {'Accept': 'application/json'},
-      );
+      final response = await _client
+          .get(
+            Uri.parse('$_apiUrl?key=$_apiKey&q=$city&aqi=no'),
+            headers: {'Accept': 'application/json'},
+          )
+          .timeout(_timeout);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        logger.d('Weather data for $city: $data');
         await _cacheWeatherData(city, data);
         return data;
       } else {
-        logger.e('WeatherAPI error: Status ${response.statusCode}, ${response.body}');
+        logger.e('WeatherAPI error: Status ${response.statusCode}');
         return await _getCachedWeatherData(city);
       }
+    } on TimeoutException {
+      logger.e('WeatherAPI: таймаут ${_timeout.inSeconds} с для $city');
+      return await _getCachedWeatherData(city);
     } catch (e) {
       logger.e('Error fetching weather data: $e');
       return await _getCachedWeatherData(city);
@@ -76,9 +86,17 @@ class WeatherService {
       return 1.0;
     }
 
-    final temp = weatherData['current']['temp_c'] as double;
-    final precip = weatherData['current']['precip_mm'] as double;
-    final wind = weatherData['current']['wind_kph'] as double;
+    final current = weatherData['current'];
+    if (current is! Map) {
+      logger.w('Некорректные данные о погоде для $city — множитель 1.0');
+      return 1.0;
+    }
+
+    // B-5 аудита: WeatherAPI отдаёт целые значения как int (20, а не 20.0),
+    // а касты `as double` роняли расчёт топлива с TypeError.
+    final temp = parseNumeric(current['temp_c'], 0);
+    final precip = parseNumeric(current['precip_mm'], 0);
+    final wind = parseNumeric(current['wind_kph'], 0);
 
     double multiplier = 1.0;
     final db = await DatabaseHelper.instance.database;
@@ -91,7 +109,7 @@ class WeatherService {
       limit: 1,
     );
     if (tempResult.isNotEmpty) {
-      multiplier *= tempResult.first['multiplier'] as double;
+      multiplier *= parseNumeric(tempResult.first['multiplier']);
       logger.d('Applied temperature multiplier: ${tempResult.first['multiplier']} for temp: $temp°C');
     }
 
@@ -105,7 +123,7 @@ class WeatherService {
         limit: 1,
       );
       if (precipResult.isNotEmpty) {
-        multiplier *= precipResult.first['multiplier'] as double;
+        multiplier *= parseNumeric(precipResult.first['multiplier']);
         logger.d('Applied precipitation multiplier: ${precipResult.first['multiplier']} for precip: $precip mm');
       }
     }
@@ -120,11 +138,20 @@ class WeatherService {
         limit: 1,
       );
       if (windResult.isNotEmpty) {
-        multiplier *= windResult.first['multiplier'] as double;
+        multiplier *= parseNumeric(windResult.first['multiplier']);
         logger.d('Applied wind multiplier: ${windResult.first['multiplier']} for wind: $wind kph');
       }
     }
 
     return multiplier;
+  }
+
+  /// Безопасное приведение значения из JSON/SQLite к double.
+  ///
+  /// Числа из ответа API и из SQLite могут быть int — прямой каст `as double`
+  /// на них падает с TypeError (см. B-5 аудита).
+  static double parseNumeric(dynamic value, [double fallback = 1.0]) {
+    if (value is num) return value.toDouble();
+    return double.tryParse(value?.toString() ?? '') ?? fallback;
   }
 }
