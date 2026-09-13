@@ -11272,5 +11272,205 @@ Toyota,Sienna AWD,Minivan,4,,2.5,AT,0,6.8,6.6,Б,Van
 Toyota,Sienna AWD,Minivan,4,,2.5,AT,0,6.8,6.6,Б,Van
 Toyota,Sienna AWD,Minivan,4,,2.5,AT,0,6.8,6.6,Б,Van
 Toyota,Sienna AWD,Minivan,4,,2.5,AT,0,6.8,6.6,Б,Van
-Andare,Andare 1000,47 мест, ш. Scania,6L,372.0,12.920,MT,5,25.8,21.9,Д
-Iveco,Daily 45C15VH 3,0TD,22 мест,4L,146.0,2.998,MT,6,13.2,11.2,Д
+Andare,Andare 1000,47 мест,,372.0,12.920,MT,5,25.8,21.9,Д,Bus
+Iveco,Daily 45C15VH 3,22 мест,,146.0,2.998,MT,6,13.2,11.2,Д,Bus
+Haval,Jolion,1.5T 2WD,,143.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Haval,Jolion,1.5T 4WD,,143.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Haval,H6,1.5T 2WD,,150.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Haval,H6,2.0T 4WD,,190.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Haval,H6 Coupe,1.5T,,150.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Haval,F7,1.5T 2WD,,150.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Haval,F7,2.0T 4WD,,190.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Haval,F7x,2.0T 4WD,,190.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Haval,Dargo,2.0T 4WD,,190.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Haval,H9,2.0T 4WD,,218.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Haval,H9,2.0D 4WD,,190.0,2.000,AT,8,7.8,5.8,Д,Passenger Car
+Haval,H5,2.0T 4WD,,150.0,2.000,MT,6,11.0,8.1,Б,Passenger Car
+Haval,M6,1.5T,,143.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Haval,H2,1.5T,,150.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Haval,H1,1.5L,,105.0,1.500,MT,5,8.9,7.0,Б,Passenger Car
+Geely,Coolray,1.5T 2WD,,150.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Geely,Coolray,1.5T 4WD,,150.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Geely,Atlas,2.4L 2WD,,148.0,2.400,AT,6,10.0,7.1,Б,Passenger Car
+Geely,Atlas,1.8T 4WD,,184.0,1.800,AT,6,9.6,6.8,Б,Passenger Car
+Geely,Atlas Pro,1.8T 4WD,,184.0,1.800,AT,7,9.6,6.8,Б,Passenger Car
+Geely,Atlas Pro,2.4L 2WD,,148.0,2.400,AT,6,10.0,7.1,Б,Passenger Car
+Geely,Tugella,2.0T 4WD,,238.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Geely,Monjaro,2.0T 4WD,,238.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Geely,Monjaro,2.0T 2WD,,200.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Geely,Cityray,1.5T 2WD,,150.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Geely,Okavango,2.0T 4WD,,200.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Geely,Preface,2.0T,,190.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Geely,Emgrand,1.5L,,103.0,1.500,MT,5,8.9,7.0,Б,Passenger Car
+Geely,Emgrand,1.8L,,133.0,1.800,CVT,0,9.6,6.8,Б,Passenger Car
+Geely,GS,1.8T,,133.0,1.800,AT,6,9.6,6.8,Б,Passenger Car
+Exeed,TXL,2.0T 4WD,,249.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Exeed,VX,2.0T 4WD,,249.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Exeed,LX,1.6T,,186.0,1.600,AT,7,8.8,6.5,Б,Passenger Car
+Exeed,RX,2.0T 4WD,,249.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Exeed,TX,2.0T,,249.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Changan,CS35 Plus,1.6L,,114.0,1.600,AT,6,8.8,6.5,Б,Passenger Car
+Changan,CS35 Plus,1.4T,,150.0,1.400,AT,7,9.4,7.5,Б,Passenger Car
+Changan,CS55 Plus,1.5T,,181.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Changan,CS75 Plus,1.5T,,181.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Changan,CS75 Plus,2.0T 4WD,,233.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Changan,UNI-T,1.5T,,181.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Changan,UNI-K,2.0T 4WD,,226.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Changan,UNI-V,1.5T,,181.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Changan,Alsvin,1.5L,,107.0,1.500,AT,5,8.9,7.0,Б,Passenger Car
+Changan,Eado,1.6L,,114.0,1.600,AT,6,8.8,6.5,Б,Passenger Car
+Changan,Lamore,1.5T,,181.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Omoda,C5,1.5T 2WD,,147.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+Omoda,C5,1.6T 4WD,,186.0,1.600,AT,7,8.8,6.5,Б,Passenger Car
+Omoda,S5,1.6T 4WD,,186.0,1.600,AT,7,8.8,6.5,Б,Passenger Car
+Omoda,S5 GT,1.6T,,186.0,1.600,AT,7,8.8,6.5,Б,Passenger Car
+Jaecoo,J7,1.6T 4WD,,186.0,1.600,AT,7,8.8,6.5,Б,Passenger Car
+Jaecoo,J7,1.6T 2WD,,147.0,1.600,AT,7,8.8,6.5,Б,Passenger Car
+Jaecoo,J6,1.6T,,186.0,1.600,AT,7,8.8,6.5,Б,Passenger Car
+Jetour,X70,1.5T,,147.0,1.500,AT,6,8.9,7.0,Б,Passenger Car
+Jetour,X70 Plus,1.5T,,147.0,1.500,AT,6,8.9,7.0,Б,Passenger Car
+Jetour,X90,1.6T,,186.0,1.600,AT,7,8.8,6.5,Б,Passenger Car
+Jetour,Dashing,1.6T,,186.0,1.600,AT,7,8.8,6.5,Б,Passenger Car
+Jetour,T2,2.0T 4WD,,245.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Tank,300,2.0T 4WD,,220.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Tank,500,3.0T 4WD,,299.0,3.000,AT,9,11.5,8.8,Б,Passenger Car
+Tank,500,2.0T 4WD,,245.0,2.000,AT,9,11.0,8.1,Б,Passenger Car
+Tank,700,3.0T 4WD,,354.0,3.000,AT,9,11.5,8.8,Б,Passenger Car
+Tank,400,2.0T 4WD,,245.0,2.000,AT,9,11.0,8.1,Б,Passenger Car
+Wey,05,2.0T 4WD,,224.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Wey,07,2.0T 4WD,,224.0,2.000,AT,9,11.0,8.1,Б,Passenger Car
+Kaiyi,E5,1.5L,,113.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+Kaiyi,X3,1.5L,,113.0,1.500,MT,5,8.9,7.0,Б,Passenger Car
+Kaiyi,X3 Pro,1.5T,,147.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+Kaiyi,X5,1.5L,,113.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+Rox,01,2.0T 4WD,,224.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Rox,05,2.0T 4WD,,224.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Rox,50,2.0T 4WD,,224.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+BAIC,X35,1.5L,,116.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+BAIC,X55,1.5T,,143.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+BAIC,U5 Plus,1.5T,,143.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+BAIC,BJ40,2.0T 4WD,,224.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+BAIC,BJ80,2.3T 4WD,,250.0,2.300,AT,6,13.1,13.1,Б,Passenger Car
+Hongqi,H5,1.5T,,169.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Hongqi,H5,2.0T,,224.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Hongqi,HS5,2.0T 4WD,,224.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Hongqi,H9,3.0T 4WD,,283.0,3.000,AT,8,11.5,8.8,Б,Passenger Car
+Hongqi,HS3,1.5T,,169.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Deepal,S07,1.5 EREV,,98.0,1.500,AT,1,8.9,7.0,Б,Passenger Car
+Deepal,S05,1.5 EREV,,98.0,1.500,AT,1,8.9,7.0,Б,Passenger Car
+Deepal,SL03,1.5 EREV,,95.0,1.500,AT,1,8.9,7.0,Б,Passenger Car
+Forthing,T5 Evo,1.5T,,177.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Forthing,T5,1.5T,,177.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Forthing,S50,1.5T,,177.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Forthing,Yacht,1.5T,,177.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+MG,ZS,1.5L,,114.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+MG,HS,1.5T,,167.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+MG,HS,2.0T 4WD,,224.0,2.000,AT,6,11.0,8.1,Б,Passenger Car
+MG,RX5,1.5T,,167.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+MG,MG5,1.5L,,114.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+MG,MG6,1.5T,,167.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Voyah,Free,1.5 EREV 4WD,,109.0,1.500,AT,1,8.9,7.0,Б,Passenger Car
+Voyah,Dreamer,1.5 EREV 4WD,,109.0,1.500,AT,1,8.9,7.0,Б,Passenger Car
+Voyah,Courage,1.5 EREV 4WD,,109.0,1.500,AT,1,8.9,7.0,Б,Passenger Car
+VGV,U75 Plus,2.0T,,224.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+VGV,U70 Pro,1.5T,,150.0,1.500,AT,6,8.9,7.0,Б,Passenger Car
+Soueast,DX7,1.5T,,150.0,1.500,AT,6,8.9,7.0,Б,Passenger Car
+Soueast,DX5,1.5T,,150.0,1.500,AT,6,8.9,7.0,Б,Passenger Car
+FAW,Besturn B50,1.6L,,103.0,1.600,MT,5,8.8,6.5,Б,Passenger Car
+FAW,Besturn X40,1.6L,,109.0,1.600,AT,6,8.8,6.5,Б,Passenger Car
+FAW,V5,1.5L,,102.0,1.500,MT,5,8.9,7.0,Б,Passenger Car
+Dongfeng,AX7,1.6T,,150.0,1.600,AT,6,8.8,6.5,Б,Passenger Car
+Dongfeng,DF6,2.0T 4WD,,218.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Dongfeng,S30,1.6L,,117.0,1.600,MT,5,8.8,6.5,Б,Passenger Car
+Dongfeng,Captain T5,2.4D,,140.0,2.400,MT,6,12.0,8.2,Д,Truck
+JAC,S3,1.5L,,113.0,1.500,MT,6,8.9,7.0,Б,Passenger Car
+JAC,S5,1.5T,,150.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+JAC,J7,1.5T,,150.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+JAC,T6,2.0D 4WD,,139.0,2.000,MT,6,12.0,8.2,Д,Truck
+JAC,Sunray,2.0D,,139.0,2.000,MT,6,12.7,9.5,Д,Van
+Zotye,T600,1.5T,,150.0,1.500,AT,6,8.9,7.0,Б,Passenger Car
+Zotye,Coupa,1.5T,,150.0,1.500,AT,6,8.9,7.0,Б,Passenger Car
+Brilliance,V5,1.5T,,143.0,1.500,AT,6,8.9,7.0,Б,Passenger Car
+Brilliance,H230,1.5L,,105.0,1.500,MT,5,8.9,7.0,Б,Passenger Car
+Brilliance,M2,1.5L,,105.0,1.500,MT,5,8.9,7.0,Б,Passenger Car
+Haima,M3,1.5L,,113.0,1.500,MT,5,8.9,7.0,Б,Passenger Car
+Haima,S5,1.5T,,150.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+Haima,7X,1.5T,,150.0,1.500,AT,6,8.9,7.0,Б,Passenger Car
+Baojun,510,1.5L,,112.0,1.500,MT,6,8.9,7.0,Б,Passenger Car
+Baojun,530,1.5T,,150.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+Roewe,RX5,1.5T,,169.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Roewe,i5,1.5L,,120.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+Maxus,G10,2.0T,,224.0,2.000,AT,6,12.7,9.5,Б,Van
+Maxus,D90,2.0T 4WD,,224.0,2.000,AT,8,11.0,8.1,Б,Passenger Car
+Seres,SF5,1.5 EREV 4WD,,112.0,1.500,AT,1,8.9,7.0,Б,Passenger Car
+SWM,X7,1.8T,,143.0,1.800,AT,6,9.6,6.8,Б,Passenger Car
+SWM,X3,1.5T,,143.0,1.500,AT,6,8.9,7.0,Б,Passenger Car
+Москвич,3,1.5T,,150.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+Москвич,3e,1.5T,,150.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+Москвич,6,1.5T,,150.0,1.500,CVT,0,8.9,7.0,Б,Passenger Car
+Belgee,X50,1.5T,,150.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Belgee,X70,1.5T,,150.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Solaris,HS,1.6L,,123.0,1.600,AT,6,8.8,6.5,Б,Passenger Car
+Solaris,HC,1.6L,,123.0,1.600,AT,6,8.8,6.5,Б,Passenger Car
+Solaris,KRS,1.6L,,123.0,1.600,CVT,0,8.8,6.5,Б,Passenger Car
+Solaris,KR,1.4L,,100.0,1.400,AT,6,9.4,7.5,Б,Passenger Car
+Amberauto,A5,1.6L,,106.0,1.600,CVT,0,8.8,6.5,Б,Passenger Car
+Tenet,T7,1.5T,,147.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Tenet,T4,1.5T,,147.0,1.500,AT,7,8.9,7.0,Б,Passenger Car
+Isuzu,D-Max,2.5D 4WD,,163.0,2.500,AT,5,12.0,8.2,Д,Truck
+Isuzu,MU-X,3.0D 4WD,,177.0,3.000,AT,6,10.3,8.0,Д,Passenger Car
+Isuzu,NPR,4.8D,,155.0,4.800,MT,6,16.0,12.1,Д,Truck
+Isuzu,NQR,5.2D,,175.0,5.200,MT,6,18.0,13.7,Д,Truck
+Isuzu,Forward,7.8D,,220.0,7.800,MT,6,24.0,18.2,Д,Truck
+Daihatsu,Terios,1.5 4WD,,105.0,1.500,MT,5,8.9,7.0,Б,Passenger Car
+Daihatsu,Sirion,1.3,,87.0,1.300,MT,5,9.1,7.9,Б,Passenger Car
+Daihatsu,Materia,1.5,,103.0,1.500,AT,4,8.9,7.0,Б,Passenger Car
+Daihatsu,Cuore,1.0,,70.0,1.000,MT,5,7.8,6.1,Б,Passenger Car
+Hummer,H2,6.0 4WD,,398.0,6.000,AT,4,18.9,11.6,Б,Passenger Car
+Hummer,H3,3.7 4WD,,245.0,3.700,AT,4,13.6,9.6,Б,Passenger Car
+Hummer,H3,5.3 4WD,,305.0,5.300,AT,4,15.6,11.3,Б,Passenger Car
+Hummer,H1,6.2 4WD,,325.0,6.200,AT,4,10.3,8.0,Д,Passenger Car
+Pontiac,Vibe,1.8,,132.0,1.800,AT,4,9.6,6.8,Б,Passenger Car
+Pontiac,Grand Prix,3.8,,200.0,3.800,AT,4,13.4,9.6,Б,Passenger Car
+Pontiac,G6,2.4,,169.0,2.400,AT,4,10.0,7.1,Б,Passenger Car
+Saturn,Vue,3.5,,248.0,3.500,AT,5,12.2,9.1,Б,Passenger Car
+Saturn,Outlook,3.6,,275.0,3.600,AT,6,13.6,9.1,Б,Passenger Car
+Saturn,Aura,3.5,,224.0,3.500,AT,4,12.2,9.1,Б,Passenger Car
+Dacia,Logan,1.4,,75.0,1.400,MT,5,9.4,7.5,Б,Passenger Car
+Dacia,Logan,1.6,,87.0,1.600,MT,5,8.8,6.5,Б,Passenger Car
+Dacia,Sandero,1.6,,87.0,1.600,MT,5,8.8,6.5,Б,Passenger Car
+Dacia,Duster,1.6 4WD,,105.0,1.600,MT,6,8.8,6.5,Б,Passenger Car
+Dacia,Duster,2.0 4WD,,135.0,2.000,AT,4,11.0,8.1,Б,Passenger Car
+Dacia,Lodgy,1.6,,105.0,1.600,MT,5,12.7,9.5,Б,Van
+Dacia,Dokker,1.5D,,90.0,1.500,MT,5,12.7,9.5,Д,Van
+Lancia,Delta,1.6,,120.0,1.600,MT,6,8.8,6.5,Б,Passenger Car
+Lancia,Ypsilon,1.2,,69.0,1.200,MT,5,7.1,5.8,Б,Passenger Car
+Lancia,Musa,1.4,,95.0,1.400,MT,6,9.4,7.5,Б,Passenger Car
+Abarth,500,1.4T,,135.0,1.400,AT,5,9.4,7.5,Б,Passenger Car
+Abarth,595,1.4T,,145.0,1.400,MT,5,9.4,7.5,Б,Passenger Car
+Abarth,Punto,1.4T,,155.0,1.400,MT,6,9.4,7.5,Б,Passenger Car
+Cupra,Leon,2.0T,,300.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Cupra,Formentor,2.0T 4WD,,310.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Cupra,Ateca,2.0T 4WD,,300.0,2.000,AT,7,11.0,8.1,Б,Passenger Car
+Trabant,601,1.0,,26.0,1.000,MT,4,7.9,6.2,Б,Passenger Car
+Wartburg,353,1.0,,45.0,1.000,MT,4,7.9,6.2,Б,Passenger Car
+ЗИЛ,130,6.0,,150.0,6.000,MT,5,31.0,23.5,Б,Truck
+ЗИЛ,431410,6.0,,150.0,6.000,MT,5,31.0,23.5,Б,Truck
+ЗИЛ,4331,6.0,,150.0,6.000,MT,5,31.0,23.5,Б,Truck
+КамАЗ,5320,10.85D,,210.0,10.850,MT,5,25.0,19.0,Д,Truck
+КамАЗ,5490,11.8D,,400.0,11.800,MT,16,24.0,18.2,Д,Truck
+КамАЗ,65115,10.85D,,260.0,10.850,MT,10,28.0,21.3,Д,Truck
+КамАЗ,4308,4.75D,,140.0,4.750,MT,5,18.0,13.7,Д,Truck
+КамАЗ,6520,11.8D,,360.0,11.800,MT,16,29.0,22.0,Д,Truck
+КрАЗ,65032,14.9D,,330.0,14.900,MT,8,39.0,29.6,Д,Truck
+МАЗ,5440,12.0D,,400.0,12.000,MT,16,24.0,18.2,Д,Truck
+КАВЗ,4238,4.75D,,140.0,4.750,MT,5,23.0,19.6,Д,Bus
+ГолАЗ,ЛиАЗ-5256,6.7D,,180.0,6.700,MT,5,35.8,30.4,Д,Bus
+DAF,XF,12.9D,,462.0,12.900,MT,16,30.0,22.8,Д,Truck
+DAF,CF,12.9D,,410.0,12.900,MT,16,28.0,21.3,Д,Truck
+DAF,LF,6.7D,,300.0,6.700,MT,6,20.0,15.2,Д,Truck
+Hino,300,4.0D,,150.0,4.000,MT,5,18.0,13.7,Д,Truck
+Hino,500,7.7D,,240.0,7.700,MT,6,25.0,19.0,Д,Truck
+Fuso,Canter,3.0D,,130.0,3.000,MT,5,16.0,12.1,Д,Truck
+Fuso,Fighter,7.5D,,240.0,7.500,MT,6,24.0,18.2,Д,Truck
+Tatra,815,12.7D 6X6,,320.0,12.700,MT,10,38.0,28.8,Д,Truck

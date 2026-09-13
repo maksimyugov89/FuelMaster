@@ -6,6 +6,16 @@ import 'package:fuelmaster/utils/models/car_data.dart';
 import 'package:sqflite/sqflite.dart';
 
 class InitialData {
+  /// Версия каталога `assets/cars.csv`.
+  ///
+  /// Менять ВМЕСТЕ с правкой самого CSV. На старте приложение сравнивает её с
+  /// отметкой в prefs и переливает каталог, если версия выросла: иначе новые
+  /// марки и модели увидит только тот, кто ставит приложение с нуля.
+  static const int presetDataVersion = 2;
+
+  /// Защита от параллельного переимпорта (сплэш + возврат в приложение).
+  static bool _reimportInProgress = false;
+
   static Future<void> addInitialCars() async {
     final db = await DatabaseHelper.instance.database;
     try {
@@ -41,7 +51,35 @@ class InitialData {
     }
   }
 
-  static Future<void> _addCarsFromCsv(String csvString, Database db) async {
+  /// Переливает каталог предустановленных авто из CSV в уже существующую базу.
+  ///
+  /// Удаляются и заново вставляются ТОЛЬКО строки `is_preset = 1`: машины и
+  /// записи пользователя (`is_preset = 0`) не затрагиваются. Всё в одной
+  /// транзакции — обрыв на середине не оставит базу без каталога.
+  ///
+  /// [csvString] нужен только тестам: без него CSV берётся из ассетов.
+  static Future<bool> reimportPresetData({String? csvString}) async {
+    if (_reimportInProgress) return false;
+    _reimportInProgress = true;
+    try {
+      final Database db = await DatabaseHelper.instance.database;
+      final String csv =
+          csvString ?? await rootBundle.loadString('assets/cars.csv');
+      await db.transaction((txn) async {
+        await txn.delete('cars', where: 'is_preset = ?', whereArgs: [1]);
+        await _addCarsFromCsv(csv, txn);
+      });
+      logger.d('Каталог авто перелит: версия $presetDataVersion');
+      return true;
+    } catch (e) {
+      logger.e('Не удалось перелить каталог авто: $e');
+      return false;
+    } finally {
+      _reimportInProgress = false;
+    }
+  }
+
+  static Future<void> _addCarsFromCsv(String csvString, DatabaseExecutor db) async {
     final List<List<dynamic>> rows =
         const CsvToListConverter(shouldParseNumbers: false).convert(csvString);
     final List<CarData> predefinedCars = [];

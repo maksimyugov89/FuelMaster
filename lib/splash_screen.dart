@@ -23,14 +23,21 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _loadInitialData() async {
     final prefs = await SharedPreferences.getInstance();
-    final hasInitialData = prefs.getBool('has_initial_data') ?? false;
-    if (!hasInitialData) {
+    // E-1/F-3: каталог авто версионирован. Установки без отметки считаем
+    // первой версией (раньше признаком был флаг has_initial_data) — так
+    // расширенная база доезжает и до тех, кто ставил приложение раньше.
+    final int installedPresetVersion = prefs.getInt('preset_data_version') ??
+        ((prefs.getBool('has_initial_data') ?? false) ? 1 : 0);
+    if (installedPresetVersion < InitialData.presetDataVersion) {
       try {
-        await InitialData.addInitialCars();
-        await prefs.setBool('has_initial_data', true);
-        logger.d('Начальные данные успешно добавлены');
+        final bool ok = await InitialData.reimportPresetData();
+        if (ok) {
+          await prefs.setInt('preset_data_version', InitialData.presetDataVersion);
+          await prefs.setBool('has_initial_data', true);
+          logger.d('Каталог авто обновлён до версии ${InitialData.presetDataVersion}');
+        }
       } catch (e) {
-        logger.e('Ошибка добавления начальных данных: $e');
+        logger.e('Ошибка обновления каталога авто: $e');
       }
     }
 
