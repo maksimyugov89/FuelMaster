@@ -49,6 +49,9 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  /// Собственная копия истории (B-8 аудита): раньше экран держал ссылку на
+  /// список провайдера и мутировал его через clear/addAll.
+  List<Map<String, dynamic>> _history = [];
   List<CarData> _cars = [];
   String? selectedModel;
   String? selectedRecord;
@@ -65,6 +68,7 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
+    _history = List<Map<String, dynamic>>.of(widget.history);
     _loadInitialData();
   }
 
@@ -111,7 +115,6 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   void dispose() {
-    AdManager.dispose();
     PremiumService.instance.removeListener(_onPremiumChanged);
     for (var controller in _tileControllers.values) {
       controller.dispose();
@@ -127,17 +130,17 @@ class _HistoryPageState extends State<HistoryPage> {
       if (user != null && _isPremium) {
         await HistoryManager.syncHistoryWithFirestore(user.uid);
         final syncedHistory = await HistoryManager.loadHistoryFromDatabase();
-        if (mounted && !_listEquality.equals(widget.history, syncedHistory)) {
+        if (mounted && !_listEquality.equals(_history, syncedHistory)) {
           setState(() {
-            widget.history.clear();
-            widget.history.addAll(syncedHistory);
+            _history.clear();
+            _history.addAll(syncedHistory);
           });
         }
       } else {
-        if (mounted && !_listEquality.equals(widget.history, loadedHistory)) {
+        if (mounted && !_listEquality.equals(_history, loadedHistory)) {
           setState(() {
-            widget.history.clear();
-            widget.history.addAll(loadedHistory);
+            _history.clear();
+            _history.addAll(loadedHistory);
           });
         }
       }
@@ -165,7 +168,7 @@ class _HistoryPageState extends State<HistoryPage> {
       try {
         await HistoryManager.deleteHistoryRecord(record['id']);
         setState(() {
-          widget.history.removeWhere((r) => r['id'] == record['id']);
+          _history.removeWhere((r) => r['id'] == record['id']);
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.record_deleted)));
       } catch (e) {
@@ -193,7 +196,7 @@ class _HistoryPageState extends State<HistoryPage> {
       try {
         final db = await DatabaseHelper.instance.database;
         await db.delete('fuel_logs');
-        setState(() => widget.history.clear());
+        setState(() => _history.clear());
         final user = FirebaseAuth.instance.currentUser;
         if (user != null && _isPremium) {
           final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).collection('history').get();
@@ -484,7 +487,7 @@ class _HistoryPageState extends State<HistoryPage> {
         alignment: Alignment.center,
         height: 270,
         padding: const EdgeInsets.all(8.0),
-        child: AdManager.buildNativeAdView(adUnitId: "R-M-16174255-2"),
+        child: AdManager.buildNativeAdView(adUnitId: AdUnitIds.nativeAd),
       ),
     );
   }
@@ -494,7 +497,7 @@ class _HistoryPageState extends State<HistoryPage> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final historyDisplayService = HistoryDisplayService(
-      history: widget.history,
+      history: _history,
       cars: _cars,
       selectedModel: selectedModel,
       startDate: _startDate,

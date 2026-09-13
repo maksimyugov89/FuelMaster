@@ -20,7 +20,6 @@ import 'registration_page.dart';
 import 'splash_screen.dart';
 import 'package:fuelmaster/utils/models/car_data.dart';
 import 'theme.dart';
-import 'package:fuelmaster/utils/ad_manager.dart';
 import 'package:fuelmaster/providers/car_provider.dart';
 import 'package:fuelmaster/utils/app_initializer.dart';
 import 'package:fuelmaster/providers/app_settings_provider.dart';
@@ -89,30 +88,31 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
-  late List<Widget> _pages;
   bool _isLoading = true;
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializePages();
-    });
-  }
+  /// Страницы собираются на каждой сборке из провайдеров (B-8 аудита).
+  ///
+  /// Раньше список строился один раз в `postFrameCallback`: после смены языка,
+  /// темы или добавления авто экраны держали старые `locale`/`cars`, а список
+  /// истории передавался по ссылке. `List.of` отдаёт копию — страница больше
+  /// не может мутировать состояние провайдера.
+  /// `listen: false` нужен для вызова вне фазы сборки (маршруты).
+  List<Widget> _buildPages({bool listen = true}) {
+    final appSettings = listen
+        ? context.watch<AppSettingsProvider>()
+        : context.read<AppSettingsProvider>();
+    final carProvider =
+        listen ? context.watch<CarProvider>() : context.read<CarProvider>();
+    final historyProvider = listen
+        ? context.watch<HistoryProvider>()
+        : context.read<HistoryProvider>();
 
-  void _initializePages() {
-    final appSettings = Provider.of<AppSettingsProvider>(context, listen: false);
-    final carProvider = Provider.of<CarProvider>(context, listen: false);
-    final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
-
-    _pages = [
-      MainMenuPage(
-        history: historyProvider.history,
-      ),
+    return [
+      MainMenuPage(history: historyProvider.history),
       HistoryPage(
-        history: historyProvider.history,
-        cars: carProvider.cars,
+        history: List<Map<String, dynamic>>.of(historyProvider.history),
+        cars: List<CarData>.of(carProvider.cars),
         locale: appSettings.locale,
         isDarkMode: appSettings.isDarkMode,
       ),
@@ -121,14 +121,8 @@ class _MyAppState extends State<MyApp> {
     ];
   }
 
-  @override
-  void dispose() {
-    final appSettings = Provider.of<AppSettingsProvider>(context, listen: false);
-    if (!appSettings.isPremium) {
-      AdManager.dispose();
-    }
-    super.dispose();
-  }
+  // Реклама живёт жизнью приложения: SDK больше не гасится в dispose экранов
+  // (иначе после ухода с истории он не оживал до перезапуска — B-8).
 
   Widget _buildBottomNavigationBar(BuildContext context) {
     final theme = Theme.of(context);
@@ -197,7 +191,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final appSettings = Provider.of<AppSettingsProvider>(context);
+    final appSettings = context.watch<AppSettingsProvider>();
 
     return MaterialApp(
       scaffoldMessengerKey: _scaffoldMessengerKey,
@@ -226,7 +220,7 @@ class _MyAppState extends State<MyApp> {
                   ? RegistrationPage(onRegistered: () => appSettings.setRegistered(true), locale: appSettings.locale)
                   : Builder(
                       builder: (context) => Scaffold(
-                        body: _pages[_selectedIndex],
+                        body: _buildPages()[_selectedIndex],
                         bottomNavigationBar: _buildBottomNavigationBar(context),
                       ),
                     ),
@@ -284,7 +278,7 @@ class _MyAppState extends State<MyApp> {
                     : !appSettings.isRegistered
                         ? RegistrationPage(onRegistered: () => appSettings.setRegistered(true), locale: appSettings.locale)
                         : Scaffold(
-                            body: _pages[0],
+                            body: _buildPages(listen: false)[0],
                             bottomNavigationBar: _buildBottomNavigationBar(context),
                           ),
           );

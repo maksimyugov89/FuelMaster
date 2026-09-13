@@ -151,11 +151,22 @@ class FuelCalculatorPageState extends State<FuelCalculatorPage> {
       final screenWidth = MediaQuery.of(context).size.width.toInt();
       AdManager.showBannerAd(
         context: context,
-        adUnitId: "R-M-16174255-1",
+        adUnitId: AdUnitIds.banner,
         width: screenWidth,
       );
       _bannerShown = true;
+      // B-9 аудита: межстраничную рекламу грузим заранее, иначе показывать нечего.
+      _preloadInterstitial();
     }
+  }
+
+  /// Предзагрузка межстраничной рекламы (B-9 аудита).
+  ///
+  /// Грузим, пока пользователь считает расход: к моменту показа объявление уже
+  /// готово, а `showInterstitialAd` вызывается только по загруженному.
+  Future<void> _preloadInterstitial() async {
+    if (_isPremium) return;
+    await AdManager.loadInterstitialAd(adUnitId: AdUnitIds.interstitial);
   }
 
   Future<void> _loadHistoryForCar() async {
@@ -684,7 +695,9 @@ if (correctionFactor != null && correctionFactor != 0.0) {
                 isMountain: isMountain,
               );
               if (!_isPremium) {
-                AdManager.showInterstitialAd();
+                await AdManager.showInterstitialAd();
+                // Следующий показ возможен только после новой загрузки.
+                await _preloadInterstitial();
               }
             },
             onSaveAndBack: () async {

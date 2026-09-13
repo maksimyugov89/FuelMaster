@@ -343,7 +343,7 @@ void _refreshCarListAndSetSelection() {
                 _buildMyCarsCard(context),
                 if (!appSettings.isPremium) ...[
                   const SizedBox(height: 24),
-                  AdManager.buildNativeAdView(adUnitId: "R-M-16174255-2"),
+                  AdManager.buildNativeAdView(adUnitId: AdUnitIds.nativeAd),
                 ],
               ],
             ),
